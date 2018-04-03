@@ -1,0 +1,94 @@
+build_failure_conditions:
+    - 'project.metric_change("scrutinizer.quality", < -0.30)'
+    - 'elements.rating(<= D).exists'               # No classes/methods with a rating of D or worse
+    - 'issues.severity(>= MAJOR).exists'           # New major or higher severity issues
+    - 'project.metric("scrutinizer.quality", < 9)' # Code Quality Rating drops below 9
+    - 'project.metric("scrutinizer.test_coverage", < 1)' # Code Coverage must alway be 100%
+    - 'patches.label("Doc Comments").exists'       # No doc comments patches allowed
+    - 'patches.label("Spacing").exists'            # No spacing patches allowed
+    - 'patches.label("Bug").exists'                # No bug patches allowed
+    - 'issues.label("coding-style").exists'        # No coding style issues allowed
+build:
+    dependencies:
+        before:
+            - composer global require hirak/prestissimo
+        override:
+            - make build
+    tests:
+        stop_on_failure: true
+        override:
+            - php-scrutinizer-run
+            -
+                command: make codestyle
+                analysis:
+                      file: 'build/reports/cs-data'
+                      format: 'php-cs-checkstyle'
+            -
+                command: make coverage
+                idle_timeout: 1200
+                coverage:
+                    file: 'build/coverage/clover.xml'
+                    format: 'php-clover'
+    cache:
+        directories:
+            - ~/.composer
+            - vendor
+
+    environment:
+        variables:
+            CI: 'true'
+            TEST_OUTPUT_STYLE: 'pretty'
+            COVERAGE_OUTPUT_STYLE: 'clover'
+            COVERAGE_CLOVER_FILE_PATH: 'build/coverage/clover.xml'
+            PHPCS_REPORT_STYLE: 'checkstyle'
+            PHPCS_REPORT_FILE: 'build/reports/cs-data'
+            COMPOSER_OPTIONS: '--optimize-autoloader'
+        php:
+            version: "7.1"
+        timezone: UTC
+        postgresql: false
+        redis: false
+filter:
+    paths:
+        - src/*
+checks:
+    php:
+        code_rating: true
+        duplication: true
+        no_debug_code: true
+        check_method_contracts:
+            verify_interface_like_constraints: true
+            verify_documented_constraints: true
+            verify_parent_constraints: true
+        simplify_boolean_return: true
+        return_doc_comments: true
+        return_doc_comment_if_not_inferrable: true
+        remove_extra_empty_lines: true
+        properties_in_camelcaps: true
+        phpunit_assertions: true
+        parameters_in_camelcaps: true
+        parameter_doc_comments: true
+        param_doc_comment_if_not_inferrable: true
+        overriding_parameter: true
+        no_trailing_whitespace: true
+        no_short_variable_names:
+            minimum: '3'
+        no_short_method_names:
+            minimum: '3'
+        no_long_variable_names:
+            maximum: '20'
+        no_goto: true
+        naming_conventions:
+            local_variable: '^[a-z][a-zA-Z0-9]*$'
+            abstract_class_name: ^Abstract|Factory$
+            utility_class_name: 'Utils?$'
+            constant_name: '^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*$'
+            property_name: '^[a-z][a-zA-Z0-9]*$'
+            method_name: '^(?:[a-z]|__)[a-zA-Z0-9]*$'
+            parameter_name: '^[a-z][a-zA-Z0-9]*$'
+            interface_name: '^[A-Z][a-zA-Z0-9]*Interface$'
+            type_name: '^[A-Z][a-zA-Z0-9]*$'
+            exception_name: '^[A-Z][a-zA-Z0-9]*Exception$'
+            isser_method_name: '^(?:is|has|should|may|supports)'
+        more_specific_types_in_doc_comments: true
+        fix_doc_comments: false

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- https://phpunit.de/manual/current/en/appendixes.configuration.html -->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.8/phpunit.xsd"
+         backupStaticAttributes="false"
+         colors="true"
+         processIsolation="false"
+
+         stopOnRisky="true"
+         processUncoveredFilesFromWhitelist="true"
+         addUncoveredFilesFromWhitelist="true"
+         checkForUnintentionallyCoveredCode="true"
+
+         stopOnError="true"
+         stopOnFailure="true"
+
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+
+         beStrictAboutOutputDuringTests="true"
+         beStrictAboutTestsThatDoNotTestAnything="true"
+         beStrictAboutChangesToGlobalState="true"
+         backupGlobals="true"
+
+         forceCoversAnnotation="true"
+
+         bootstrap="vendor/autoload.php"
+>
+    <testsuites>
+        <testsuite name="functional">
+            <directory>tests/Functional/*</directory>
+        </testsuite>
+        <testsuite name="technical">
+            <directory>tests/Technical/*</directory>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist>
+            <directory>src</directory>
+        </whitelist>
+    </filter>
+</phpunit>

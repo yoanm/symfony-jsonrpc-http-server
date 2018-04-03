@@ -1,0 +1,28 @@
+language: php
+
+php:
+  - '7.0'
+  - '7.1'
+  - '7.2'
+
+env:
+  CI: 'true'
+  TEST_OUTPUT_STYLE: 'pretty'
+  PHPCS_REPORT_STYLE: 'full'
+  COMPOSER_OPTIONS: '--optimize-autoloader'
+
+sudo: false
+
+matrix:
+  fast_finish: true
+
+install:
+  - make build
+script:
+  - make test-technical
+  - make test-functional
+
+cache:
+  directories:
+    - $HOME/.composer
+    - vendor
