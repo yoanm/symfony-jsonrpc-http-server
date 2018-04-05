@@ -63,6 +63,9 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
     private $methodResolverStubServiceId = 'infra.resolver.method';
     private $customResolverContainerParameter = self::EXTENSION_IDENTIFIER.'.custom_method_resolver';
 
+    /** @var bool */
+    private $parseConfig = false;
+
     /**
      * @param bool|false $parseConfig If true, Config component is required
      */

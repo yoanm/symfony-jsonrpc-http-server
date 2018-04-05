@@ -1,6 +1,7 @@
 <?php
 namespace Yoanm\SymfonyJsonRpcHttpServer\Infra\Symfony\DependencyInjection;
 
+use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -11,7 +12,8 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root(JsonRpcHttpServerExtension::EXTENSION_IDENTIFIER);
+        /** @var ArrayNode $rootNode */
+        $rootNode = $treeBuilder->root(JsonRpcHttpServerExtension::EXTENSION_IDENTIFIER, 'array');
 
         $rootNode
             ->addDefaultsIfNotSet()
