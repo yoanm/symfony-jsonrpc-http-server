@@ -254,10 +254,10 @@ class JsonRpcHttpServerExtension extends Extension
     }
 
     /**
-     * @param array  $tag
-     * @param string $serviceId
+     * @param array|mixed $tag
+     * @param string      $serviceId
      */
-    private function validateJsonRpcMethodTag(array $tag, string $serviceId)
+    private function validateJsonRpcMethodTag($tag, string $serviceId)
     {
         if (!is_array($tag) || !array_key_exists(self::JSONRPC_METHOD_TAG_METHOD_NAME_KEY, $tag)) {
             throw new LogicException(sprintf(
