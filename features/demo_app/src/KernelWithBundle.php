@@ -7,18 +7,23 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 use Yoanm\SymfonyJsonRpcHttpServer\Infra\Symfony\DependencyInjection\JsonRpcHttpServerExtension;
 
-class DefaultKernel extends AbstractKernel implements CompilerPassInterface
+class KernelWithBundle extends AbstractKernel implements CompilerPassInterface
 {
+    public function registerBundles()
+    {
+        $contents = require $this->getProjectDir().'/config/fullbundles.php';
+        foreach ($contents as $class => $envs) {
+            if (isset($envs['all']) || isset($envs[$this->environment])) {
+                yield new $class();
+            }
+        }
+    }
+
     /**
      * {@inheritdoc}
      */
     protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader)
     {
-        /**** Add extension **/
-        $container->registerExtension($extension = new JsonRpcHttpServerExtension());
-        $container->loadFromExtension($extension->getAlias());
-
-        /**** Continue as usual **/
         $container->setParameter('container.dumper.inline_class_loader', true);
         $confDir = $this->getProjectDir().'/config';
         $loader->load($confDir.'/config'.self::CONFIG_EXTS, 'glob');
@@ -37,23 +42,11 @@ class DefaultKernel extends AbstractKernel implements CompilerPassInterface
         ;
     }
 
-    public function registerBundles()
-    {
-        $contents = require $this->getProjectDir().'/config/bundles.php';
-        foreach ($contents as $class => $envs) {
-            if (isset($envs['all']) || isset($envs[$this->environment])) {
-                yield new $class();
-            }
-        }
-    }
-
     /**
      * {@inheritdoc}
      */
     protected function configureRoutes(RouteCollectionBuilder $routes)
     {
-        $confDir = $this->getProjectDir().'/config';
-        $routes->import($confDir.'/routes'.self::CONFIG_EXTS, '/', 'glob');
     }
 
     /**

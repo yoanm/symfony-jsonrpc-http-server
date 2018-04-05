@@ -1,36 +1,15 @@
 <?php
 namespace DemoApp;
 
-use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\Kernel as BaseHttpKernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 
-class BaseKernel extends BaseHttpKernel
+class KernelWithBundleAndCustomLoader extends AbstractKernel
 {
-    use MicroKernelTrait;
-    const CONFIG_EXTS = '.{php,xml,yaml,yml}';
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getCacheDir()
-    {
-        return $this->getProjectDir().'/var/cache/'.$this->environment;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getLogDir()
-    {
-        return $this->getProjectDir().'/var/log';
-    }
-
     public function registerBundles()
     {
-        $contents = require $this->getProjectDir().'/config/bundles.php';
+        $contents = require $this->getProjectDir().'/config/fullbundles.php';
         foreach ($contents as $class => $envs) {
             if (isset($envs['all']) || isset($envs[$this->environment])) {
                 yield new $class();
@@ -41,16 +20,12 @@ class BaseKernel extends BaseHttpKernel
     /**
      * {@inheritdoc}
      */
-    public function getProjectDir()
-    {
-        return realpath(__DIR__.'/../');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader)
     {
+        // Load custom method resolver configuration
+        $confDir = $this->getProjectDir().'/config';
+        $loader->load($confDir.'/custom_method_resolver'.self::CONFIG_EXTS, 'glob');
+
         $container->setParameter('container.dumper.inline_class_loader', true);
         $confDir = $this->getProjectDir().'/config';
         $loader->load($confDir.'/config'.self::CONFIG_EXTS, 'glob');
@@ -62,7 +37,14 @@ class BaseKernel extends BaseHttpKernel
      */
     protected function configureRoutes(RouteCollectionBuilder $routes)
     {
-        $confDir = $this->getProjectDir().'/config';
-        $routes->import($confDir.'/routes'.self::CONFIG_EXTS, '/', 'glob');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCacheDir()
+    {
+        // Use another cache to not be dependent of other kernel cache
+        return parent::getCacheDir().'/default';
     }
 }

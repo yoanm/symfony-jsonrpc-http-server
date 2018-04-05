@@ -1,4 +1,2 @@
 framework:
     secret: '%env(APP_SECRET)%'
-
-yoanm_jsonrpc_http_server: ~

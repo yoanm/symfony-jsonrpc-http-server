@@ -3,27 +3,48 @@ namespace DemoApp;
 
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Routing\RouteCollectionBuilder;
 use Yoanm\SymfonyJsonRpcHttpServer\Infra\Symfony\DependencyInjection\JsonRpcHttpServerExtension;
 
-class KernelWithCustomResolver extends BaseKernel
+class KernelWithCustomResolver extends AbstractKernel
 {
     /**
      * {@inheritdoc}
      */
     protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader)
     {
-        // Mandatory if no Bundle used
-        $container->registerExtension(new JsonRpcHttpServerExtension());
-
-        // You can either add in config.yml
-        // or load the extension manually with loadFromExtension method
-        // -> $container->loadFromExtension($extension->getAlias());
+        /**** Add extension **/
+        $container->registerExtension($extension = new JsonRpcHttpServerExtension());
+        $container->loadFromExtension($extension->getAlias());
 
         // Load custom method resolver configuration
         $confDir = $this->getProjectDir().'/config';
         $loader->load($confDir.'/custom_method_resolver'.self::CONFIG_EXTS, 'glob');
 
-        parent::configureContainer($container, $loader);
+        /**** Continue as usual **/
+        $container->setParameter('container.dumper.inline_class_loader', true);
+        $confDir = $this->getProjectDir().'/config';
+        $loader->load($confDir.'/config'.self::CONFIG_EXTS, 'glob');
+        $loader->load($confDir.'/services'.self::CONFIG_EXTS, 'glob');
+    }
+
+    public function registerBundles()
+    {
+        $contents = require $this->getProjectDir().'/config/bundles.php';
+        foreach ($contents as $class => $envs) {
+            if (isset($envs['all']) || isset($envs[$this->environment])) {
+                yield new $class();
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function configureRoutes(RouteCollectionBuilder $routes)
+    {
+        $confDir = $this->getProjectDir().'/config';
+        $routes->import($confDir.'/routes'.self::CONFIG_EXTS, '/', 'glob');
     }
 
     /**
