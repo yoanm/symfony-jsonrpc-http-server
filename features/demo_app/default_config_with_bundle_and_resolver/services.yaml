@@ -15,11 +15,9 @@ services:
   jsonrpc.method.d:
     class: DemoApp\Method\MethodD
 
-  ##### Configure your resolver and add the required tag
+  ##### Configure your resolver (do not add the tag, service will be injected thanks to bundle configuration)
   jsonrpc.custom_method_resolver:
     class: Tests\Common\Infra\Symfony\DependencyInjection\CustomMethodResolverClass
-    tags: ['yoanm.jsonrpc_http_server.method_resolver']
-
     # Inject your JSON-RPC methods (They cannot be automatically injected as resolver implementation is on your own)
     calls:
       - method: 'addMethod'
