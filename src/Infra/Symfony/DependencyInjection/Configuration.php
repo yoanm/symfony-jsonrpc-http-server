@@ -1,7 +1,6 @@
 <?php
 namespace Yoanm\SymfonyJsonRpcHttpServer\Infra\Symfony\DependencyInjection;
 
-use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -12,11 +11,10 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        /** @var ArrayNodeDefinition $rootNode */
-        $rootNode = $treeBuilder->root(JsonRpcHttpServerExtension::EXTENSION_IDENTIFIER, 'array');
+
+        $rootNode = $treeBuilder->root(JsonRpcHttpServerExtension::EXTENSION_IDENTIFIER);
 
         $rootNode
-            ->addDefaultsIfNotSet()
             ->children()
                 ->variableNode('method_resolver')
                     ->info('Your custom method resolver service')
