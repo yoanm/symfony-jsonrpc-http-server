@@ -12,12 +12,20 @@ abstract class AbstractKernel extends BaseHttpKernel
     use MicroKernelTrait;
     const CONFIG_EXTS = '.{php,xml,yaml,yml}';
 
+    /** @var string|null */
+    private $customCacheDir = null;
+
     /**
      * {@inheritdoc}
      */
     public function getCacheDir()
     {
-        return $this->getProjectDir().'/var/cache/'.$this->environment;
+        // Use a specific cache for each kernels
+        if (null === $this->customCacheDir) {
+            $this->customCacheDir = $this->getProjectDir().'/var/cache/'.$this->environment.'/'.$this->getConfigDirectory();
+        }
+
+        return $this->customCacheDir;
     }
 
     /**
@@ -35,4 +43,6 @@ abstract class AbstractKernel extends BaseHttpKernel
     {
         return realpath(__DIR__.'/../');
     }
+
+    abstract public function getConfigDirectory() : string;
 }

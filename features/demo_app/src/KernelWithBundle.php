@@ -11,7 +11,7 @@ class KernelWithBundle extends AbstractKernel implements CompilerPassInterface
 {
     public function registerBundles()
     {
-        $contents = require $this->getProjectDir().'/config/fullbundles.php';
+        $contents = require $this->getProjectDir().'/'.$this->getConfigDirectory().'/bundles.php';
         foreach ($contents as $class => $envs) {
             if (isset($envs['all']) || isset($envs[$this->environment])) {
                 yield new $class();
@@ -25,7 +25,7 @@ class KernelWithBundle extends AbstractKernel implements CompilerPassInterface
     protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader)
     {
         $container->setParameter('container.dumper.inline_class_loader', true);
-        $confDir = $this->getProjectDir().'/config';
+        $confDir = $this->getProjectDir().'/'.$this->getConfigDirectory();
         $loader->load($confDir.'/config'.self::CONFIG_EXTS, 'glob');
         $loader->load($confDir.'/services'.self::CONFIG_EXTS, 'glob');
     }
@@ -37,8 +37,8 @@ class KernelWithBundle extends AbstractKernel implements CompilerPassInterface
     {
         // You can manually inject method mapping if you want, use ServiceNameResolver::addMethodMapping method
         $container->getDefinition(JsonRpcHttpServerExtension::SERVICE_NAME_RESOLVER_SERVICE_NAME)
-            ->addMethodCall('addMethodMapping', ['getDummy', 'jsonrpc.method.c'])
-            ->addMethodCall('addMethodMapping', ['getAnotherDummy', 'jsonrpc.method.d'])
+            ->addMethodCall('addMethodMapping', ['get_dummy', 'jsonrpc.method.c'])
+            ->addMethodCall('addMethodMapping', ['get_another_dummy', 'jsonrpc.method.d'])
         ;
     }
 
@@ -47,14 +47,15 @@ class KernelWithBundle extends AbstractKernel implements CompilerPassInterface
      */
     protected function configureRoutes(RouteCollectionBuilder $routes)
     {
+        $confDir = $this->getProjectDir().'/'.$this->getConfigDirectory();
+        $routes->import($confDir.'/routes'.self::CONFIG_EXTS, '/', 'glob');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getCacheDir()
+    public function getConfigDirectory() : string
     {
-        // Use another cache to not be dependent of other kernel cache
-        return parent::getCacheDir().'/default';
+        return 'default_config_with_bundle';
     }
 }
