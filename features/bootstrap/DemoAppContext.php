@@ -3,7 +3,8 @@ namespace Tests\Functional\BehatContext;
 
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
-use DemoApp\Kernel;
+use DemoApp\BaseKernel;
+use DemoApp\DefaultKernel;
 use DemoApp\KernelWithCustomResolver;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,16 +29,16 @@ class DemoAppContext implements Context
     }
 
     /**
-     * @When I send following :httpMethod input on demoApp kernel:
+     * @When I send following :httpMethod input on :uri demoApp kernel endpoint:
      */
-    public function whenISendFollowingPayloadToDemoApp($httpMethod, PyStringNode $payload)
+    public function whenISendFollowingPayloadToDemoApp($httpMethod, $uri, PyStringNode $payload)
     {
         $this->lastResponse = null;
 
         $kernel = $this->getDemoAppKernel();
         $kernel->boot();
         $this->lastResponse = $kernel->handle(
-            Request::create('/my-json-rpc-endpoint', $httpMethod, [], [], [], [], $payload->getRaw())
+            Request::create($uri, $httpMethod, [], [], [], [], $payload->getRaw())
         );
     }
 
@@ -56,7 +57,7 @@ class DemoAppContext implements Context
     }
 
     /**
-     * @return Kernel
+     * @return BaseKernel
      */
     protected function getDemoAppKernel()
     {
@@ -64,6 +65,6 @@ class DemoAppContext implements Context
             return new KernelWithCustomResolver('prod', true);
         }
 
-        return new Kernel('prod', true);
+        return new DefaultKernel('prod', true);
     }
 }
