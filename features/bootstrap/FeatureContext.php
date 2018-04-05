@@ -222,7 +222,6 @@ class FeatureContext implements Context
             $this->containerBuilder = new ContainerBuilder();
             // Add definition of custom resolver (without tags)
             $customResolverDefinition = (new Definition(CustomMethodResolver::class))->setPrivate(false);
-            $this->containerBuilder->set('container', $this->containerBuilder);
             $this->containerBuilder->setDefinition(self::CUSTOM_METHOD_RESOLVER_SERVICE_ID, $customResolverDefinition);
         }
         return $this->containerBuilder;

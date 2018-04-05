@@ -156,7 +156,7 @@ class JsonRpcHttpServerExtension extends Extension
             (new Definition(
                 ContainerMethodResolver::class,
                 [
-                    new Reference('container')
+                    new Reference('service_container')
                 ]
             ))->addMethodCall(
                 'setServiceNameResolver',

@@ -1,5 +1,5 @@
 <?php
-namespace Tests\Functional\Infra\Endpoint\JsonRpcHttpEndpoint;
+namespace Tests\Functional\Infra\Endpoint;
 
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
