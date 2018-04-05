@@ -81,7 +81,7 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
      */
     public function getXsdValidationBasePath()
     {
-        return false;
+        return '';
     }
 
     /**

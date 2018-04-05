@@ -26,6 +26,11 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
         $this->assertEndpointIsUsable();
     }
 
+    public function testShouldReturnAnXsdValidationBasePath()
+    {
+        $this->assertNotNull((new JsonRpcHttpServerExtension())->getXsdValidationBasePath());
+    }
+
     public function testShouldExposeServiceNameResolverService()
     {
         $this->load();
