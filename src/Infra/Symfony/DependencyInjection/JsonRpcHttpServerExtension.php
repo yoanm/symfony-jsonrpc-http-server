@@ -182,7 +182,7 @@ class JsonRpcHttpServerExtension extends Extension
         // ServiceNameResolver
         $container->setDefinition(
             self::SERVICE_NAME_RESOLVER_SERVICE_NAME,
-            new Definition(ServiceNameResolver::class)
+            (new Definition(ServiceNameResolver::class))->setPrivate(false)
         );
     }
 
