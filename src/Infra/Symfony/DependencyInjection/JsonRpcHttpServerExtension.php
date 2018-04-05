@@ -21,6 +21,9 @@ use Yoanm\SymfonyJsonRpcHttpServer\Infra\Resolver\ServiceNameResolver;
 
 /**
  * Class JsonRpcHttpServerExtension
+ *
+ * /!\ In case you the default resolver (yoanm/jsonrpc-server-sdk-psr11-resolver),
+ * your JSON-RPC method services must be public in order to retrieve it later from container
  */
 class JsonRpcHttpServerExtension extends Extension
 {
@@ -232,6 +235,14 @@ class JsonRpcHttpServerExtension extends Extension
                     .'method name defined under "%s" tag attribute key',
                     $serviceId,
                     self::JSONRPC_METHOD_TAG_METHOD_NAME_KEY
+                ));
+            }
+            // Check if given service is public => must be public in order to get it from container later
+            if ($container->getDefinition($serviceId)->isPrivate()) {
+                throw new LogicException(sprintf(
+                    'Service %s is taggued as JSON-RPC method but is not public. Service must be public in order'
+                        .' to retrieve it later',
+                    $serviceId
                 ));
             }
             $defaultResolverDefinition->addMethodCall(

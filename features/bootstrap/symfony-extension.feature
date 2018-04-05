@@ -1,11 +1,12 @@
 @symfony-extension
 Feature: Symfony extension
 
+  @yo
   Scenario: An endpoint should be quickly usable
     Given I process the symfony extension
-    And there is a "my_service.method.method_name" JSON-RPC method service
-    And there is a "my_service.method.another" JSON-RPC method service
-    And there is a "my_service.method.dummy" JSON-RPC method service
+    And there is a public "my_service.method.method_name" JSON-RPC method service
+    And there is a public "my_service.method.another" JSON-RPC method service
+    And there is a public "my_service.method.dummy" JSON-RPC method service
     When I load endpoint from "yoanm.jsonrpc_http_server.endpoint" service
     And I inject my "my-method-name" to "my_service.method.method_name" JSON-RPC mapping into default method resolver instance
     # Bind service a second time
@@ -20,9 +21,9 @@ Feature: Symfony extension
 
   Scenario: An endpoint should be quickly usable also by using container injection
     Given I process the symfony extension
-    And there is a "my_service.method.method_name" JSON-RPC method service
-    And there is a "my_service.method.another" JSON-RPC method service
-    And there is a "my_service.method.dummy" JSON-RPC method service
+    And there is a public "my_service.method.method_name" JSON-RPC method service
+    And there is a public "my_service.method.another" JSON-RPC method service
+    And there is a public "my_service.method.dummy" JSON-RPC method service
     And I inject my "my-method-name" to "my_service.method.method_name" JSON-RPC mapping into default method resolver definition
     # Bind service a second time
     And I inject my "my-method-alias" to "my_service.method.method_name" JSON-RPC mapping into default method resolver definition
@@ -61,7 +62,7 @@ Feature: Symfony extension
       | doALastThing   |
       | doSomething    |
 
-  @symfony-jsonrpc-method-tag
+  @symfony-jsonrpc-method-tag @yo2
   Scenario: Define json-rpc method with tags
     Given I have a JSON-RPC method service definition with "yoanm.jsonrpc_http_server.jsonrpc_method" tag and following tag attributes:
     """

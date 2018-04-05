@@ -52,7 +52,7 @@ class FeatureContext implements Context
     }
 
     /**
-     * @Given there is a :serviceName JSON-RPC method service
+     * @Given there is a public :serviceName JSON-RPC method service
      */
     public function givenThereAJsonRpcMethodService($serviceId)
     {
@@ -173,7 +173,7 @@ class FeatureContext implements Context
      */
     private function createJsonRpcMethodDefinition()
     {
-        return new Definition(JsonRpcMethod::class);
+        return (new Definition(JsonRpcMethod::class))->setPrivate(false);
     }
 
     /**
