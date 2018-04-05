@@ -3,8 +3,10 @@ namespace Tests\Functional\BehatContext;
 
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
-use DemoApp\BaseKernel;
+use DemoApp\AbstractKernel;
 use DemoApp\DefaultKernel;
+use DemoApp\KernelWithBundle;
+use DemoApp\KernelWithBundleAndCustomResolver;
 use DemoApp\KernelWithCustomResolver;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +21,8 @@ class DemoAppContext implements Context
     private $lastResponse;
     /** @var bool */
     private $useCustomResolver = false;
+    /** @var bool */
+    private $useBundle = false;
 
     /**
      * @Given I use my DemoApp custom method resolver
@@ -26,6 +30,14 @@ class DemoAppContext implements Context
     public function givenIUseMyDemoAppCustomMethodResolve()
     {
         $this->useCustomResolver = true;
+    }
+
+    /**
+     * @Given DemoApp will use JsonRpcHttpServerBundle
+     */
+    public function givenDemoAppWillUseBundle()
+    {
+        $this->useBundle = true;
     }
 
     /**
@@ -37,9 +49,10 @@ class DemoAppContext implements Context
 
         $kernel = $this->getDemoAppKernel();
         $kernel->boot();
-        $this->lastResponse = $kernel->handle(
-            Request::create($uri, $httpMethod, [], [], [], [], $payload->getRaw())
-        );
+        $request = Request::create($uri, $httpMethod, [], [], [], [], $payload->getRaw());
+        $this->lastResponse = $kernel->handle($request);
+        $kernel->terminate($request, $this->lastResponse);
+        $kernel->shutdown();
     }
 
     /**
@@ -57,14 +70,21 @@ class DemoAppContext implements Context
     }
 
     /**
-     * @return BaseKernel
+     * @return AbstractKernel
      */
     protected function getDemoAppKernel()
     {
-        if (true === $this->useCustomResolver) {
-            return new KernelWithCustomResolver('prod', true);
+        $env = 'prod';
+        $debug = true;
+        switch (true) {
+            case true === $this->useBundle && true === $this->useCustomResolver:
+                return new KernelWithBundleAndCustomResolver($env, $debug);
+            case true === $this->useBundle && false === $this->useCustomResolver:
+                return new KernelWithBundle($env, $debug);
+            case false === $this->useBundle && true === $this->useCustomResolver:
+                return new KernelWithCustomResolver($env, $debug);
         }
 
-        return new DefaultKernel('prod', true);
+        return new DefaultKernel($env, $debug);
     }
 }

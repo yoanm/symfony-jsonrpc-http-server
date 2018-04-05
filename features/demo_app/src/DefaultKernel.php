@@ -4,23 +4,35 @@ namespace DemoApp;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Routing\RouteCollectionBuilder;
 use Yoanm\SymfonyJsonRpcHttpServer\Infra\Symfony\DependencyInjection\JsonRpcHttpServerExtension;
 
-class DefaultKernel extends BaseKernel implements CompilerPassInterface
+class DefaultKernel extends AbstractKernel implements CompilerPassInterface
 {
+    public function registerBundles()
+    {
+        $contents = require $this->getProjectDir().'/'.$this->getConfigDirectory().'/bundles.php';
+        foreach ($contents as $class => $envs) {
+            if (isset($envs['all']) || isset($envs[$this->environment])) {
+                yield new $class();
+            }
+        }
+    }
+
     /**
      * {@inheritdoc}
      */
     protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader)
     {
-        // Mandatory if no Bundle used
-        $container->registerExtension(new JsonRpcHttpServerExtension());
+        /**** Add extension **/
+        $container->registerExtension($extension = new JsonRpcHttpServerExtension());
+        $container->loadFromExtension($extension->getAlias());
 
-        // You can either add in config.yml
-        // or load the extension manually with loadFromExtension method
-        // -> $container->loadFromExtension($extension->getAlias());
-
-        parent::configureContainer($container, $loader);
+        /**** Continue as usual **/
+        $container->setParameter('container.dumper.inline_class_loader', true);
+        $confDir = $this->getProjectDir().'/'.$this->getConfigDirectory();
+        $loader->load($confDir.'/config'.self::CONFIG_EXTS, 'glob');
+        $loader->load($confDir.'/services'.self::CONFIG_EXTS, 'glob');
     }
 
     /**
@@ -30,17 +42,25 @@ class DefaultKernel extends BaseKernel implements CompilerPassInterface
     {
         // You can manually inject method mapping if you want, use ServiceNameResolver::addMethodMapping method
         $container->getDefinition(JsonRpcHttpServerExtension::SERVICE_NAME_RESOLVER_SERVICE_NAME)
-            ->addMethodCall('addMethodMapping', ['getDummy', 'jsonrpc.method.c'])
-            ->addMethodCall('addMethodMapping', ['getAnotherDummy', 'jsonrpc.method.d'])
+            ->addMethodCall('addMethodMapping', ['defaultGetDummy', 'jsonrpc.method.c'])
+            ->addMethodCall('addMethodMapping', ['defaultGetAnotherDummy', 'jsonrpc.method.d'])
         ;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getCacheDir()
+    protected function configureRoutes(RouteCollectionBuilder $routes)
     {
-        // Use another cache to not be dependent of other kernel cache
-        return parent::getCacheDir().'/default';
+        $confDir = $this->getProjectDir().'/'.$this->getConfigDirectory();
+        $routes->import($confDir.'/routes'.self::CONFIG_EXTS, '/', 'glob');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConfigDirectory() : string
+    {
+        return 'default_config';
     }
 }

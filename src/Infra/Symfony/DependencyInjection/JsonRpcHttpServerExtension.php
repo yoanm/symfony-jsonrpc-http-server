@@ -89,7 +89,7 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
      */
     public function getAlias()
     {
-        return 'yoanm_jsonrpc_http_server';
+        return 'json_rpc_http_server';
     }
 
     /**
