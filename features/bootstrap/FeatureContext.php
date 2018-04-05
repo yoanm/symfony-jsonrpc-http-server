@@ -41,6 +41,7 @@ class FeatureContext implements Context
     public function __construct()
     {
         $this->prophet = new Prophet();
+        $this->extension = new JsonRpcHttpServerExtension();
     }
 
     /**
@@ -48,7 +49,7 @@ class FeatureContext implements Context
      */
     public function givenIProcessTheSymfonyExtension()
     {
-        (new JsonRpcHttpServerExtension())->load([], $this->getContainerBuilder());
+        $this->extension->load([], $this->getContainerBuilder());
     }
 
     /**
@@ -116,6 +117,7 @@ class FeatureContext implements Context
      */
     public function whenILoadEndpointFromService($serviceId)
     {
+        $this->extension->process($this->getContainerBuilder());
         $this->getContainerBuilder()->compile();
         $this->endpoint = $this->getContainerBuilder()->get($serviceId);
     }

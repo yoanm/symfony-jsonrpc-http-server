@@ -1,13 +1,10 @@
 <?php
-namespace Tests\Common\Infra\Symfony\DependencyInjection;
+namespace DemoApp\Resolver;
 
 use Yoanm\JsonRpcServer\Domain\Model\JsonRpcMethodInterface;
 use Yoanm\JsonRpcServer\Domain\Model\MethodResolverInterface;
 
-/**
- * Class CustomMethodResolverClass
- */
-class CustomMethodResolverClass implements MethodResolverInterface
+class CustomMethodResolver implements MethodResolverInterface
 {
     /** @var JsonRpcMethodInterface[] */
     private $methodList;

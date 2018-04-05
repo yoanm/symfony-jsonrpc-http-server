@@ -3,3 +3,4 @@ default:
     default:
       contexts:
         - Tests\Functional\BehatContext\FeatureContext: ~
+        - Tests\Functional\BehatContext\DemoAppContext: ~

@@ -1,10 +1,11 @@
 <?php
 namespace Yoanm\SymfonyJsonRpcHttpServer\Infra\Symfony\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
-use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Yoanm\JsonRpcServer\App\Creator\CustomExceptionCreator;
 use Yoanm\JsonRpcServer\App\Creator\ResponseCreator;
@@ -25,7 +26,7 @@ use Yoanm\SymfonyJsonRpcHttpServer\Infra\Resolver\ServiceNameResolver;
  * /!\ In case you use the default resolver (yoanm/jsonrpc-server-sdk-psr11-resolver),
  * your JSON-RPC method services must be public in order to retrieve it later from container
  */
-class JsonRpcHttpServerExtension extends Extension
+class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInterface
 {
     // Use this service to inject string request
     const ENDPOINT_SERVICE_NAME = 'yoanm.jsonrpc_http_server.endpoint';
@@ -53,6 +54,8 @@ class JsonRpcHttpServerExtension extends Extension
 
     private $psr11InfraMethodResolverServiceId = 'psr11.infra.resolver.method';
 
+    private $methodResolverStubServiceId = 'infra.resolver.method';
+
     /**
      * {@inheritdoc}
      */
@@ -64,6 +67,42 @@ class JsonRpcHttpServerExtension extends Extension
         $this->createInfraServiceDefinitions($container);
         $this->createAppServiceDefinitions($container);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getNamespace()
+    {
+        return 'http://example.org/schema/dic/'.$this->getAlias();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getXsdValidationBasePath()
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAlias()
+    {
+        return 'yoanm_jsonrpc_http_server';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function process(ContainerBuilder $container)
+    {
+        $isContainerResolver = $this->aliasMethodResolver($container);
+        if (true === $isContainerResolver) {
+            $this->loadJsonRpcMethodsFromTag($container);
+        }
+    }
+
 
     /**
      * @param ContainerBuilder $container
@@ -97,7 +136,7 @@ class JsonRpcHttpServerExtension extends Extension
             new Definition(
                 MethodManager::class,
                 [
-                    new Reference($this->getMethodResolverServiceId($container)),
+                    new Reference($this->prependServiceName($this->methodResolverStubServiceId)),
                     new Reference($this->prependServiceName($this->sdkAppCustomExceptionCreatorServiceId))
                 ]
             )
@@ -180,22 +219,23 @@ class JsonRpcHttpServerExtension extends Extension
                 [
                     new Reference($this->prependServiceName($this->sdkInfraEndpointServiceId))
                 ]
-            ))->setPrivate(false)
+            ))->setPublic(true)
         );
         // ServiceNameResolver
         $container->setDefinition(
             self::SERVICE_NAME_RESOLVER_SERVICE_NAME,
-            (new Definition(ServiceNameResolver::class))->setPrivate(false)
+            (new Definition(ServiceNameResolver::class))->setPublic(true)
         );
     }
 
     /**
      * @param ContainerBuilder $container
      *
-     * @return string
+     * @return bool Wether it is a ContainerResolver or not
      */
-    private function getMethodResolverServiceId(ContainerBuilder $container)
+    private function aliasMethodResolver(ContainerBuilder $container)
     {
+        $isContainerResolver = false;
         $serviceIdList = array_keys($container->findTaggedServiceIds(self::METHOD_RESOLVER_TAG));
         $serviceCount = count($serviceIdList);
         if ($serviceCount > 0) {
@@ -212,10 +252,12 @@ class JsonRpcHttpServerExtension extends Extension
         } else {
             // Use ArrayMethodResolver as default resolver
             $resolverServiceId = $this->prependServiceName($this->psr11InfraMethodResolverServiceId);
-            $this->loadJsonRpcMethodsFromTag($container);
+            $isContainerResolver = true;
         }
 
-        return $resolverServiceId;
+        $container->setAlias($this->prependServiceName($this->methodResolverStubServiceId), $resolverServiceId);
+
+        return $isContainerResolver;
     }
 
     /**
@@ -227,19 +269,12 @@ class JsonRpcHttpServerExtension extends Extension
         $methodServiceList = $container->findTaggedServiceIds(self::JSONRPC_METHOD_TAG);
         $defaultResolverDefinition = $container->getDefinition(self::SERVICE_NAME_RESOLVER_SERVICE_NAME);
 
-        foreach ($methodServiceList as $serviceId => $tags) {
-            $firstTag = array_shift($tags);
-
-            $this->validateJsonRpcMethodTag($firstTag, $serviceId);
+        foreach ($methodServiceList as $serviceId => $tagAttributeList) {
             $this->checkJsonRpcMethodService($container, $serviceId);
-
-            $defaultResolverDefinition->addMethodCall(
-                'addMethodMapping',
-                [
-                    $firstTag[self::JSONRPC_METHOD_TAG_METHOD_NAME_KEY],
-                    $serviceId
-                ]
-            );
+            $methodNameList = $this->extractMethodNameList($tagAttributeList, $serviceId);
+            foreach ($methodNameList as $methodName) {
+                $defaultResolverDefinition->addMethodCall('addMethodMapping', [$methodName, $serviceId]);
+            }
         }
     }
 
@@ -254,19 +289,25 @@ class JsonRpcHttpServerExtension extends Extension
     }
 
     /**
-     * @param array|mixed $tag
-     * @param string      $serviceId
+     * @param array  $tagAttributeList
+     * @param string $serviceId
      */
-    private function validateJsonRpcMethodTag($tag, string $serviceId)
+    private function extractMethodNameList(array $tagAttributeList, string $serviceId) : array
     {
-        if (!is_array($tag) || !array_key_exists(self::JSONRPC_METHOD_TAG_METHOD_NAME_KEY, $tag)) {
-            throw new LogicException(sprintf(
-                'Service %s is taggued as JSON-RPC method but does not have'
-                . 'method name defined under "%s" tag attribute key',
-                $serviceId,
-                self::JSONRPC_METHOD_TAG_METHOD_NAME_KEY
-            ));
+        $methodNameList = [];
+        foreach ($tagAttributeList as $tagAttributeKey => $tagAttributeData) {
+            if (!array_key_exists(self::JSONRPC_METHOD_TAG_METHOD_NAME_KEY, $tagAttributeData)) {
+                throw new LogicException(sprintf(
+                    'Service "%s" is taggued as JSON-RPC method but does not have'
+                    . ' method name defined under "%s" tag attribute key',
+                    $serviceId,
+                    self::JSONRPC_METHOD_TAG_METHOD_NAME_KEY
+                ));
+            }
+            $methodNameList[] = $tagAttributeData[self::JSONRPC_METHOD_TAG_METHOD_NAME_KEY];
         }
+
+        return $methodNameList;
     }
 
     /**
@@ -278,7 +319,7 @@ class JsonRpcHttpServerExtension extends Extension
         // Check if given service is public => must be public in order to get it from container later
         if ($container->getDefinition($serviceId)->isPrivate()) {
             throw new LogicException(sprintf(
-                'Service %s is taggued as JSON-RPC method but is not public. Service must be public in order'
+                'Service "%s" is taggued as JSON-RPC method but is not public. Service must be public in order'
                 . ' to retrieve it later',
                 $serviceId
             ));
