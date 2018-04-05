@@ -19,6 +19,7 @@ class Configuration implements ConfigurationInterface
                 ->variableNode('method_resolver')
                     ->info('Your custom method resolver service')
                     ->treatNullLike(false)
+                    ->defaultFalse()
                 ->end()
             ->end()
         ;
