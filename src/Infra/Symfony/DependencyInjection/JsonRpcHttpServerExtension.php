@@ -22,7 +22,7 @@ use Yoanm\SymfonyJsonRpcHttpServer\Infra\Resolver\ServiceNameResolver;
 /**
  * Class JsonRpcHttpServerExtension
  *
- * /!\ In case you the default resolver (yoanm/jsonrpc-server-sdk-psr11-resolver),
+ * /!\ In case you use the default resolver (yoanm/jsonrpc-server-sdk-psr11-resolver),
  * your JSON-RPC method services must be public in order to retrieve it later from container
  */
 class JsonRpcHttpServerExtension extends Extension
@@ -229,22 +229,10 @@ class JsonRpcHttpServerExtension extends Extension
 
         foreach ($methodServiceList as $serviceId => $tags) {
             $firstTag = array_shift($tags);
-            if (!is_array($firstTag) || !array_key_exists(self::JSONRPC_METHOD_TAG_METHOD_NAME_KEY, $firstTag)) {
-                throw new LogicException(sprintf(
-                    'Service %s is taggued as JSON-RPC method but does not have'
-                    .'method name defined under "%s" tag attribute key',
-                    $serviceId,
-                    self::JSONRPC_METHOD_TAG_METHOD_NAME_KEY
-                ));
-            }
-            // Check if given service is public => must be public in order to get it from container later
-            if ($container->getDefinition($serviceId)->isPrivate()) {
-                throw new LogicException(sprintf(
-                    'Service %s is taggued as JSON-RPC method but is not public. Service must be public in order'
-                        .' to retrieve it later',
-                    $serviceId
-                ));
-            }
+
+            $this->validateJsonRpcMethodTag($firstTag, $serviceId);
+            $this->checkJsonRpcMethodService($container, $serviceId);
+
             $defaultResolverDefinition->addMethodCall(
                 'addMethodMapping',
                 [
@@ -263,5 +251,37 @@ class JsonRpcHttpServerExtension extends Extension
     private function prependServiceName(string $serviceName) : string
     {
         return sprintf('yoanm.jsonrpc_http_server.%s', $serviceName);
+    }
+
+    /**
+     * @param array  $tag
+     * @param string $serviceId
+     */
+    private function validateJsonRpcMethodTag(array $tag, string $serviceId)
+    {
+        if (!is_array($tag) || !array_key_exists(self::JSONRPC_METHOD_TAG_METHOD_NAME_KEY, $tag)) {
+            throw new LogicException(sprintf(
+                'Service %s is taggued as JSON-RPC method but does not have'
+                . 'method name defined under "%s" tag attribute key',
+                $serviceId,
+                self::JSONRPC_METHOD_TAG_METHOD_NAME_KEY
+            ));
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param string           $serviceId
+     */
+    private function checkJsonRpcMethodService(ContainerBuilder $container, string $serviceId)
+    {
+        // Check if given service is public => must be public in order to get it from container later
+        if ($container->getDefinition($serviceId)->isPrivate()) {
+            throw new LogicException(sprintf(
+                'Service %s is taggued as JSON-RPC method but is not public. Service must be public in order'
+                . ' to retrieve it later',
+                $serviceId
+            ));
+        }
     }
 }

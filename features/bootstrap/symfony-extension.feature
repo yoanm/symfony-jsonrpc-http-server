@@ -1,7 +1,6 @@
 @symfony-extension
 Feature: Symfony extension
 
-  @yo
   Scenario: An endpoint should be quickly usable
     Given I process the symfony extension
     And there is a public "my_service.method.method_name" JSON-RPC method service
@@ -62,7 +61,7 @@ Feature: Symfony extension
       | doALastThing   |
       | doSomething    |
 
-  @symfony-jsonrpc-method-tag @yo2
+  @symfony-jsonrpc-method-tag
   Scenario: Define json-rpc method with tags
     Given I have a JSON-RPC method service definition with "yoanm.jsonrpc_http_server.jsonrpc_method" tag and following tag attributes:
     """
