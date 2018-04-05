@@ -18,6 +18,7 @@ abstract class AbstractTestClass extends AbstractExtensionTestCase
     const EXPECTED_JSONRPC_METHOD_TAG_METHOD_NAME_KEY = 'method';
 
     const EXPECTED_METHOD_MANAGER_SERVICE_ID = 'yoanm.jsonrpc_http_server.sdk.app.manager.method';
+    const EXPECTED_METHOD_RESOLVER_STUB_SERVICE_ID = 'yoanm.jsonrpc_http_server.infra.resolver.method';
 
     /**
      * {@inheritdoc}
@@ -28,6 +29,15 @@ abstract class AbstractTestClass extends AbstractExtensionTestCase
             new JsonRpcHttpServerExtension()
         ];
     }
+
+    protected function load(array $configurationValues = [])
+    {
+        parent::load($configurationValues);
+
+        // And then compile container to have correct inject
+        $this->compile();
+    }
+
 
     protected function assertEndpointIsUsable()
     {

@@ -317,7 +317,7 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
     private function checkJsonRpcMethodService(ContainerBuilder $container, string $serviceId)
     {
         // Check if given service is public => must be public in order to get it from container later
-        if ($container->getDefinition($serviceId)->isPrivate()) {
+        if (!$container->getDefinition($serviceId)->isPublic()) {
             throw new LogicException(sprintf(
                 'Service "%s" is taggued as JSON-RPC method but is not public. Service must be public in order'
                 . ' to retrieve it later',
