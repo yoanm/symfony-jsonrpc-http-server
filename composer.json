@@ -28,8 +28,10 @@
     },
     "require": {
         "php": ">7.0",
-        "yoanm/jsonrpc-server-sdk": "^1.0",
-        "symfony/http-foundation": "^3.0 || ^4.0"
+        "yoanm/jsonrpc-server-sdk": "^1.2",
+        "symfony/http-foundation": "^3.0 || ^4.0",
+        "symfony/dependency-injection": "^3.0 || ^4.0",
+        "yoanm/jsonrpc-server-sdk-psr11-resolver": "^2.0"
     },
     "require-dev": {
         "behat/behat": "~3.0",
