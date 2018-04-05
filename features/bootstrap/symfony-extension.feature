@@ -21,12 +21,12 @@ Feature: Symfony extension
   Scenario: An endpoint should be quickly usable also by using container injection
     Given I process the symfony extension
     And there is a "my_service.method.method_name" JSON-RPC method service
+    And there is a "my_service.method.another" JSON-RPC method service
+    And there is a "my_service.method.dummy" JSON-RPC method service
     And I inject my "my-method-name" to "my_service.method.method_name" JSON-RPC mapping into default method resolver definition
     # Bind service a second time
     And I inject my "my-method-alias" to "my_service.method.method_name" JSON-RPC mapping into default method resolver definition
-    And there is a "my_service.method.another" JSON-RPC method service
     And I inject my "an-another-method" to "my_service.method.another" JSON-RPC mapping into default method resolver definition
-    And there is a "my_service.method.dummy" JSON-RPC method service
     And I inject my "getDummy" to "my_service.method.dummy" JSON-RPC mapping into default method resolver definition
     When I load endpoint from "yoanm.jsonrpc_http_server.endpoint" service
     Then endpoint should respond to following JSON-RPC methods:

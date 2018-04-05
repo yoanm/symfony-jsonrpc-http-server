@@ -13,11 +13,19 @@ class JsonRpcHttpEndpoint
     /** @var SdkJsonRpcEndpoint */
     private $sdkEndpoint;
 
+    /**
+     * @param SDKJsonRpcEndpoint $sdkEndpoint
+     */
     public function __construct(SDKJsonRpcEndpoint $sdkEndpoint)
     {
         $this->sdkEndpoint = $sdkEndpoint;
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return Response
+     */
     public function index(Request $request) : Response
     {
         if (Request::METHOD_POST !== $request->getMethod()) {

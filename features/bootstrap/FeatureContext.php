@@ -6,14 +6,12 @@ use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use PHPUnit\Framework\Assert;
 use Prophecy\Argument;
-use Prophecy\Prophecy\ObjectProphecy;
 use Prophecy\Prophet;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpFoundation\Request;
 use Tests\Functional\BehatContext\App\CustomMethodResolver;
 use Tests\Functional\BehatContext\App\JsonRpcMethod;
-use Yoanm\JsonRpcServer\Domain\Model\MethodResolverInterface;
 use Yoanm\JsonRpcServer\Infra\Endpoint\JsonRpcEndpoint;
 use Yoanm\SymfonyJsonRpcHttpServer\Infra\Endpoint\JsonRpcHttpEndpoint;
 use Yoanm\SymfonyJsonRpcHttpServer\Infra\Symfony\DependencyInjection\JsonRpcHttpServerExtension;
@@ -31,10 +29,6 @@ class FeatureContext implements Context
     private $prophet;
     /** @var ContainerBuilder */
     private $containerBuilder;
-    /** @var MethodResolverInterface|ObjectProphecy */
-    private $customMethodResolverDefinition;
-    /** @var ObjectProphecy[] */
-    private $methodList = [];
     /** @var mixed */
     private $endpoint;
     /**

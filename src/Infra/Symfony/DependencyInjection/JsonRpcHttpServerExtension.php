@@ -244,7 +244,12 @@ class JsonRpcHttpServerExtension extends Extension
         }
     }
 
-    private function prependServiceName($serviceName)
+    /**
+     * @param string $serviceName
+     *
+     * @return string
+     */
+    private function prependServiceName(string $serviceName) : string
     {
         return sprintf('yoanm.jsonrpc_http_server.%s', $serviceName);
     }
