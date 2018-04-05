@@ -42,8 +42,8 @@ class DefaultKernel extends AbstractKernel implements CompilerPassInterface
     {
         // You can manually inject method mapping if you want, use ServiceNameResolver::addMethodMapping method
         $container->getDefinition(JsonRpcHttpServerExtension::SERVICE_NAME_RESOLVER_SERVICE_NAME)
-            ->addMethodCall('addMethodMapping', ['getDummy', 'jsonrpc.method.c'])
-            ->addMethodCall('addMethodMapping', ['getAnotherDummy', 'jsonrpc.method.d'])
+            ->addMethodCall('addMethodMapping', ['defaultGetDummy', 'jsonrpc.method.c'])
+            ->addMethodCall('addMethodMapping', ['defaultGetAnotherDummy', 'jsonrpc.method.d'])
         ;
     }
 

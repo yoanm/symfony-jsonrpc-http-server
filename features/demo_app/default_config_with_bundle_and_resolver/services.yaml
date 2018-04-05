@@ -25,16 +25,16 @@ services:
       - method: 'addMethod'
         arguments:
             - '@jsonrpc.method.a'
-            - 'custom_method_A'
+            - 'customBundledMethodA'
       - method: 'addMethod'
         arguments:
             - '@jsonrpc.method.b'
-            - 'custom_method_B'
+            - 'customBundledMethodB'
       - method: 'addMethod'
         arguments:
             - '@jsonrpc.method.c'
-            - 'custom_method_C'
+            - 'customBundledMethodC'
       - method: 'addMethod'
         arguments:
             - '@jsonrpc.method.d'
-            - 'custom_method_D'
+            - 'customBundledMethodD'

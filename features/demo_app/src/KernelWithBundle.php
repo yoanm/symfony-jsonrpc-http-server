@@ -37,8 +37,8 @@ class KernelWithBundle extends AbstractKernel implements CompilerPassInterface
     {
         // You can manually inject method mapping if you want, use ServiceNameResolver::addMethodMapping method
         $container->getDefinition(JsonRpcHttpServerExtension::SERVICE_NAME_RESOLVER_SERVICE_NAME)
-            ->addMethodCall('addMethodMapping', ['get_dummy', 'jsonrpc.method.c'])
-            ->addMethodCall('addMethodMapping', ['get_another_dummy', 'jsonrpc.method.d'])
+            ->addMethodCall('addMethodMapping', ['bundledGetDummy', 'jsonrpc.method.c'])
+            ->addMethodCall('addMethodMapping', ['bundledGetAnotherDummy', 'jsonrpc.method.d'])
         ;
     }
 

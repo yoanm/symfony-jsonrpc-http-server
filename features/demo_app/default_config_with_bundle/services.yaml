@@ -5,14 +5,14 @@ services:
     class: DemoApp\Method\MethodA
     public: true
     tags:
-      - { name: 'yoanm.jsonrpc_http_server.jsonrpc_method', method: 'method_A' }
-      - { name: 'yoanm.jsonrpc_http_server.jsonrpc_method', method: 'method_A_Alias' }
+      - { name: 'yoanm.jsonrpc_http_server.jsonrpc_method', method: 'bundledMethodA' }
+      - { name: 'yoanm.jsonrpc_http_server.jsonrpc_method', method: 'bundledMethodAAlias' }
   # Configure Json-RPC method MethodB with tag also
   jsonrpc.method.b:
     class: DemoApp\Method\MethodB
     public: true
     tags:
-        - { name: 'yoanm.jsonrpc_http_server.jsonrpc_method', method: 'Method_B' }
+        - { name: 'yoanm.jsonrpc_http_server.jsonrpc_method', method: 'bundledMethodB' }
 
   # Configure Json-RPC method MethodC as simple service, it will be injected on container building
   jsonrpc.method.c:
