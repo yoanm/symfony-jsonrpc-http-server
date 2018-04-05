@@ -103,7 +103,6 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
         }
     }
 
-
     /**
      * @param ContainerBuilder $container
      */
@@ -231,7 +230,7 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
     /**
      * @param ContainerBuilder $container
      *
-     * @return bool Wether it is a ContainerResolver or not
+     * @return bool Whether it is a ContainerResolver or not
      */
     private function aliasMethodResolver(ContainerBuilder $container)
     {

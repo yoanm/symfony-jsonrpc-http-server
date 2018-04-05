@@ -19,7 +19,7 @@ use Yoanm\SymfonyJsonRpcHttpServer\Infra\Symfony\DependencyInjection\JsonRpcHttp
 /**
  * Defines application features from the specific context.
  */
-class FeatureContext implements Context
+class SymfonyExtensionContext implements Context
 {
     const CUSTOM_METHOD_RESOLVER_SERVICE_ID = 'custom-method-resolver-service';
 

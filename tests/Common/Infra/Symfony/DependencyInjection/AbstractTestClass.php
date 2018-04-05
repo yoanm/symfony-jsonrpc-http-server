@@ -34,7 +34,7 @@ abstract class AbstractTestClass extends AbstractExtensionTestCase
     {
         parent::load($configurationValues);
 
-        // And then compile container to have correct inject
+        // And then compile container to have correct injection
         $this->compile();
     }
 
