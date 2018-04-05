@@ -26,6 +26,11 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
         $this->assertEndpointIsUsable();
     }
 
+    public function testShouldReturnAnXsdValidationBasePath()
+    {
+        $this->assertNotNull((new JsonRpcHttpServerExtension())->getXsdValidationBasePath());
+    }
+
     public function testShouldExposeServiceNameResolverService()
     {
         $this->load();
@@ -41,21 +46,27 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
         $this->assertEndpointIsUsable();
     }
 
-    public function testUsePSR11MethodResolverByDefault()
+    public function testShouldAliasPSR11MethodResolverByDefault()
     {
         $this->load();
 
-        // Assert that MethodManager have the right resolver
+        // Assert that MethodManager have the stub resolver
         $this->assertContainerBuilderHasServiceDefinitionWithArgument(
             self::EXPECTED_METHOD_MANAGER_SERVICE_ID,
             0,
-            new Reference('yoanm.jsonrpc_http_server.psr11.infra.resolver.method')
+            new Reference(self::EXPECTED_METHOD_RESOLVER_STUB_SERVICE_ID)
+        );
+
+        // Assert PSR-11 resolver is an alias of the stub
+        $this->assertContainerBuilderHasAlias(
+            self::EXPECTED_METHOD_RESOLVER_STUB_SERVICE_ID,
+            'yoanm.jsonrpc_http_server.psr11.infra.resolver.method'
         );
 
         $this->assertEndpointIsUsable();
     }
 
-    public function testHandleMethodResolverInjectionByTag()
+    public function testShouldAliasMethodResolverInjectionFoundByTag()
     {
         $myCustomResolverServiceId = 'my_custom_resolver';
 
@@ -63,11 +74,17 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
 
         $this->load();
 
-        // Assert that MethodManager have the right resolver
+        // Assert that MethodManager have the stub resolver
         $this->assertContainerBuilderHasServiceDefinitionWithArgument(
             self::EXPECTED_METHOD_MANAGER_SERVICE_ID,
             0,
-            new Reference($myCustomResolverServiceId)
+            new Reference(self::EXPECTED_METHOD_RESOLVER_STUB_SERVICE_ID)
+        );
+
+        // Assert custom resolver is an alias of the stub
+        $this->assertContainerBuilderHasAlias(
+            self::EXPECTED_METHOD_RESOLVER_STUB_SERVICE_ID,
+            $myCustomResolverServiceId
         );
 
         $this->assertEndpointIsUsable();
@@ -136,7 +153,7 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
         $this->assertEndpointIsUsable();
     }
 
-    public function testShouldThrowAnExceptionIfJsonRpcMethodUsedWithTagIsNotPublic()
+    public function testShouldThrowAnExceptionIfJsonRpcMethodUsedWithTagIsDoesNotHaveTheMethodTagAttribute()
     {
         $jsonRpcMethodServiceId = uniqid();
         $jsonRpcMethodServiceId2 = uniqid();
@@ -159,8 +176,8 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
         // Check that exception is for the second method
         $this->expectExceptionMessage(
             sprintf(
-                'Service %s is taggued as JSON-RPC method but does not have'
-                . 'method name defined under "%s" tag attribute key',
+                'Service "%s" is taggued as JSON-RPC method but does not have'
+                . ' method name defined under "%s" tag attribute key',
                 $jsonRpcMethodServiceId2,
                 self::EXPECTED_JSONRPC_METHOD_TAG_METHOD_NAME_KEY
             )
@@ -169,7 +186,7 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
         $this->load();
     }
 
-    public function testShouldThrowAnExceptionIfJsonRpcMethodUsedWithTagIsDoesNotHaveTheMethodTagAttribute()
+    public function testShouldThrowAnExceptionIfJsonRpcMethodUsedWithTagIsNotPublic()
     {
         $jsonRpcMethodServiceId = uniqid();
         $jsonRpcMethodServiceId2 = uniqid();
@@ -181,14 +198,14 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
         // A second method
         $this->setDefinition(
             $jsonRpcMethodServiceId2,
-            $this->createJsonRpcMethodDefinition($methodName2)->setPrivate(true)
+            $this->createJsonRpcMethodDefinition($methodName2)->setPublic(false)
         );
 
         $this->expectException(LogicException::class);
         // Check that exception is for the second method
         $this->expectExceptionMessage(
             sprintf(
-                'Service %s is taggued as JSON-RPC method but is not public. '
+                'Service "%s" is taggued as JSON-RPC method but is not public. '
                 .'Service must be public in order to retrieve it later',
                 $jsonRpcMethodServiceId2
             )

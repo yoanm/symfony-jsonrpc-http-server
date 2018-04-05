@@ -1,9 +1,9 @@
 <?php
-namespace Tests\Functional\BehatContext\App;
+namespace DemoApp\Method;
 
 use Yoanm\JsonRpcServer\Domain\Model\JsonRpcMethodInterface;
 
-class JsonRpcMethod implements JsonRpcMethodInterface
+class MethodD implements JsonRpcMethodInterface
 {
     public function validateParams(array $paramList)
     {
@@ -11,6 +11,6 @@ class JsonRpcMethod implements JsonRpcMethodInterface
 
     public function apply(array $paramList = null)
     {
-        return 'OK';
+        return 'MethodD';
     }
 }

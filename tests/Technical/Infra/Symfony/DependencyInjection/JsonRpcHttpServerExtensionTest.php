@@ -9,7 +9,7 @@ use Tests\Common\Infra\Symfony\DependencyInjection\AbstractTestClass;
  */
 class JsonRpcHttpServerExtensionTest extends AbstractTestClass
 {
-    public function testShouldThrowAnExceptionIfMoreThanOneMethodResolveHaveTheMethodResolverTag()
+    public function testShouldThrowAnExceptionIfMoreThanOneMethodResolverHaveTheMethodResolverTag()
     {
         // A two custom resolver with tag
         $serviceId1 = uniqid();

@@ -8,7 +8,7 @@ Feature: Symfony extension
     And there is a public "my_service.method.dummy" JSON-RPC method service
     When I load endpoint from "yoanm.jsonrpc_http_server.endpoint" service
     And I inject my "my-method-name" to "my_service.method.method_name" JSON-RPC mapping into default method resolver instance
-    # Bind service a second time
+    # Bind same service a second time
     And I inject my "my-method-alias" to "my_service.method.method_name" JSON-RPC mapping into default method resolver instance
     And I inject my "an-another-method" to "my_service.method.another" JSON-RPC mapping into default method resolver instance
     And I inject my "getDummy" to "my_service.method.dummy" JSON-RPC mapping into default method resolver instance
@@ -24,7 +24,7 @@ Feature: Symfony extension
     And there is a public "my_service.method.another" JSON-RPC method service
     And there is a public "my_service.method.dummy" JSON-RPC method service
     And I inject my "my-method-name" to "my_service.method.method_name" JSON-RPC mapping into default method resolver definition
-    # Bind service a second time
+    # Bind same service a second time
     And I inject my "my-method-alias" to "my_service.method.method_name" JSON-RPC mapping into default method resolver definition
     And I inject my "an-another-method" to "my_service.method.another" JSON-RPC mapping into default method resolver definition
     And I inject my "getDummy" to "my_service.method.dummy" JSON-RPC mapping into default method resolver definition
@@ -49,7 +49,7 @@ Feature: Symfony extension
       | doSomething    |
 
   @symfony-method-resolver-tag
-  Scenario: Use a custom method resolver with json-rpc methods autoloading
+  Scenario: Use a custom method resolver with json-rpc methods container injection
     Given I tag my custom method resolver service with "yoanm.jsonrpc_http_server.method_resolver"
     And I process the symfony extension
     And I inject my "doSomething" JSON-RPC method into my custom method resolver definition

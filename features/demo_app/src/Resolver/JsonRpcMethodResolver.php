@@ -1,10 +1,10 @@
 <?php
-namespace Tests\Functional\BehatContext\App;
+namespace DemoApp\Resolver;
 
 use Yoanm\JsonRpcServer\Domain\Model\JsonRpcMethodInterface;
 use Yoanm\JsonRpcServer\Domain\Model\MethodResolverInterface;
 
-class CustomMethodResolver implements MethodResolverInterface
+class JsonRpcMethodResolver implements MethodResolverInterface
 {
     /** @var JsonRpcMethodInterface[] */
     private $methodList;

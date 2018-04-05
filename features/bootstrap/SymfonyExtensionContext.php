@@ -4,14 +4,15 @@ namespace Tests\Functional\BehatContext;
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
+use DemoApp\Method\MethodB;
+use DemoApp\Resolver\JsonRpcMethodResolver;
 use PHPUnit\Framework\Assert;
 use Prophecy\Argument;
 use Prophecy\Prophet;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpFoundation\Request;
-use Tests\Functional\BehatContext\App\CustomMethodResolver;
-use Tests\Functional\BehatContext\App\JsonRpcMethod;
+use Yoanm\JsonRpcServer\Domain\Model\JsonRpcMethodInterface;
 use Yoanm\JsonRpcServer\Infra\Endpoint\JsonRpcEndpoint;
 use Yoanm\SymfonyJsonRpcHttpServer\Infra\Endpoint\JsonRpcHttpEndpoint;
 use Yoanm\SymfonyJsonRpcHttpServer\Infra\Symfony\DependencyInjection\JsonRpcHttpServerExtension;
@@ -19,7 +20,7 @@ use Yoanm\SymfonyJsonRpcHttpServer\Infra\Symfony\DependencyInjection\JsonRpcHttp
 /**
  * Defines application features from the specific context.
  */
-class FeatureContext implements Context
+class SymfonyExtensionContext implements Context
 {
     const CUSTOM_METHOD_RESOLVER_SERVICE_ID = 'custom-method-resolver-service';
 
@@ -41,6 +42,7 @@ class FeatureContext implements Context
     public function __construct()
     {
         $this->prophet = new Prophet();
+        $this->extension = new JsonRpcHttpServerExtension();
     }
 
     /**
@@ -48,7 +50,7 @@ class FeatureContext implements Context
      */
     public function givenIProcessTheSymfonyExtension()
     {
-        (new JsonRpcHttpServerExtension())->load([], $this->getContainerBuilder());
+        $this->extension->load([], $this->getContainerBuilder());
     }
 
     /**
@@ -116,6 +118,7 @@ class FeatureContext implements Context
      */
     public function whenILoadEndpointFromService($serviceId)
     {
+        $this->extension->process($this->getContainerBuilder());
         $this->getContainerBuilder()->compile();
         $this->endpoint = $this->getContainerBuilder()->get($serviceId);
     }
@@ -152,7 +155,7 @@ class FeatureContext implements Context
                     [
                         'jsonrpc' => '2.0',
                         'id' => $requestId,
-                        'result' => 'OK'
+                        'result' => 'MethodB'
                     ]
                 ),
                 $endpoint->index($request)->getContent()
@@ -161,11 +164,11 @@ class FeatureContext implements Context
     }
 
     /**
-     * @return JsonRpcMethod
+     * @return JsonRpcMethodInterface
      */
     private function createJsonRpcMethod()
     {
-        return new JsonRpcMethod();
+        return new MethodB();
     }
 
     /**
@@ -173,7 +176,7 @@ class FeatureContext implements Context
      */
     private function createJsonRpcMethodDefinition()
     {
-        return (new Definition(JsonRpcMethod::class))->setPrivate(false);
+        return (new Definition(MethodB::class))->setPrivate(false);
     }
 
     /**
@@ -196,8 +199,8 @@ class FeatureContext implements Context
     }
 
     /**
-     * @param string                   $methodName
-     * @param JsonRpcMethod|Definition $method
+     * @param string                            $methodName
+     * @param JsonRpcMethodInterface|Definition $method
      */
     private function injectJsonRpcMethodToCustomResolverService($methodName, $method)
     {
@@ -221,7 +224,7 @@ class FeatureContext implements Context
         if (!$this->containerBuilder) {
             $this->containerBuilder = new ContainerBuilder();
             // Add definition of custom resolver (without tags)
-            $customResolverDefinition = (new Definition(CustomMethodResolver::class))->setPrivate(false);
+            $customResolverDefinition = (new Definition(JsonRpcMethodResolver::class))->setPublic(true);
             $this->containerBuilder->setDefinition(self::CUSTOM_METHOD_RESOLVER_SERVICE_ID, $customResolverDefinition);
         }
         return $this->containerBuilder;

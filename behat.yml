@@ -2,4 +2,5 @@ default:
   suites:
     default:
       contexts:
-        - Tests\Functional\BehatContext\FeatureContext: ~
+        - Tests\Functional\BehatContext\SymfonyExtensionContext: ~
+        - Tests\Functional\BehatContext\DemoAppContext: ~
