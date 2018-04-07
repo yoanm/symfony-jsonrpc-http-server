@@ -20,6 +20,19 @@ class JsonRpcHttpServerExtensionWithConfigurationParsedTest extends AbstractTest
         ];
     }
 
+    public function testShouldHaveADefaultEndpointConfigured()
+    {
+        $this->load();
+
+        // Assert custom resolver is an alias of the stub
+        $this->assertContainerBuilderHasParameter(
+            self::EXPECTED_HTTP_ENDPOINT_PATH_CONTAINER_PARAM,
+            JsonRpcHttpServerExtension::HTTP_ENDPOINT_PATH
+        );
+
+        $this->assertEndpointIsUsable();
+    }
+
     public function testShouldNormalizeExternalServiceIdStringPassedForMethodResolver()
     {
         $myCustomResolverServiceId = 'my-custom-resolver';

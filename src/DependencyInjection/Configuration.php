@@ -14,6 +14,10 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
+                ->variableNode('http_endpoint_path')
+                    ->info('Your custom http endpoint path')
+                    ->defaultValue(JsonRpcHttpServerExtension::HTTP_ENDPOINT_PATH)
+                ->end()
                 ->variableNode('method_resolver')
                     ->info('Your custom method resolver service')
                     ->treatNullLike(false)

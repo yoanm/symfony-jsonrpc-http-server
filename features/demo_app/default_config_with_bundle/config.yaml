@@ -2,6 +2,7 @@ framework:
     secret: '%env(APP_SECRET)%'
 
 json_rpc_http_server:
+    http_endpoint_path: '/my-custom-endpoint'
     methods_mapping:
         bundledMethodA:
             service: '@jsonrpc.method.a'

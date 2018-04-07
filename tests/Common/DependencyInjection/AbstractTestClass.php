@@ -21,6 +21,8 @@ abstract class AbstractTestClass extends AbstractExtensionTestCase
     const EXPECTED_METHOD_MANAGER_SERVICE_ID = 'json_rpc_http_server.sdk.app.manager.method';
     const EXPECTED_METHOD_RESOLVER_STUB_SERVICE_ID = 'json_rpc_http_server.infra.resolver.method';
 
+    const EXPECTED_HTTP_ENDPOINT_PATH_CONTAINER_PARAM = 'json_rpc_http_server.http_endpoint_path';
+
     /**
      * {@inheritdoc}
      */
