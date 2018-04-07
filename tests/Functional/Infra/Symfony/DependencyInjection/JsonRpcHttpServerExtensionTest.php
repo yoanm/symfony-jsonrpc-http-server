@@ -1,6 +1,8 @@
 <?php
 namespace Tests\Functional\Infra\Symfony\DependencyInjection;
 
+use Matthias\SymfonyDependencyInjectionTest\PhpUnit\ContainerHasParameterConstraint;
+use PHPUnit\Framework\Constraint\LogicalNot;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
