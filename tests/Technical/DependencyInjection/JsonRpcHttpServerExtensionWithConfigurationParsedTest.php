@@ -44,6 +44,8 @@ class JsonRpcHttpServerExtensionWithConfigurationParsedTest extends AbstractTest
             ]
         ]);
 
+        $this->assertJsonRpcMethodServiceIsAvailable($jsonRpcMethodServiceId);
+
         $this->assertEndpointIsUsable();
     }
 }

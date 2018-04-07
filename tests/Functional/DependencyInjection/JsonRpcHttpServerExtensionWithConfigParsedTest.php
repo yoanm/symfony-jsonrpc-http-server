@@ -101,6 +101,10 @@ class JsonRpcHttpServerExtensionWithConfigParsedTest extends AbstractTestClass
             [$methodCName, $serviceC]
         );
 
+        $this->assertJsonRpcMethodServiceIsAvailable($serviceA);
+        $this->assertJsonRpcMethodServiceIsAvailable($serviceB);
+        $this->assertJsonRpcMethodServiceIsAvailable($serviceC);
+
         $this->assertEndpointIsUsable();
     }
 
