@@ -28,6 +28,10 @@
 
          bootstrap="vendor/autoload.php"
 >
+    <listeners>
+        <listener class="Yoanm\PhpUnitExtended\Listener\YoanmTestsStrategyListener"/>
+    </listeners>
+
     <testsuites>
         <testsuite name="functional">
             <directory>tests/Functional</directory>
