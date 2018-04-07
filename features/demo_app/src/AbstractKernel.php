@@ -2,6 +2,7 @@
 namespace DemoApp;
 
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpKernel\Kernel as BaseHttpKernel;
 
 abstract class AbstractKernel extends BaseHttpKernel
@@ -39,6 +40,17 @@ abstract class AbstractKernel extends BaseHttpKernel
     public function getProjectDir()
     {
         return realpath(__DIR__.'/../');
+    }
+
+    /**
+     * Gets the container class.
+     *
+     * @return string The container class
+     */
+    protected function getContainerClass()
+    {
+        // In order to avoid collisions between kernels use a dedicated name
+        return parent::getContainerClass().Container::camelize($this->getConfigDirectory());
     }
 
     abstract public function getConfigDirectory() : string;
