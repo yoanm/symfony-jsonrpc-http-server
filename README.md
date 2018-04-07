@@ -108,16 +108,16 @@ You have many ways to inject you json-rpc methods :
    {
        ....
        /**
-       * {@inheritdoc}
-       */
-      public function process(ContainerBuilder $container)
-      {
-          $container->getDefinition(JsonRpcHttpServerExtension::SERVICE_NAME_RESOLVER_SERVICE_NAME)
-              ->addMethodCall('addMethodMapping', ['method-a', 'method-a.service-id'])
-              ->addMethodCall('addMethodMapping', ['method-b', 'method-b.service-id'])
-              ->addMethodCall('addMethodMapping', ['method-b-alias', 'method-b.service-id'])
-          ;
-      }
+        * {@inheritdoc}
+        */
+       public function process(ContainerBuilder $container)
+       {
+           $container->getDefinition(JsonRpcHttpServerExtension::SERVICE_NAME_RESOLVER_SERVICE_NAME)
+               ->addMethodCall('addMethodMapping', ['method-a', 'method-a.service-id'])
+               ->addMethodCall('addMethodMapping', ['method-b', 'method-b.service-id'])
+               ->addMethodCall('addMethodMapping', ['method-b-alias', 'method-b.service-id'])
+           ;
+       }
        ....
    }
    ```
