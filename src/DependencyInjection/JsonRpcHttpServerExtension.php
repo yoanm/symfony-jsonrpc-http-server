@@ -1,5 +1,5 @@
 <?php
-namespace Yoanm\SymfonyJsonRpcHttpServer\Symfony\DependencyInjection;
+namespace Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Processor; // <= Must stay optional !
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;

@@ -1,10 +1,10 @@
 <?php
-namespace Tests\Common\Symfony\DependencyInjection;
+namespace Tests\Common\DependencyInjection;
 
 use Matthias\SymfonyDependencyInjectionTest\PhpUnit\AbstractExtensionTestCase;
 use Symfony\Component\DependencyInjection\Definition;
 use Yoanm\JsonRpcServer\Domain\Model\MethodResolverInterface;
-use Yoanm\SymfonyJsonRpcHttpServer\Symfony\DependencyInjection\JsonRpcHttpServerExtension;
+use Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\JsonRpcHttpServerExtension;
 
 abstract class AbstractTestClass extends AbstractExtensionTestCase
 {

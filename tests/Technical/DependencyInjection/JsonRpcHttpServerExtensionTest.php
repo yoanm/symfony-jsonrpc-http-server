@@ -1,11 +1,11 @@
 <?php
-namespace Tests\Technical\Symfony\DependencyInjection;
+namespace Tests\Technical\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Exception\LogicException;
-use Tests\Common\Symfony\DependencyInjection\AbstractTestClass;
+use Tests\Common\DependencyInjection\AbstractTestClass;
 
 /**
- * @covers \Yoanm\SymfonyJsonRpcHttpServer\Symfony\DependencyInjection\JsonRpcHttpServerExtension
+ * @covers \Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\JsonRpcHttpServerExtension
  */
 class JsonRpcHttpServerExtensionTest extends AbstractTestClass
 {
