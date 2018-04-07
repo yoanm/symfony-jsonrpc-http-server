@@ -2,12 +2,10 @@
 namespace DemoApp;
 
 use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Routing\RouteCollectionBuilder;
-use Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\JsonRpcHttpServerExtension;
 
-class KernelWithBundle extends AbstractKernel implements CompilerPassInterface
+class KernelWithBundle extends AbstractKernel
 {
     public function registerBundles()
     {
@@ -28,18 +26,6 @@ class KernelWithBundle extends AbstractKernel implements CompilerPassInterface
         $confDir = $this->getProjectDir().'/'.$this->getConfigDirectory();
         $loader->load($confDir.'/config'.self::CONFIG_EXTS, 'glob');
         $loader->load($confDir.'/services'.self::CONFIG_EXTS, 'glob');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function process(ContainerBuilder $container)
-    {
-        // You can manually inject method mapping if you want, use ServiceNameResolver::addMethodMapping method
-        $container->getDefinition(JsonRpcHttpServerExtension::SERVICE_NAME_RESOLVER_SERVICE_NAME)
-            ->addMethodCall('addMethodMapping', ['bundledGetDummy', 'jsonrpc.method.c'])
-            ->addMethodCall('addMethodMapping', ['bundledGetAnotherDummy', 'jsonrpc.method.d'])
-        ;
     }
 
     /**

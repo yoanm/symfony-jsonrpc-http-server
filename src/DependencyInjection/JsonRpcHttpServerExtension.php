@@ -49,6 +49,7 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
 
     /** Private constants */
     const CUSTOM_METHOD_RESOLVER_CONTAINER_PARAM = self::EXTENSION_IDENTIFIER.'.custom_method_resolver';
+    const METHODS_MAPPING_CONTAINER_PARAM = self::EXTENSION_IDENTIFIER.'.methods_mapping';
 
     /** @var bool */
     private $parseConfig = false;
@@ -106,7 +107,7 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
     {
         $isContainerResolver = $this->aliasMethodResolver($container);
         if (true === $isContainerResolver) {
-            $this->loadJsonRpcMethodsFromTag($container);
+            $this->loadJsonRpcMethods($container);
         }
     }
 
@@ -273,17 +274,26 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
     /**
      * @param ContainerBuilder $container
      */
-    private function loadJsonRpcMethodsFromTag(ContainerBuilder $container)
+    private function loadJsonRpcMethods(ContainerBuilder $container)
     {
         // Check if methods have been defined by tags
         $methodServiceList = $container->findTaggedServiceIds(self::JSONRPC_METHOD_TAG);
-        $defaultResolverDefinition = $container->getDefinition(self::SERVICE_NAME_RESOLVER_SERVICE_NAME);
 
         foreach ($methodServiceList as $serviceId => $tagAttributeList) {
             $this->checkJsonRpcMethodService($container, $serviceId);
             $methodNameList = $this->extractMethodNameList($tagAttributeList, $serviceId);
             foreach ($methodNameList as $methodName) {
-                $defaultResolverDefinition->addMethodCall('addMethodMapping', [$methodName, $serviceId]);
+                $this->injectMethodMappingToServiceNameResolver($methodName, $serviceId, $container);
+            }
+        }
+
+        if ($container->hasParameter(self::METHODS_MAPPING_CONTAINER_PARAM)) {
+            foreach($container->getParameter(self::METHODS_MAPPING_CONTAINER_PARAM) as $methodName => $mappingConfig) {
+                $serviceId = $mappingConfig['service'];
+                $this->injectMethodMappingToServiceNameResolver($methodName, $serviceId, $container);
+                foreach($mappingConfig['aliases'] as $methodAlias) {
+                    $this->injectMethodMappingToServiceNameResolver($methodAlias, $serviceId, $container);
+                }
             }
         }
     }
@@ -339,6 +349,23 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
             if (array_key_exists('method_resolver', $config) && $config['method_resolver']) {
                 $container->setParameter(self::CUSTOM_METHOD_RESOLVER_CONTAINER_PARAM, $config['method_resolver']);
             }
+            if (array_key_exists('methods_mapping', $config) && is_array($config['methods_mapping'])) {
+                $container->setParameter(self::METHODS_MAPPING_CONTAINER_PARAM, $config['methods_mapping']);
+            }
         }
+    }
+
+    /**
+     * @param string           $methodName
+     * @param string           $serviceId
+     * @param ContainerBuilder $container
+     */
+    private function injectMethodMappingToServiceNameResolver(
+        string $methodName,
+        string $serviceId,
+        ContainerBuilder $container
+    ) {
+        $container->getDefinition(self::SERVICE_NAME_RESOLVER_SERVICE_NAME)
+            ->addMethodCall('addMethodMapping', [$methodName, $serviceId]);
     }
 }
