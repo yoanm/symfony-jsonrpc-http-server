@@ -1,15 +1,15 @@
 <?php
-namespace Tests\Functional\Infra\Symfony\DependencyInjection;
+namespace Tests\Functional\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
-use Tests\Common\Infra\Symfony\DependencyInjection\AbstractTestClass;
-use Yoanm\SymfonyJsonRpcHttpServer\Infra\Endpoint\JsonRpcHttpEndpoint;
-use Yoanm\SymfonyJsonRpcHttpServer\Infra\Resolver\ServiceNameResolver;
-use Yoanm\SymfonyJsonRpcHttpServer\Infra\Symfony\DependencyInjection\JsonRpcHttpServerExtension;
+use Tests\Common\DependencyInjection\AbstractTestClass;
+use Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\JsonRpcHttpServerExtension;
+use Yoanm\SymfonyJsonRpcHttpServer\Endpoint\JsonRpcHttpEndpoint;
+use Yoanm\SymfonyJsonRpcHttpServer\Resolver\ServiceNameResolver;
 
 /**
- * @covers \Yoanm\SymfonyJsonRpcHttpServer\Infra\Symfony\DependencyInjection\JsonRpcHttpServerExtension
+ * @covers \Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\JsonRpcHttpServerExtension
  */
 class JsonRpcHttpServerExtensionTest extends AbstractTestClass
 {

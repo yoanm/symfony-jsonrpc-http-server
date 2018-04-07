@@ -14,8 +14,8 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpFoundation\Request;
 use Yoanm\JsonRpcServer\Domain\Model\JsonRpcMethodInterface;
 use Yoanm\JsonRpcServer\Infra\Endpoint\JsonRpcEndpoint;
-use Yoanm\SymfonyJsonRpcHttpServer\Infra\Endpoint\JsonRpcHttpEndpoint;
-use Yoanm\SymfonyJsonRpcHttpServer\Infra\Symfony\DependencyInjection\JsonRpcHttpServerExtension;
+use Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\JsonRpcHttpServerExtension;
+use Yoanm\SymfonyJsonRpcHttpServer\Endpoint\JsonRpcHttpEndpoint;
 
 /**
  * Defines application features from the specific context.

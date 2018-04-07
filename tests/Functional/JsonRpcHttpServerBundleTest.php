@@ -1,11 +1,11 @@
 <?php
-namespace Tests\Functional\Infra\Symfony\DependencyInjection;
+namespace Tests\Functional\DependencyInjection;
 
-use Tests\Common\Infra\Symfony\DependencyInjection\AbstractTestClass;
-use Yoanm\SymfonyJsonRpcHttpServer\Infra\Symfony\JsonRpcHttpServerBundle;
+use Tests\Common\DependencyInjection\AbstractTestClass;
+use Yoanm\SymfonyJsonRpcHttpServer\JsonRpcHttpServerBundle;
 
 /**
- * @covers \Yoanm\SymfonyJsonRpcHttpServer\Infra\Symfony\JsonRpcHttpServerBundle
+ * @covers \Yoanm\SymfonyJsonRpcHttpServer\JsonRpcHttpServerBundle
  */
 class JsonRpcHttpServerBundleTest extends AbstractTestClass
 {

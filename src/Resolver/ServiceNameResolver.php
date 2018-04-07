@@ -1,5 +1,5 @@
 <?php
-namespace Yoanm\SymfonyJsonRpcHttpServer\Infra\Resolver;
+namespace Yoanm\SymfonyJsonRpcHttpServer\Resolver;
 
 use Yoanm\JsonRpcServerPsr11Resolver\Domain\Model\ServiceNameResolverInterface;
 

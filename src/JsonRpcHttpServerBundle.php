@@ -1,8 +1,8 @@
 <?php
-namespace Yoanm\SymfonyJsonRpcHttpServer\Infra\Symfony;
+namespace Yoanm\SymfonyJsonRpcHttpServer;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Yoanm\SymfonyJsonRpcHttpServer\Infra\Symfony\DependencyInjection\JsonRpcHttpServerExtension;
+use Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\JsonRpcHttpServerExtension;
 
 /**
  * Class JsonRpcHttpServerBundle
