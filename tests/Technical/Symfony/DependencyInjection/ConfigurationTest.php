@@ -1,12 +1,12 @@
 <?php
-namespace Tests\Technical\Infra\Symfony\DependencyInjection;
+namespace Tests\Technical\Symfony\DependencyInjection;
 
 use Matthias\SymfonyConfigTest\PhpUnit\ConfigurationTestCaseTrait;
 use PHPUnit\Framework\TestCase;
-use Yoanm\SymfonyJsonRpcHttpServer\Infra\Symfony\DependencyInjection\Configuration;
+use Yoanm\SymfonyJsonRpcHttpServer\Symfony\DependencyInjection\Configuration;
 
 /**
- * @covers \Yoanm\SymfonyJsonRpcHttpServer\Infra\Symfony\DependencyInjection\Configuration
+ * @covers \Yoanm\SymfonyJsonRpcHttpServer\Symfony\DependencyInjection\Configuration
  */
 class ConfigurationTest extends TestCase
 {

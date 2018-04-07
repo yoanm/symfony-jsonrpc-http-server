@@ -1,11 +1,11 @@
 <?php
-namespace Tests\Functional\Infra\Endpoint;
+namespace Tests\Functional\Endpoint;
 
 use PHPUnit\Framework\TestCase;
-use Yoanm\SymfonyJsonRpcHttpServer\Infra\Resolver\ServiceNameResolver;
+use Yoanm\SymfonyJsonRpcHttpServer\Resolver\ServiceNameResolver;
 
 /**
- * @covers \Yoanm\SymfonyJsonRpcHttpServer\Infra\Resolver\ServiceNameResolver
+ * @covers \Yoanm\SymfonyJsonRpcHttpServer\Resolver\ServiceNameResolver
  */
 class ServiceNameResolverTest extends TestCase
 {

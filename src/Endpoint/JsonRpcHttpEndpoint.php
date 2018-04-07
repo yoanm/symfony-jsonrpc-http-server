@@ -1,5 +1,5 @@
 <?php
-namespace Yoanm\SymfonyJsonRpcHttpServer\Infra\Endpoint;
+namespace Yoanm\SymfonyJsonRpcHttpServer\Endpoint;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

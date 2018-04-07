@@ -1,5 +1,5 @@
 <?php
-namespace Yoanm\SymfonyJsonRpcHttpServer\Infra\Symfony\DependencyInjection;
+namespace Yoanm\SymfonyJsonRpcHttpServer\Symfony\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
