@@ -4,15 +4,24 @@ services:
   jsonrpc.method.a:
     class: DemoApp\Method\MethodA
     public: true
-  # Configure Json-RPC method MethodB as simple service, it will be injected by configuration mapping
+    tags:
+      - { name: 'json_rpc_http_server.jsonrpc_method', method: 'bundledMethodA' }
+      - { name: 'json_rpc_http_server.jsonrpc_method', method: 'bundledMethodAAlias' }
+  # Configure Json-RPC method MethodB with tag also
   jsonrpc.method.b:
     class: DemoApp\Method\MethodB
     public: true
-  # Configure Json-RPC method MethodC as simple service, it will be injected by configuration mapping
+    tags:
+        - { name: 'json_rpc_http_server.jsonrpc_method', method: 'bundledMethodB' }
+  # Configure Json-RPC method MethodC with tag also
   jsonrpc.method.c:
     class: DemoApp\Method\MethodC
     public: true
-  # Configure Json-RPC method MethodD as simple service, it will be injected by configuration mapping
+    tags:
+        - { name: 'json_rpc_http_server.jsonrpc_method', method: 'bundledGetDummy' }
+  # Configure Json-RPC method MethodD with tag also
   jsonrpc.method.d:
     class: DemoApp\Method\MethodD
     public: true
+    tags:
+        - { name: 'json_rpc_http_server.jsonrpc_method', method: 'bundledGetAnotherDummy' }

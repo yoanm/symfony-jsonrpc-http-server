@@ -1,0 +1,18 @@
+# Configure JSON-RPC method services. /!\ Do not forget to define public visibility /!\
+services:
+  # Configure Json-RPC method MethodA as simple service, it will be injected by configuration mapping
+  jsonrpc.method.a:
+    class: DemoApp\Method\MethodA
+    public: true
+  # Configure Json-RPC method MethodB as simple service, it will be injected by configuration mapping
+  jsonrpc.method.b:
+    class: DemoApp\Method\MethodB
+    public: true
+  # Configure Json-RPC method MethodC as simple service, it will be injected by configuration mapping
+  jsonrpc.method.c:
+    class: DemoApp\Method\MethodC
+    public: true
+  # Configure Json-RPC method MethodD as simple service, it will be injected by configuration mapping
+  jsonrpc.method.d:
+    class: DemoApp\Method\MethodD
+    public: true

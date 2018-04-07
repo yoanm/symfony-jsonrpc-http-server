@@ -7,6 +7,7 @@ use DemoApp\AbstractKernel;
 use DemoApp\DefaultKernel;
 use DemoApp\KernelWithBundle;
 use DemoApp\KernelWithBundleAndCustomResolver;
+use DemoApp\KernelWithBundleAndMethodsMapping;
 use DemoApp\KernelWithCustomResolver;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,6 +24,8 @@ class DemoAppContext implements Context
     private $useCustomResolver = false;
     /** @var bool */
     private $useBundle = false;
+    /** @var bool */
+    private $useBundleMethodsMappingFromConfiguration = false;
 
     /**
      * @Given I use my DemoApp custom method resolver
@@ -38,6 +41,15 @@ class DemoAppContext implements Context
     public function givenDemoAppWillUseBundle()
     {
         $this->useBundle = true;
+    }
+
+    /**
+     * @Given DemoApp will use JsonRpcHttpServerBundle with methods mapping configuration
+     */
+    public function givenDemoAppWillUseBundleWithMethodsMappingConfiguration()
+    {
+        $this->givenDemoAppWillUseBundle();
+        $this->useBundleMethodsMappingFromConfiguration = true;
     }
 
     /**
@@ -77,6 +89,8 @@ class DemoAppContext implements Context
         $env = 'prod';
         $debug = true;
         switch (true) {
+            case true === $this->useBundleMethodsMappingFromConfiguration:
+                return new KernelWithBundleAndMethodsMapping($env, $debug);
             case true === $this->useBundle && true === $this->useCustomResolver:
                 return new KernelWithBundleAndCustomResolver($env, $debug);
             case true === $this->useBundle && false === $this->useCustomResolver:
