@@ -1,7 +1,7 @@
 <?php
 namespace Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection;
 
-use Symfony\Component\Config\Definition\Processor; // <= Must stay optional !
+use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -19,7 +19,7 @@ use Yoanm\JsonRpcServer\Infra\Serialization\RawRequestSerializer;
 use Yoanm\JsonRpcServer\Infra\Serialization\RawResponseSerializer;
 use Yoanm\JsonRpcServerPsr11Resolver\Infra\Resolver\ContainerMethodResolver;
 use Yoanm\SymfonyJsonRpcHttpServer\Endpoint\JsonRpcHttpEndpoint;
-use Yoanm\SymfonyJsonRpcHttpServer\Resolver\ServiceNameResolver;
+use Yoanm\SymfonyJsonRpcHttpServer\Resolver\ServiceNameResolver; // <= Must stay optional !
 
 /**
  * Class JsonRpcHttpServerExtension

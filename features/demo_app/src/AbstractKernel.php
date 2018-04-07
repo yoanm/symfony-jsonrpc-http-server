@@ -2,10 +2,7 @@
 namespace DemoApp;
 
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
-use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseHttpKernel;
-use Symfony\Component\Routing\RouteCollectionBuilder;
 
 abstract class AbstractKernel extends BaseHttpKernel
 {
