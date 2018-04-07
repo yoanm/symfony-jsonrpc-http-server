@@ -48,6 +48,14 @@ abstract class AbstractTestClass extends AbstractExtensionTestCase
     }
 
     /**
+     * @param $jsonRpcMethodServiceId
+     */
+    protected function assertJsonRpcMethodServiceIsAvailable($jsonRpcMethodServiceId)
+    {
+        $this->assertNotNull($this->container->get($jsonRpcMethodServiceId));
+    }
+
+    /**
      * @return Definition
      */
     protected function createJsonRpcMethodDefinition()

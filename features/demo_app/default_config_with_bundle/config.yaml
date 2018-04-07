@@ -4,8 +4,8 @@ framework:
 json_rpc_http_server:
     methods_mapping:
         bundledMethodA:
-            service: 'jsonrpc.method.a'
+            service: '@jsonrpc.method.a'
             aliases: 'bundledMethodAAlias'
-        bundledMethodB: 'jsonrpc.method.b'
-        bundledGetDummy: 'jsonrpc.method.c'
-        bundledGetAnotherDummy: 'jsonrpc.method.d'
+        bundledMethodB: '@jsonrpc.method.b'
+        bundledGetDummy: '@jsonrpc.method.c'
+        bundledGetAnotherDummy: '@jsonrpc.method.d'
