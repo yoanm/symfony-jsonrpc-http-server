@@ -347,6 +347,7 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
      */
     private function compileAndProcessConfigurations(array $configs, ContainerBuilder $container)
     {
+        $httpEndpointPath = self::HTTP_ENDPOINT_PATH;
         if (true === $this->parseConfig) {
             $configuration = new Configuration();
             $config = (new Processor())->processConfiguration($configuration, $configs);
@@ -360,9 +361,12 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
             if (array_key_exists('methods_mapping', $config) && is_array($config['methods_mapping'])) {
                 $container->setParameter(self::METHODS_MAPPING_CONTAINER_PARAM, $config['methods_mapping']);
             }
+            if (array_key_exists('http_endpoint_path', $config)) {
+                $httpEndpointPath = $config['http_endpoint_path'];
+            }
         }
 
-        $container->setParameter(self::HTTP_ENDPOINT_PATH_CONTAINER_PARAM, self::HTTP_ENDPOINT_PATH);
+        $container->setParameter(self::HTTP_ENDPOINT_PATH_CONTAINER_PARAM, $httpEndpointPath);
     }
 
     /**
