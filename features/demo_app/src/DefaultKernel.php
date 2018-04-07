@@ -24,7 +24,7 @@ class DefaultKernel extends AbstractKernel implements CompilerPassInterface
      */
     protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader)
     {
-        /**** Add extension **/
+        /**** Add and load extension **/
         $container->registerExtension($extension = new JsonRpcHttpServerExtension());
         $container->loadFromExtension($extension->getAlias());
 

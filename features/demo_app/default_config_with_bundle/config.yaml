@@ -1,4 +1,11 @@
 framework:
     secret: '%env(APP_SECRET)%'
 
-json_rpc_http_server: ~
+json_rpc_http_server:
+    methods_mapping:
+        bundledMethodA:
+            service: 'jsonrpc.method.a'
+            aliases: 'bundledMethodAAlias'
+        bundledMethodB: 'jsonrpc.method.b'
+        bundledGetDummy: 'jsonrpc.method.c'
+        bundledGetAnotherDummy: 'jsonrpc.method.d'

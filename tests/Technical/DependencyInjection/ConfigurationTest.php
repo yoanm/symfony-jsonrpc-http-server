@@ -19,7 +19,7 @@ class ConfigurationTest extends TestCase
 
     public function testShouldHaveFalseAsCustomMethodResolverByDefault()
     {
-        $this->assertProcessedConfigurationEquals([[]], ['method_resolver'=> false]);
+        $this->assertProcessedConfigurationEquals([[]], ['method_resolver'=> false], 'method_resolver');
     }
 
     public function testShouldReturnCustomMethodResolverServiceIfDefined()
@@ -34,7 +34,92 @@ class ConfigurationTest extends TestCase
             ],
             [
                 'method_resolver'=> $expectedCustomMethodResolverService
-            ]
+            ],
+            'method_resolver'
+        );
+    }
+
+    public function testShouldManageSimpleMethodMapping()
+    {
+        $expectedMethodName = 'my-method-name';
+        $expectedService = 'my-service-id';
+
+        $this->assertProcessedConfigurationEquals(
+            [
+                [
+                    'methods_mapping' => [
+                        $expectedMethodName => $expectedService
+                    ]
+                ]
+            ],
+            [
+                'methods_mapping'=> [
+                    $expectedMethodName => [
+                        'service' => $expectedService,
+                        'aliases' => []
+                    ]
+                ]
+            ],
+            'methods_mapping'
+        );
+    }
+
+    public function testShouldManageFullyConfiguredMapping()
+    {
+        $expectedMethodName = 'my-method-name';
+        $expectedAlias1 = 'my-method-name-alias-1';
+        $expectedAlias2 = 'my-method-name-alias-2';
+        $expectedService = 'my-service-id';
+
+        $this->assertProcessedConfigurationEquals(
+            [
+                [
+                    'methods_mapping' => [
+                        $expectedMethodName => [
+                            'service' => $expectedService,
+                            'aliases' => [$expectedAlias1, $expectedAlias2]
+                        ]
+                    ]
+                ]
+            ],
+            [
+                'methods_mapping'=> [
+                    $expectedMethodName => [
+                        'service' => $expectedService,
+                        'aliases' => [$expectedAlias1, $expectedAlias2]
+                    ]
+                ]
+            ],
+            'methods_mapping'
+        );
+    }
+
+    public function testShouldManageASimpleAliasDefinition()
+    {
+        $expectedMethodName = 'my-method-name';
+        $expectedAlias = 'my-method-name-alias';
+        $expectedService = 'my-service-id';
+
+        $this->assertProcessedConfigurationEquals(
+            [
+                [
+                    'methods_mapping' => [
+                        $expectedMethodName => [
+                            'service' => $expectedService,
+                            'aliases' => $expectedAlias,
+                        ]
+                    ]
+                ]
+            ],
+            [
+                'methods_mapping'=> [
+                    $expectedMethodName => [
+                        'service' => $expectedService,
+                        'aliases' => [$expectedAlias]
+                    ]
+                ]
+            ],
+            'methods_mapping'
         );
     }
 }

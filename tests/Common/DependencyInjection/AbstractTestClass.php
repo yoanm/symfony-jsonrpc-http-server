@@ -48,20 +48,24 @@ abstract class AbstractTestClass extends AbstractExtensionTestCase
     }
 
     /**
-     * @param $methodName
      * @return Definition
      */
-    protected function createJsonRpcMethodDefinition($methodName)
+    protected function createJsonRpcMethodDefinition()
     {
-        $jsonRpcMethodServiceDefinition = new Definition(\stdClass::class);
-        $jsonRpcMethodServiceDefinition
-            ->setPrivate(false)
-            ->addTag(
-                self::EXPECTED_JSONRPC_METHOD_TAG,
-                [self::EXPECTED_JSONRPC_METHOD_TAG_METHOD_NAME_KEY => $methodName]
-            );
+        return (new Definition(\stdClass::class))
+            ->setPrivate(false);
+    }
 
-        return $jsonRpcMethodServiceDefinition;
+    /**
+     * @param Definition $definition
+     * @param string     $methodName
+     */
+    protected function addJsonRpcMethodTag(Definition $definition, $methodName)
+    {
+        $definition->addTag(
+            self::EXPECTED_JSONRPC_METHOD_TAG,
+            [self::EXPECTED_JSONRPC_METHOD_TAG_METHOD_NAME_KEY => $methodName]
+        );
     }
 
     /**
