@@ -1,7 +1,6 @@
 <?php
 namespace Tests\Functional\Infra\Symfony\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Tests\Common\Infra\Symfony\DependencyInjection\AbstractTestClass;

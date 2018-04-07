@@ -3,6 +3,7 @@ namespace Tests\Common\Infra\Symfony\DependencyInjection;
 
 use Matthias\SymfonyDependencyInjectionTest\PhpUnit\AbstractExtensionTestCase;
 use Symfony\Component\DependencyInjection\Definition;
+use Yoanm\JsonRpcServer\Domain\Model\MethodResolverInterface;
 use Yoanm\SymfonyJsonRpcHttpServer\Infra\Symfony\DependencyInjection\JsonRpcHttpServerExtension;
 
 abstract class AbstractTestClass extends AbstractExtensionTestCase
@@ -68,7 +69,7 @@ abstract class AbstractTestClass extends AbstractExtensionTestCase
      */
     protected function createCustomMethodResolverDefinition()
     {
-        $customResolverService = new Definition(CustomMethodResolverClass::class);
+        $customResolverService = new Definition($this->prophesize(MethodResolverInterface::class)->reveal());
         $customResolverService->addTag(self::EXPECTED_METHOD_RESOLVER_TAG);
 
         return $customResolverService;

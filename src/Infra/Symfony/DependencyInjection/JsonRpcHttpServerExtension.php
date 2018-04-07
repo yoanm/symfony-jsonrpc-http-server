@@ -1,6 +1,7 @@
 <?php
 namespace Yoanm\SymfonyJsonRpcHttpServer\Infra\Symfony\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Processor; // <= Must stay optional !
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -30,15 +31,20 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
 {
     // Use this service to inject string request
     const ENDPOINT_SERVICE_NAME = 'yoanm.jsonrpc_http_server.endpoint';
+
     // Use this tag to inject your own resolver
     const METHOD_RESOLVER_TAG = 'yoanm.jsonrpc_http_server.method_resolver';
+
     // Use this tag to inject your JSON-RPC methods into the default method resolver
     const JSONRPC_METHOD_TAG = 'yoanm.jsonrpc_http_server.jsonrpc_method';
+
     // In case you want to add mapping for a method, use the following service
     const SERVICE_NAME_RESOLVER_SERVICE_NAME = 'yoanm.jsonrpc_http_server.resolver.service_name';
-
-
+    // And add an attribute with following key
     const JSONRPC_METHOD_TAG_METHOD_NAME_KEY = 'method';
+
+    // Extension identifier (used in configuration for instance)
+    const EXTENSION_IDENTIFIER = 'json_rpc_http_server';
 
 
     private $sdkAppResponseCreatorServiceId        = 'sdk.app.creator.response';
@@ -55,12 +61,26 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
     private $psr11InfraMethodResolverServiceId = 'psr11.infra.resolver.method';
 
     private $methodResolverStubServiceId = 'infra.resolver.method';
+    private $customResolverContainerParameter = self::EXTENSION_IDENTIFIER.'.custom_method_resolver';
+
+    /** @var bool */
+    private $parseConfig = false;
+
+    /**
+     * @param bool|false $parseConfig If true, Config component is required
+     */
+    public function __construct(bool $parseConfig = false)
+    {
+        $this->parseConfig = $parseConfig;
+    }
 
     /**
      * {@inheritdoc}
      */
     public function load(array $configs, ContainerBuilder $container)
     {
+        $this->compileAndProcessConfigurations($configs, $container);
+
         // Use only references to avoid class instantiation
         // And don't use file configuration in order to not add Symfony\Component\Config as dependency
         $this->createPublicServiceDefinitions($container);
@@ -89,7 +109,7 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
      */
     public function getAlias()
     {
-        return 'json_rpc_http_server';
+        return self::EXTENSION_IDENTIFIER;
     }
 
     /**
@@ -235,23 +255,27 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
     private function aliasMethodResolver(ContainerBuilder $container)
     {
         $isContainerResolver = false;
-        $serviceIdList = array_keys($container->findTaggedServiceIds(self::METHOD_RESOLVER_TAG));
-        $serviceCount = count($serviceIdList);
-        if ($serviceCount > 0) {
-            if ($serviceCount > 1) {
-                throw new LogicException(
-                    sprintf(
-                        'Only one method resolver could be defined, found following services : %s',
-                        implode(', ', $serviceIdList)
-                    )
-                );
-            }
-            // Use the first result
-            $resolverServiceId = array_shift($serviceIdList);
+        if ($container->hasParameter($this->customResolverContainerParameter)) {
+            $resolverServiceId = $container->getParameter($this->customResolverContainerParameter);
         } else {
-            // Use ArrayMethodResolver as default resolver
-            $resolverServiceId = $this->prependServiceName($this->psr11InfraMethodResolverServiceId);
-            $isContainerResolver = true;
+            $serviceIdList = array_keys($container->findTaggedServiceIds(self::METHOD_RESOLVER_TAG));
+            $serviceCount = count($serviceIdList);
+            if ($serviceCount > 0) {
+                if ($serviceCount > 1) {
+                    throw new LogicException(
+                        sprintf(
+                            'Only one method resolver could be defined, found following services : %s',
+                            implode(', ', $serviceIdList)
+                        )
+                    );
+                }
+                // Use the first result
+                $resolverServiceId = array_shift($serviceIdList);
+            } else {
+                // Use ArrayMethodResolver as default resolver
+                $resolverServiceId = $this->prependServiceName($this->psr11InfraMethodResolverServiceId);
+                $isContainerResolver = true;
+            }
         }
 
         $container->setAlias($this->prependServiceName($this->methodResolverStubServiceId), $resolverServiceId);
@@ -322,6 +346,22 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
                 . ' to retrieve it later',
                 $serviceId
             ));
+        }
+    }
+
+    /**
+     * @param array            $configs
+     * @param ContainerBuilder $container
+     */
+    private function compileAndProcessConfigurations(array $configs, ContainerBuilder $container)
+    {
+        if (true === $this->parseConfig) {
+            $configuration = new Configuration();
+            $config = (new Processor())->processConfiguration($configuration, $configs);
+
+            if (array_key_exists('method_resolver', $config) && $config['method_resolver']) {
+                $container->setParameter($this->customResolverContainerParameter, $config['method_resolver']);
+            }
         }
     }
 }
