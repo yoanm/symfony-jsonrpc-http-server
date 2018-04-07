@@ -24,8 +24,10 @@ class Configuration implements ConfigurationInterface
                     ->normalizeKeys(false)
                     ->arrayPrototype()
                         ->beforeNormalization()
-                            // Convert simple to an array with the string as service
-                            ->ifString()->then(function($v) {return ['service' => $v];})
+                            // Convert simple string to an array with the string as service
+                            ->ifString()->then(function ($v) {
+                                return ['service' => $v];
+                            })
                         ->end()
                         ->children()
                             ->scalarNode('service')

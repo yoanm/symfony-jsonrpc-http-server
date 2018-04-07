@@ -7,6 +7,7 @@ services:
   # Configure Json-RPC method MethodB as simple service, it will be injected by configuration mapping
   jsonrpc.method.b:
     class: DemoApp\Method\MethodB
+    public: true
   # Configure Json-RPC method MethodC as simple service, it will be injected by configuration mapping
   jsonrpc.method.c:
     class: DemoApp\Method\MethodC
