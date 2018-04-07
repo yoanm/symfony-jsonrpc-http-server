@@ -30,16 +30,16 @@ use Yoanm\SymfonyJsonRpcHttpServer\Infra\Resolver\ServiceNameResolver;
 class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInterface
 {
     // Use this service to inject string request
-    const ENDPOINT_SERVICE_NAME = 'yoanm.jsonrpc_http_server.endpoint';
+    const ENDPOINT_SERVICE_NAME = 'json_rpc_http_server.endpoint';
 
     // Use this tag to inject your own resolver
-    const METHOD_RESOLVER_TAG = 'yoanm.jsonrpc_http_server.method_resolver';
+    const METHOD_RESOLVER_TAG = 'json_rpc_http_server.method_resolver';
 
     // Use this tag to inject your JSON-RPC methods into the default method resolver
-    const JSONRPC_METHOD_TAG = 'yoanm.jsonrpc_http_server.jsonrpc_method';
+    const JSONRPC_METHOD_TAG = 'json_rpc_http_server.jsonrpc_method';
 
     // In case you want to add mapping for a method, use the following service
-    const SERVICE_NAME_RESOLVER_SERVICE_NAME = 'yoanm.jsonrpc_http_server.resolver.service_name';
+    const SERVICE_NAME_RESOLVER_SERVICE_NAME = 'json_rpc_http_server.resolver.service_name';
     // And add an attribute with following key
     const JSONRPC_METHOD_TAG_METHOD_NAME_KEY = 'method';
 
@@ -47,21 +47,8 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
     const EXTENSION_IDENTIFIER = 'json_rpc_http_server';
 
 
-    private $sdkAppResponseCreatorServiceId        = 'sdk.app.creator.response';
-    private $sdkAppCustomExceptionCreatorServiceId = 'sdk.app.creator.custom_exception';
-    private $sdkAppRequestDenormalizerServiceId    = 'sdk.app.serialization.request_denormalizer';
-    private $sdkAppResponseNormalizerServiceId     = 'sdk.app.serialization.response_normalizer';
-    private $sdkAppMethodManagerServiceId          = 'sdk.app.manager.method';
-    private $sdkAppRequestHandlerServiceId         = 'sdk.app.handler.request';
-
-    private $sdkInfraEndpointServiceId          = 'sdk.infra.endpoint';
-    private $sdkInfraRawReqSerializerServiceId  = 'sdk.infra.serialization.raw_request_serializer';
-    private $sdkInfraRawRespSerializerServiceId = 'sdk.infra.serialization.raw_response_serializer';
-
-    private $psr11InfraMethodResolverServiceId = 'psr11.infra.resolver.method';
-
-    private $methodResolverStubServiceId = 'infra.resolver.method';
-    private $customResolverContainerParameter = self::EXTENSION_IDENTIFIER.'.custom_method_resolver';
+    /** Private constants */
+    const CUSTOM_METHOD_RESOLVER_CONTAINER_PARAM = self::EXTENSION_IDENTIFIER.'.custom_method_resolver';
 
     /** @var bool */
     private $parseConfig = false;
@@ -130,44 +117,44 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
     {
         // RequestDenormalizer
         $container->setDefinition(
-            $this->prependServiceName($this->sdkAppRequestDenormalizerServiceId),
+            'json_rpc_http_server.sdk.app.serialization.request_denormalizer',
             new Definition(RequestDenormalizer::class)
         );
         // ResponseNormalizer
         $container->setDefinition(
-            $this->prependServiceName($this->sdkAppResponseNormalizerServiceId),
+            'json_rpc_http_server.sdk.app.serialization.response_normalizer',
             new Definition(ResponseNormalizer::class)
         );
         // ResponseCreator
         $container->setDefinition(
-            $this->prependServiceName($this->sdkAppResponseCreatorServiceId),
+            'json_rpc_http_server.sdk.app.creator.response',
             new Definition(ResponseCreator::class)
         );
         // CustomExceptionCreator
         $container->setDefinition(
-            $this->prependServiceName($this->sdkAppCustomExceptionCreatorServiceId),
+            'json_rpc_http_server.sdk.app.creator.custom_exception',
             new Definition(CustomExceptionCreator::class)
         );
 
         // MethodManager
         $container->setDefinition(
-            $this->prependServiceName($this->sdkAppMethodManagerServiceId),
+            'json_rpc_http_server.sdk.app.manager.method',
             new Definition(
                 MethodManager::class,
                 [
-                    new Reference($this->prependServiceName($this->methodResolverStubServiceId)),
-                    new Reference($this->prependServiceName($this->sdkAppCustomExceptionCreatorServiceId))
+                    new Reference('json_rpc_http_server.infra.resolver.method'),
+                    new Reference('json_rpc_http_server.sdk.app.creator.custom_exception')
                 ]
             )
         );
         // RequestHandler
         $container->setDefinition(
-            $this->prependServiceName($this->sdkAppRequestHandlerServiceId),
+            'json_rpc_http_server.sdk.app.handler.request',
             new Definition(
                 RequestHandler::class,
                 [
-                    new Reference($this->prependServiceName($this->sdkAppMethodManagerServiceId)),
-                    new Reference($this->prependServiceName($this->sdkAppResponseCreatorServiceId))
+                    new Reference('json_rpc_http_server.sdk.app.manager.method'),
+                    new Reference('json_rpc_http_server.sdk.app.creator.response')
                 ]
             )
         );
@@ -180,37 +167,37 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
     {
         // RawRequestSerializer
         $container->setDefinition(
-            $this->prependServiceName($this->sdkInfraRawReqSerializerServiceId),
+            'json_rpc_http_server.sdk.infra.serialization.raw_request_serializer',
             new Definition(
                 RawRequestSerializer::class,
-                [new Reference($this->prependServiceName($this->sdkAppRequestDenormalizerServiceId))]
+                [new Reference('json_rpc_http_server.sdk.app.serialization.request_denormalizer')]
             )
         );
 
         // RawResponseSerializer
         $container->setDefinition(
-            $this->prependServiceName($this->sdkInfraRawRespSerializerServiceId),
+            'json_rpc_http_server.sdk.infra.serialization.raw_response_serializer',
             new Definition(
                 RawResponseSerializer::class,
-                [new Reference($this->prependServiceName($this->sdkAppResponseNormalizerServiceId))]
+                [new Reference('json_rpc_http_server.sdk.app.serialization.response_normalizer')]
             )
         );
         // JsonRpcEndpoint
         $container->setDefinition(
-            $this->prependServiceName($this->sdkInfraEndpointServiceId),
+            'json_rpc_http_server.sdk.infra.endpoint',
             new Definition(
                 JsonRpcEndpoint::class,
                 [
-                    new Reference($this->prependServiceName($this->sdkInfraRawReqSerializerServiceId)),
-                    new Reference($this->prependServiceName($this->sdkAppRequestHandlerServiceId)),
-                    new Reference($this->prependServiceName($this->sdkInfraRawRespSerializerServiceId)),
-                    new Reference($this->prependServiceName($this->sdkAppResponseCreatorServiceId))
+                    new Reference('json_rpc_http_server.sdk.infra.serialization.raw_request_serializer'),
+                    new Reference('json_rpc_http_server.sdk.app.handler.request'),
+                    new Reference('json_rpc_http_server.sdk.infra.serialization.raw_response_serializer'),
+                    new Reference('json_rpc_http_server.sdk.app.creator.response')
                 ]
             )
         );
         // ContainerMethodResolver
         $container->setDefinition(
-            $this->prependServiceName($this->psr11InfraMethodResolverServiceId),
+            'json_rpc_http_server.psr11.infra.resolver.method',
             (new Definition(
                 ContainerMethodResolver::class,
                 [
@@ -236,7 +223,7 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
             (new Definition(
                 JsonRpcHttpEndpoint::class,
                 [
-                    new Reference($this->prependServiceName($this->sdkInfraEndpointServiceId))
+                    new Reference('json_rpc_http_server.sdk.infra.endpoint')
                 ]
             ))->setPublic(true)
         );
@@ -255,8 +242,8 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
     private function aliasMethodResolver(ContainerBuilder $container)
     {
         $isContainerResolver = false;
-        if ($container->hasParameter($this->customResolverContainerParameter)) {
-            $resolverServiceId = $container->getParameter($this->customResolverContainerParameter);
+        if ($container->hasParameter(self::CUSTOM_METHOD_RESOLVER_CONTAINER_PARAM)) {
+            $resolverServiceId = $container->getParameter(self::CUSTOM_METHOD_RESOLVER_CONTAINER_PARAM);
         } else {
             $serviceIdList = array_keys($container->findTaggedServiceIds(self::METHOD_RESOLVER_TAG));
             $serviceCount = count($serviceIdList);
@@ -273,12 +260,12 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
                 $resolverServiceId = array_shift($serviceIdList);
             } else {
                 // Use ArrayMethodResolver as default resolver
-                $resolverServiceId = $this->prependServiceName($this->psr11InfraMethodResolverServiceId);
+                $resolverServiceId = 'json_rpc_http_server.psr11.infra.resolver.method';
                 $isContainerResolver = true;
             }
         }
 
-        $container->setAlias($this->prependServiceName($this->methodResolverStubServiceId), $resolverServiceId);
+        $container->setAlias('json_rpc_http_server.infra.resolver.method', $resolverServiceId);
 
         return $isContainerResolver;
     }
@@ -299,16 +286,6 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
                 $defaultResolverDefinition->addMethodCall('addMethodMapping', [$methodName, $serviceId]);
             }
         }
-    }
-
-    /**
-     * @param string $serviceName
-     *
-     * @return string
-     */
-    private function prependServiceName(string $serviceName) : string
-    {
-        return sprintf('yoanm.jsonrpc_http_server.%s', $serviceName);
     }
 
     /**
@@ -360,7 +337,7 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
             $config = (new Processor())->processConfiguration($configuration, $configs);
 
             if (array_key_exists('method_resolver', $config) && $config['method_resolver']) {
-                $container->setParameter($this->customResolverContainerParameter, $config['method_resolver']);
+                $container->setParameter(self::CUSTOM_METHOD_RESOLVER_CONTAINER_PARAM, $config['method_resolver']);
             }
         }
     }
