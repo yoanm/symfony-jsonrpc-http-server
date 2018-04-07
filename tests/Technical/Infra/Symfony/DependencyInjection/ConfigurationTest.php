@@ -17,7 +17,6 @@ class ConfigurationTest extends TestCase
         return new Configuration();
     }
 
-
     public function testShouldHaveFalseAsCustomMethodResolverByDefault()
     {
         $this->assertProcessedConfigurationEquals([[]], ['method_resolver'=> false]);

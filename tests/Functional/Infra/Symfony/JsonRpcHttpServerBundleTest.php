@@ -19,9 +19,6 @@ class JsonRpcHttpServerBundleTest extends AbstractTestClass
         ];
     }
 
-    /**
-     * @group yo
-     */
     public function testShouldManageConfigurationByDefault()
     {
         $myCustomResolverServiceId = 'my-custom-resolver';

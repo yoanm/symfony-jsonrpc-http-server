@@ -19,9 +19,6 @@ class JsonRpcHttpServerExtensionWithConfigParsedTest extends AbstractTestClass
         ];
     }
 
-    /**
-     * @group yo
-     */
     public function testShouldManageCustomResolverFromConfiguration()
     {
         $myCustomResolverServiceId = 'my-custom-resolver';
