@@ -15,9 +15,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "Yoanm\\SymfonyJsonRpcHttpServer\\App\\": "src/App",
-            "Yoanm\\SymfonyJsonRpcHttpServer\\Domain\\": "src/Domain",
-            "Yoanm\\SymfonyJsonRpcHttpServer\\Infra\\": "src/Infra"
+            "Yoanm\\SymfonyJsonRpcHttpServer\\": "src"
         }
     },
     "autoload-dev": {
