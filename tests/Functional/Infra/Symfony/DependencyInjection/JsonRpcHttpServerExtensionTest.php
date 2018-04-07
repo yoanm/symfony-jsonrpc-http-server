@@ -59,7 +59,7 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
         // Assert PSR-11 resolver is an alias of the stub
         $this->assertContainerBuilderHasAlias(
             self::EXPECTED_METHOD_RESOLVER_STUB_SERVICE_ID,
-            'yoanm.jsonrpc_http_server.psr11.infra.resolver.method'
+            'json_rpc_http_server.psr11.infra.resolver.method'
         );
 
         $this->assertEndpointIsUsable();

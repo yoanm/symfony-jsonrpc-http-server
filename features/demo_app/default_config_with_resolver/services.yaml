@@ -19,7 +19,7 @@ services:
   ##### Configure your resolver and add the required tag
   jsonrpc.custom_method_resolver:
     class: DemoApp\Resolver\JsonRpcMethodResolver
-    tags: ['yoanm.jsonrpc_http_server.method_resolver']
+    tags: ['json_rpc_http_server.method_resolver']
 
     # Inject your JSON-RPC methods (They cannot be automatically injected as resolver implementation is on your own)
     calls:

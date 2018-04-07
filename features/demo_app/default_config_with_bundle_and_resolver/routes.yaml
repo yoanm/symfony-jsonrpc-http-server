@@ -2,4 +2,4 @@
 # And configure the controller
 homepage:
     path: /my-json-rpc-endpoint
-    defaults: { _controller: 'yoanm.jsonrpc_http_server.endpoint:index' }
+    defaults: { _controller: 'json_rpc_http_server.endpoint:index' }
