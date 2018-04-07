@@ -290,6 +290,7 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
         if ($container->hasParameter(self::METHODS_MAPPING_CONTAINER_PARAM)) {
             foreach ($container->getParameter(self::METHODS_MAPPING_CONTAINER_PARAM) as $methodName => $mappingConfig) {
                 $serviceId = $mappingConfig['service'];
+                $this->checkJsonRpcMethodService($container, $serviceId);
                 $this->injectMethodMappingToServiceNameResolver($methodName, $serviceId, $container);
                 foreach ($mappingConfig['aliases'] as $methodAlias) {
                     $this->injectMethodMappingToServiceNameResolver($methodAlias, $serviceId, $container);

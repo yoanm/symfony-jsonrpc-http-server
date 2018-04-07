@@ -97,9 +97,13 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
         $methodName2 = 'my-method-name-2';
 
         // A first method
-        $this->setDefinition($jsonRpcMethodServiceId, $this->createJsonRpcMethodDefinition($methodName));
+        $methodService = $this->createJsonRpcMethodDefinition();
+        $this->addJsonRpcMethodTag($methodService, $methodName);
+        $this->setDefinition($jsonRpcMethodServiceId, $methodService);
         // A second method
-        $this->setDefinition($jsonRpcMethodServiceId2, $this->createJsonRpcMethodDefinition($methodName2));
+        $methodService2 = $this->createJsonRpcMethodDefinition();
+        $this->addJsonRpcMethodTag($methodService2, $methodName2);
+        $this->setDefinition($jsonRpcMethodServiceId2, $methodService2);
 
         $this->load();
 
@@ -135,9 +139,13 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
         $methodName2 = 'my-method-name-2';
 
         // A first method
-        $this->setDefinition($jsonRpcMethodServiceId, $this->createJsonRpcMethodDefinition($methodName));
+        $methodService = $this->createJsonRpcMethodDefinition();
+        $this->addJsonRpcMethodTag($methodService, $methodName);
+        $this->setDefinition($jsonRpcMethodServiceId, $methodService);
         // A second method
-        $this->setDefinition($jsonRpcMethodServiceId2, $this->createJsonRpcMethodDefinition($methodName2));
+        $methodService2 = $this->createJsonRpcMethodDefinition();
+        $this->addJsonRpcMethodTag($methodService2, $methodName2);
+        $this->setDefinition($jsonRpcMethodServiceId2, $methodService2);
 
         // Add the custom method resolver
         $this->setDefinition(uniqid(), $this->createCustomMethodResolverDefinition());
@@ -157,19 +165,15 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
         $jsonRpcMethodServiceId = uniqid();
         $jsonRpcMethodServiceId2 = uniqid();
         $methodName = 'my-method-name';
-        $methodName2 = 'my-method-name-2';
 
         // A first method
-        $this->setDefinition($jsonRpcMethodServiceId, $this->createJsonRpcMethodDefinition($methodName));
-        // A second method
-        $this->setDefinition(
-            $jsonRpcMethodServiceId2,
-            $this->createJsonRpcMethodDefinition($methodName2)
-                // Clear previous tag
-                ->clearTag(self::EXPECTED_JSONRPC_METHOD_TAG)
-                // And add one without attribute
-                ->addTag(self::EXPECTED_JSONRPC_METHOD_TAG)
-        );
+        $methodService = $this->createJsonRpcMethodDefinition();
+        $this->addJsonRpcMethodTag($methodService, $methodName);
+        $this->setDefinition($jsonRpcMethodServiceId, $methodService);
+        // A second method with empty tag attribute
+        $methodService2 = $this->createJsonRpcMethodDefinition();
+        $methodService2->addTag(self::EXPECTED_JSONRPC_METHOD_TAG);
+        $this->setDefinition($jsonRpcMethodServiceId2, $methodService2);
 
         $this->expectException(LogicException::class);
         // Check that exception is for the second method
@@ -193,12 +197,13 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
         $methodName2 = 'my-method-name-2';
 
         // A first method
-        $this->setDefinition($jsonRpcMethodServiceId, $this->createJsonRpcMethodDefinition($methodName));
-        // A second method
-        $this->setDefinition(
-            $jsonRpcMethodServiceId2,
-            $this->createJsonRpcMethodDefinition($methodName2)->setPublic(false)
-        );
+        $methodService = $this->createJsonRpcMethodDefinition();
+        $this->addJsonRpcMethodTag($methodService, $methodName);
+        $this->setDefinition($jsonRpcMethodServiceId, $methodService);
+        // A second method with private service
+        $methodService2 = $this->createJsonRpcMethodDefinition()->setPublic(false);
+        $this->addJsonRpcMethodTag($methodService2, $methodName2);
+        $this->setDefinition($jsonRpcMethodServiceId2, $methodService2);
 
         $this->expectException(LogicException::class);
         // Check that exception is for the second method
