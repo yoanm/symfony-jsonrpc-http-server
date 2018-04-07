@@ -28,7 +28,7 @@ Feature: demo symfony application
     {"jsonrpc":"2.0", "result":"MethodB", "id":3}
     """
 
-  @symfony-extension
+  @symfony-extension @symfony-jsonrpc-method-injection
   Scenario: Use Extension with default method resolver with JSON-RPC methods container injection
     # Ensure the two injected methods have been injected
     When I send following "POST" input on "/my-json-rpc-endpoint" demoApp kernel endpoint:
@@ -114,7 +114,7 @@ Feature: demo symfony application
     {"jsonrpc":"2.0", "result":"MethodB", "id":3}
     """
 
-  @symfony-bundle
+  @symfony-bundle @symfony-jsonrpc-method-injection
   Scenario: Use Bundle with default method resolver with JSON-RPC methods container injection
     Given DemoApp will use JsonRpcHttpServerBundle
     # Ensure the two injected methods have been injected
@@ -171,4 +171,48 @@ Feature: demo symfony application
     Then I should have a "200" response from demoApp with following content:
     """
     {"jsonrpc":"2.0", "result":"MethodD", "id":4}
+    """
+  @symfony-bundle @symfony-jsonrpc-method-mapping-from-config
+  Scenario: Use Bundle with default method resolver with JSON-RPC method tags
+    Given DemoApp will use JsonRpcHttpServerBundle with methods mapping configuration
+    # Ensure the two methods with tag have been loaded
+    When I send following "POST" input on "/json-rpc" demoApp kernel endpoint:
+    """
+    {"jsonrpc": "2.0", "method": "mappedMethodA", "id": 1}
+    """
+    Then I should have a "200" response from demoApp with following content:
+    """
+    {"jsonrpc":"2.0", "result":"MethodA", "id":1}
+    """
+    When I send following "POST" input on "/json-rpc" demoApp kernel endpoint:
+    """
+    {"jsonrpc": "2.0", "method": "mappedMethodAAlias", "id": 2}
+    """
+    Then I should have a "200" response from demoApp with following content:
+    """
+    {"jsonrpc":"2.0", "result":"MethodA", "id":2}
+    """
+    When I send following "POST" input on "/json-rpc" demoApp kernel endpoint:
+    """
+    {"jsonrpc": "2.0", "method": "mappedMethodB", "id": 3}
+    """
+    Then I should have a "200" response from demoApp with following content:
+    """
+    {"jsonrpc":"2.0", "result":"MethodB", "id":3}
+    """
+    When I send following "POST" input on "/json-rpc" demoApp kernel endpoint:
+    """
+    {"jsonrpc": "2.0", "method": "mappedGetDummy", "id": 1}
+    """
+    Then I should have a "200" response from demoApp with following content:
+    """
+    {"jsonrpc":"2.0", "result":"MethodC", "id":1}
+    """
+    When I send following "POST" input on "/json-rpc" demoApp kernel endpoint:
+    """
+    {"jsonrpc": "2.0", "method": "mappedGetAnotherDummy", "id": 2}
+    """
+    Then I should have a "200" response from demoApp with following content:
+    """
+    {"jsonrpc":"2.0", "result":"MethodD", "id":2}
     """

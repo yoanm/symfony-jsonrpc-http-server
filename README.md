@@ -11,158 +11,164 @@ Symfony JSON-RPC HTTP Server to convert an HTTP json-rpc request into HTTP json-
 
 ## How to use
 
-Sdk requires only two things : 
- - A method resolver : must implement [MethodResolverInterface](./src/Domain/Model/MethodResolverInterface.php), resolving logic's is your own.
- - Methods : JsonRpc methods that implement [JsonRpcMethodInterface](./src/Domain/Model/JsonRpcMethodInterface.php)
+You can either use this library as a simple extension or like any symfony bundle.
+
+*[Behat demo app configuration folders](./features/demo_app/) can be used as examples.*
+
+### With Symfony bundle
+
+ - Add the bundles in your `config/bundles.php` file:
+   ```php
+   // config/bundles.php
+   return [
+       ...
+       Yoanm\SymfonyJsonRpcHttpServer\JsonRpcHttpServerBundle::class => ['all' => true],
+       ...
+   ];
+   ```
+   
+ - Add the following in your routing configuration :
+   ```yaml
+   # config/routes.yaml
+   json-rpc-endpoint:
+     resource: '@JsonRpcHttpServerBundle/Resources/config/routing/endpoint.xml'
+   ```
+   
+ - Add the following in your configuration :
+   ```yaml
+   # config/config.yaml
+   json_rpc_http_server: ~
+   ```
+
+### With Symfony extension only
+ - Load the extension in your kernel :
+   ```php
+   // src/Kernel.php
+   ...
+   use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+   use Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\JsonRpcHttpServerExtension;
+   ...
+   class Kernel
+   {
+       use MicroKernelTrait;
+       ....
+       /**
+       * {@inheritdoc}
+       */
+      protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader)
+      {
+          /**** Add and load extension **/
+          $container->registerExtension($extension = new JsonRpcHttpServerExtension());
+          // If you use Symfony Config component, add "json_rpc_http_server: ~" in your configuration.
+          // Else load it there
+          $container->loadFromExtension($extension->getAlias());
+          
+          ...
+      }
+       ....
+   }
+   ```
+   
+ - Map your your JSON-RPC methods, see **JSON-RPC Method mapping** section below
+ - Manually configure an endpoint, see **Routing** section below
+
+## JSON-RPC Method mapping
+You have many ways to inject you json-rpc methods :
+ - If you use the bundle, you can do it by configuration :
+   ```yaml
+   # config/config.yaml
+   json_rpc_http_server:
+       methods_mapping:
+           method-a: '@method-a.service-id'
+           method-b: 
+               service: '@method-b.service-id'
+               aliases: 'method-b-alias'
+           method-c: 
+               service: '@method-c.service-id'
+               aliases: ['method-c-alias-1', 'method-c-alias-2']
+   ```
+ - You can use tag in the service definition as below :
+   ```yaml
+   services:
+     method-a.service-id:
+       class: Method\A\Class
+       public: true # <= do no forget the set visibility to public !
+       tags:
+         - { name: 'json_rpc_http_server.jsonrpc_method', method: 'method-a' }
+         - { name: 'json_rpc_http_server.jsonrpc_method', method: 'method-a-alias' }
+   ```
+ - Inject manually your mapping during container building
+   ```php
+   // src/Kernel.php
+   ...
+   use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+   use Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\JsonRpcHttpServerExtension;
+   ...
+   class Kernel implements CompilerPassInterface
+   {
+       ....
+       /**
+       * {@inheritdoc}
+       */
+      public function process(ContainerBuilder $container)
+      {
+          $container->getDefinition(JsonRpcHttpServerExtension::SERVICE_NAME_RESOLVER_SERVICE_NAME)
+              ->addMethodCall('addMethodMapping', ['method-a', 'method-a.service-id'])
+              ->addMethodCall('addMethodMapping', ['method-b', 'method-b.service-id'])
+              ->addMethodCall('addMethodMapping', ['method-b-alias', 'method-b.service-id'])
+          ;
+      }
+       ....
+   }
+   ```
+ - Or inject manually your mapping after container building
+   ```php
+   $container->get(JsonRpcHttpServerExtension::SERVICE_NAME_RESOLVER_SERVICE_NAME)
+       ->addMethodMapping('method-a', 'method-a.service-id')
+       ->addMethodMapping('method-b', 'method-b.service-id')
+       ->addMethodMapping('method-b-alias', 'method-b.service-id')
+   ;
+   ```
  
-:warning: No dependency injection is managed in this library 
-
-### Example
-#### JSON-RPC Method
-```php
-use Yoanm\JsonRpcServer\Domain\Model\JsonRpcMethodInterface;
-
-class DummyMethod implements JsonRpcMethodInterface
-{
-    /**
-     * @param array $paramList
-     *
-     * @throws \Exception
-     */
-    public function validateParams(array $paramList)
-    {
-        //If case your app require a specific param for instance
-        if (!isset($paramList['my-required-key')) {
-            throw new \Exception('"my-required-key" is a required key');
-        }
-    }
-
-    /**
-     * @param array|null $paramList
-     * 
-     * @return array|int|null
-     */
-    public function apply(array $paramList = null)
-    {
-        // Handle the request
-        ...
-        // Then return a result
-        return [
-            'status' => 'done',
-        ];
-        // Or
-        return null;
-        // Or
-        return 12345;
-    }
-}
-```
-#### Array method resolver (simple example)
-*You could take example on [the one used for behat tests](./features/bootstrap/App/BehatMethodResolver.php)*
-```php
-use Yoanm\JsonRpcServer\Domain\Exception\JsonRpcMethodNotFoundException;
-use Yoanm\JsonRpcServer\Domain\Model\JsonRpcMethodInterface;
-use Yoanm\JsonRpcServer\Domain\Model\MethodResolverInterface;
-
-class ArrayMethodResolver implements MethodResolverInterface
-{
-    /** @var JsonRpcMethodInterface[] */
-    private $methodList = [];
-
-    /**
-     * @param string $methodName
-     *
-     * @return JsonRpcMethodInterface
-     *
-     * @throws JsonRpcMethodNotFoundException
-     */
-    public function resolve(string $methodName) : JsonRpcMethodInterface
-    {
-        if (!isset($this->methodList[$methodName])) {
-            throw new JsonRpcMethodNotFoundException($methodName);
-        }
-
-        return $this->methodList[$methodName];
-    }
-
-    /**
-     * @param JsonRpcMethodInterface $method
-     * @param string                 $methodName
-     */
-    public function addMethod(JsonRpcMethodInterface $method, string $methodName)
-    {
-        $this->methodList[$methodName] = $method;
-    }
-}
-```
-
-Then add your method to the resolver and create the endpoint : 
-```php
-use Yoanm\JsonRpcServer\App\Creator\CustomExceptionCreator;
-use Yoanm\JsonRpcServer\App\Creator\ResponseCreator;
-use Yoanm\JsonRpcServer\App\Manager\MethodManager;
-use Yoanm\JsonRpcServer\App\RequestHandler;
-use Yoanm\JsonRpcServer\App\Serialization\RequestDenormalizer;
-use Yoanm\JsonRpcServer\App\Serialization\ResponseNormalizer;
-use Yoanm\JsonRpcServer\Infra\Endpoint\JsonRpcEndpoint;
-use Yoanm\JsonRpcServer\Infra\Serialization\RawRequestSerializer;
-use Yoanm\JsonRpcServer\Infra\Serialization\RawResponseSerializer;
-
-$resolver = new ArrayMethodResolver();
-$resolver->addMethod(
-    'dummy-method'
-    new DummyMethod()
-);
-
-$responseCreator = new ResponseCreator();
-
-$endpoint = new JsonRpcEndpoint(
-    new RawRequestSerializer(
-        new RequestDenormalizer()
-    ),
-    new RequestHandler(
-        new MethodManager(
-            $resolver,
-            new CustomExceptionCreator()
-        ),
-        $responseCreator
-    ),
-    new RawResponseSerializer(
-        new ResponseNormalizer()
-    ),
-    $responseCreator
-);
-```
-
-Once endpoint is ready, you can send it request string : 
-```php
-use Yoanm\JsonRpcServer\Infra\Endpoint\JsonRpcEndpoint;
-
-$requestString = <<<JSONRPC
-{
-    "jsonrpc": "2.0",
-    "id": 1
-    "method": "dummy-method",
-    "params": {
-        "my-required-key": "a-value"
-    }
-}
-JSONRPC;
-
-$responseString = $endpoint->index($requestString);
-```
-
-`$responseString` will be the following string depending of method returned value : 
- * ```json
-   {"jsonrpc":"2.0","id":1,"result":{"status":"done"}}
+## Routing
+ - If you use the bundle, the default endpoint is `/json-rcp`. You can custome it by using : 
+   ```yaml
+   # config/config.yaml
+   json_rpc_http_server: 
+       http_endpoint_path: '/my-custom-endpoint'
    ```
- * ```json
-   {"jsonrpc":"2.0","id":1,"result":null}
+   
+ - Or you can define your own route and bind the endpoint as below :
+   ```yaml
+   # config/routes.yaml
+   index:
+       path: /my-json-rpc-endpoint
+       defaults: { _controller: 'json_rpc_http_server.endpoint:index' }
    ```
+   
+## Custom method resolver
 
- * ```json
-   {"jsonrpc":"2.0","id":1,"result":12345}
-   ```
+By default this bundle use [`yoanm/jsonrpc-server-sdk-psr11-resolver`](https://github.com/yoanm/php-jsonrpc-server-sdk-psr11-resolver).
+
+In case you want to use your own, you can do it by using : 
+
+### Service definition tag
+Use `json_rpc_http_server.method_resolver` tag as following:
+```yaml
+services:
+  my.custom_method_resolver.service:
+    class: Custom\Method\Resolver\Class
+    tags: ['json_rpc_http_server.method_resolver']
+```
+
+### Bundle configuration
+Configure the bundle as below
+```yaml
+# config/config.yaml
+json_rpc_http_server:
+    method_resolver: '@my.custom_method_resolver.service'
+```
+   
 
 ## Contributing
 See [contributing note](./CONTRIBUTING.md)

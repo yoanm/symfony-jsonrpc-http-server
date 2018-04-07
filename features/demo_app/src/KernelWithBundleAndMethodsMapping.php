@@ -4,9 +4,8 @@ namespace DemoApp;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Routing\RouteCollectionBuilder;
-use Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\JsonRpcHttpServerExtension;
 
-class KernelWithCustomResolver extends AbstractKernel
+class KernelWithBundleAndMethodsMapping extends AbstractKernel
 {
     public function registerBundles()
     {
@@ -23,12 +22,6 @@ class KernelWithCustomResolver extends AbstractKernel
      */
     protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader)
     {
-        /**** Add and load extension **/
-        $container->registerExtension($extension = new JsonRpcHttpServerExtension());
-        // No need to load the configuration manually as "json_rpc_http_server: ~" has been added in the config
-        //$container->loadFromExtension($extension->getAlias());
-
-        /**** Continue as usual **/
         $container->setParameter('container.dumper.inline_class_loader', true);
         $confDir = $this->getProjectDir().'/'.$this->getConfigDirectory();
         $loader->load($confDir.'/config'.self::CONFIG_EXTS, 'glob');
@@ -49,6 +42,6 @@ class KernelWithCustomResolver extends AbstractKernel
      */
     public function getConfigDirectory() : string
     {
-        return 'default_config_with_resolver';
+        return 'default_config_with_bundle_and_methods_mapping';
     }
 }
