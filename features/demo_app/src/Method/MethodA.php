@@ -5,10 +5,17 @@ use Yoanm\JsonRpcServer\Domain\Model\JsonRpcMethodInterface;
 
 class MethodA implements JsonRpcMethodInterface
 {
-    public function validateParams(array $paramList)
+    /**
+     * {@inheritdoc}
+     */
+    public function validateParams(array $paramList) : array
     {
+        return [];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function apply(array $paramList = null)
     {
         return 'MethodA';
