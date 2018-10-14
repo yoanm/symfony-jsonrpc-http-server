@@ -73,7 +73,7 @@ class SymfonyJsonRpcServerDispatcherTest extends TestCase
     {
         $eventName = 'event-name';
 
-        $this->sfDispatcher->dispatch($eventName)
+        $this->sfDispatcher->dispatch($eventName, null)
             ->shouldBeCalled();
 
         $this->dispatcher->dispatchJsonRpcEvent($eventName);
