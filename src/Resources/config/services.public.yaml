@@ -1,0 +1,14 @@
+services:
+  _defaults:
+      public: true
+
+  json_rpc_http_server.endpoint:
+    class: Yoanm\SymfonyJsonRpcHttpServer\Endpoint\JsonRpcHttpEndpoint
+    arguments:
+      - '@json_rpc_server_sdk.infra.endpoint'
+
+  json_rpc_http_server.dispatcher.server:
+    class: Yoanm\SymfonyJsonRpcHttpServer\Dispatcher\SymfonyJsonRpcServerDispatcher
+    arguments:
+      - '@event_dispatcher'
+

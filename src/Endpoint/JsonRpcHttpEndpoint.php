@@ -13,12 +13,16 @@ class JsonRpcHttpEndpoint
     /** @var SdkJsonRpcEndpoint */
     private $sdkEndpoint;
 
+    /** @var string[] */
+    private $allowedMethodList = [];
+
     /**
      * @param SDKJsonRpcEndpoint $sdkEndpoint
      */
     public function __construct(SDKJsonRpcEndpoint $sdkEndpoint)
     {
         $this->sdkEndpoint = $sdkEndpoint;
+        $this->allowedMethodList = [Request::METHOD_POST, Request::METHOD_OPTIONS];
     }
 
     /**
@@ -26,14 +30,38 @@ class JsonRpcHttpEndpoint
      *
      * @return Response
      */
-    public function index(Request $request) : Response
+    public function httpOptions(Request $request) : Response
     {
-        if (Request::METHOD_POST !== $request->getMethod()) {
-            return new Response('A JSON-RPC HTTP call must use POST', Response::HTTP_METHOD_NOT_ALLOWED);
-        }
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
 
-        return new Response(
-            $this->sdkEndpoint->index($request->getContent())
+        // Set allowed http methods
+        $response->headers->set('Allow', $this->allowedMethodList);
+        $response->headers->set('Access-Control-Request-Method', $this->allowedMethodList);
+
+        // Set allowed content type
+        $response->headers->set('Accept', 'application/json');
+        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type');
+
+        return $response;
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function httpPost(Request $request) : Response
+    {
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+
+        $response->setContent(
+            $this->sdkEndpoint->index(
+                $request->getContent()
+            )
         );
+
+        return $response;
     }
 }

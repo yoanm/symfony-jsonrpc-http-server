@@ -1,7 +1,7 @@
 <?php
 namespace DemoApp\Method;
 
-use Yoanm\JsonRpcServer\Domain\Model\JsonRpcMethodInterface;
+use Yoanm\JsonRpcServer\Domain\JsonRpcMethodInterface;
 
 class MethodD implements JsonRpcMethodInterface
 {

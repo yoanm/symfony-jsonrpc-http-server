@@ -3,29 +3,24 @@ namespace Tests\Technical\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Tests\Common\DependencyInjection\AbstractTestClass;
+use Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\Configuration;
+use Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\JsonRpcHttpServerExtension;
 
 /**
  * @covers \Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\JsonRpcHttpServerExtension
  */
 class JsonRpcHttpServerExtensionTest extends AbstractTestClass
 {
-    public function testShouldThrowAnExceptionIfMoreThanOneMethodResolverHaveTheMethodResolverTag()
+    public function testShouldHaveADefaultEndpointConfigured()
     {
-        // A two custom resolver with tag
-        $serviceId1 = uniqid();
-        $serviceId2 = uniqid();
-        $this->setDefinition($serviceId1, $this->createCustomMethodResolverDefinition());
-        $this->setDefinition($serviceId2, $this->createCustomMethodResolverDefinition());
+        $this->load();
 
-        $this->expectException(LogicException::class);
-        // Check that exception is for the second method
-        $this->expectExceptionMessage(
-            sprintf(
-                'Only one method resolver could be defined, found following services : %s',
-                implode(', ', [$serviceId1, $serviceId2])
-            )
+        // Assert custom resolver is an alias of the stub
+        $this->assertContainerBuilderHasParameter(
+            self::EXPECTED_HTTP_ENDPOINT_PATH_CONTAINER_PARAM,
+            Configuration::DEFAULT_ENDPOINT
         );
 
-        $this->load();
+        $this->assertEndpointIsUsable();
     }
 }

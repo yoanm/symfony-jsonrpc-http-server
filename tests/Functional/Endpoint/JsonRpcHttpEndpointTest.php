@@ -29,44 +29,49 @@ class JsonRpcHttpEndpointTest extends TestCase
         );
     }
 
-    public function testShouldHandleRequestContentAndReturnA200ResponseContainingSDKEndpointReturnedValue()
+    public function testHttPostShouldHandleRequestContentAndReturnA200ResponseContainingSDKEndpointReturnedValue()
     {
         $requestContent = 'request-content';
-        $expextedResponseContent = 'expected-response-content';
+        $expectedResponseContent = 'expected-response-content';
 
         /** @var Request|ObjectProphecy $request */
         $request = $this->prophesize(Request::class);
-
-        $request->getMethod()
-            ->willReturn(Request::METHOD_POST)
-            ->shouldBeCalled();
 
         $request->getContent()
             ->willReturn($requestContent)
             ->shouldBeCalled();
 
         $this->sdkEndpoint->index($requestContent)
-            ->willReturn($expextedResponseContent)
+            ->willReturn($expectedResponseContent)
             ->shouldBeCalled();
 
-        $response = $this->endpoint->index($request->reveal());
+        $response = $this->endpoint->httpPost($request->reveal());
 
         $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
-        $this->assertSame($expextedResponseContent, $response->getContent());
+        $this->assertSame($expectedResponseContent, $response->getContent());
+        $this->assertSame('application/json', $response->headers->get('Content-Type'));
     }
 
-    public function testShouldCheckIfRequestUsePostMethodAndReturnErrorResponseIfNot()
+    public function testHttOptionsShouldReturnAllowedMethodsAndContentType()
     {
+        $expectedAllowedMethodList = [Request::METHOD_POST, Request::METHOD_OPTIONS];
         /** @var Request|ObjectProphecy $request */
         $request = $this->prophesize(Request::class);
 
-        $request->getMethod()
-            ->willReturn(Request::METHOD_GET)
-            ->shouldBeCalled();
+        $response = $this->endpoint->httpOptions($request->reveal());
 
-        $response = $this->endpoint->index($request->reveal());
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertSame('application/json', $response->headers->get('Content-Type'));
 
-        $this->assertSame(Response::HTTP_METHOD_NOT_ALLOWED, $response->getStatusCode());
-        $this->assertSame('A JSON-RPC HTTP call must use POST', $response->getContent());
+        // Check allowed methods
+        $this->assertSame($expectedAllowedMethodList, $response->headers->get('Allow', null, false));
+        $this->assertSame(
+            $expectedAllowedMethodList,
+            $response->headers->get('Access-Control-Request-Method', null, false)
+        );
+
+        // Check allowed content types
+        $this->assertSame('application/json', $response->headers->get('Accept'));
+        $this->assertSame('Content-Type', $response->headers->get('Access-Control-Allow-Headers'));
     }
 }

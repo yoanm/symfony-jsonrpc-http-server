@@ -1,0 +1,8 @@
+services:
+  json_rpc_server_sdk.infra.endpoint:
+    class: Yoanm\JsonRpcServer\Infra\Endpoint\JsonRpcEndpoint
+    arguments:
+      - '@json_rpc_server_sdk.app.serialization.jsonrpc_call_serializer'
+      - '@json_rpc_server_sdk.app.handler.jsonrpc_request'
+      - '@json_rpc_server_sdk.app.handler.exception'
+    tags: ['json_rpc_http_server.server_dispatcher_aware']

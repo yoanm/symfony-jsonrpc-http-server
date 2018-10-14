@@ -1,5 +1,5 @@
 <?php
-namespace Tests\Technical\DependencyInjection;
+namespace Tests\Functional\DependencyInjection;
 
 use Matthias\SymfonyConfigTest\PhpUnit\ConfigurationTestCaseTrait;
 use PHPUnit\Framework\TestCase;
@@ -17,10 +17,10 @@ class ConfigurationTest extends TestCase
         return new Configuration();
     }
 
-    public function testShouldTreatNullAsDefaultEndpoint()
+    public function testShouldHaveADefaultEndpoint()
     {
         $this->assertProcessedConfigurationEquals(
-            [['endpoint'=> null]],
+            [[]],
             ['endpoint'=> Configuration::DEFAULT_ENDPOINT],
             'endpoint'
         );
