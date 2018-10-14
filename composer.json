@@ -1,7 +1,7 @@
 {
     "name": "yoanm/symfony-jsonrpc-http-server",
     "description": "Symfony Server SDK to convert an HTTP json-rpc request into HTTP json-rpc response",
-    "license": "GPL-3.0-only",
+    "license": "MIT",
     "type": "library",
     "support": {
         "issues": "https://github.com/yoanm/symfony-jsonrpc-http-server/issues"
@@ -26,16 +26,13 @@
         }
     },
     "require": {
+        "php": ">=7.1",
         "php": ">7.0",
         "yoanm/jsonrpc-server-sdk": "dev-release/3.0.0",
         "symfony/http-foundation": "^3.0 || ^4.0",
         "symfony/http-kernel": "^3.0 || ^4.0",
         "symfony/config": "^3.0 || ^4.0",
-        "symfony/dependency-injection": "^3.0 || ^4.0",
-        "yoanm/jsonrpc-server-sdk-psr11-resolver": "dev-release/3.0.0"
-    },
-    "suggest": {
-        "symfony/http-kernel": "To ease integration inside your application by using JsonRpcHttpServerBundle"
+        "symfony/dependency-injection": "^3.0 || ^4.0"
     },
     "require-dev": {
         "behat/behat": "~3.0",

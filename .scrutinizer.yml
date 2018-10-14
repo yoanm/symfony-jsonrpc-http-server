@@ -10,25 +10,19 @@ build_failure_conditions:
     - 'issues.label("coding-style").exists'        # No coding style issues allowed
 build:
     dependencies:
-        before:
-            - composer global require hirak/prestissimo
         override:
             - make build
     tests:
         stop_on_failure: true
         override:
-            - php-scrutinizer-run
-            -
-                command: make codestyle
-                analysis:
-                      file: 'build/reports/cs-data'
-                      format: 'php-cs-checkstyle'
             -
                 command: make coverage
                 idle_timeout: 1200
                 coverage:
                     file: 'build/coverage/clover.xml'
                     format: 'php-clover'
+            - php-scrutinizer-run --enable-security-analysis
+            - make codestyle
     cache:
         directories:
             - ~/.composer
@@ -38,11 +32,9 @@ build:
         variables:
             CI: 'true'
             TEST_OUTPUT_STYLE: 'pretty'
+            COMPOSER_OPTIONS: '--optimize-autoloader'
             COVERAGE_OUTPUT_STYLE: 'clover'
             COVERAGE_CLOVER_FILE_PATH: 'build/coverage/clover.xml'
-            PHPCS_REPORT_STYLE: 'checkstyle'
-            PHPCS_REPORT_FILE: 'build/reports/cs-data'
-            COMPOSER_OPTIONS: '--optimize-autoloader'
         php:
             version: "7.1"
         timezone: UTC

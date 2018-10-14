@@ -1,9 +1,9 @@
 language: php
 
 php:
-  - '7.0'
   - '7.1'
   - '7.2'
+  - '7.3'
 
 env:
   global:
@@ -11,9 +11,6 @@ env:
     TEST_OUTPUT_STYLE: 'pretty'
     PHPCS_REPORT_STYLE: 'full'
     COMPOSER_OPTIONS: '--optimize-autoloader'
-  matrix:
-    - SDK_VERSION: '~1.2'
-    - SDK_VERSION: '~2.0'
 
 sudo: false
 
@@ -22,10 +19,9 @@ matrix:
 
 before_install:
   # remove xdebug to speed up build
-  - phpenv config-rm xdebug.ini
+  - phpenv config-rm xdebug.ini || true
 
 install:
-  - composer require yoanm/jsonrpc-server-sdk:$SDK_VERSION
   - make build
 script:
   - make test-technical

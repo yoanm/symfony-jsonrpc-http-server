@@ -3,24 +3,17 @@ namespace Tests\Common\DependencyInjection;
 
 use Matthias\SymfonyDependencyInjectionTest\PhpUnit\AbstractExtensionTestCase;
 use Symfony\Component\DependencyInjection\Definition;
-use Yoanm\JsonRpcServer\Domain\Model\MethodResolverInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Tests\Common\Mock\ConcreteResolver;
+use Yoanm\JsonRpcServer\Domain\JsonRpcMethodResolverInterface;
 use Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\JsonRpcHttpServerExtension;
 
 abstract class AbstractTestClass extends AbstractExtensionTestCase
 {
     // Public services
     const EXPECTED_ENDPOINT_SERVICE_ID = 'json_rpc_http_server.endpoint';
-    const EXPECTED_SERVICE_NAME_RESOLVER_SERVICE_ID = 'json_rpc_http_server.resolver.service_name';
 
     // Public tags
-    const EXPECTED_METHOD_RESOLVER_TAG = 'json_rpc_http_server.method_resolver';
-    const EXPECTED_JSONRPC_METHOD_TAG = 'json_rpc_http_server.jsonrpc_method';
-
-    const EXPECTED_JSONRPC_METHOD_TAG_METHOD_NAME_KEY = 'method';
-
-    const EXPECTED_METHOD_MANAGER_SERVICE_ID = 'json_rpc_http_server.sdk.app.manager.method';
-    const EXPECTED_METHOD_RESOLVER_STUB_SERVICE_ID = 'json_rpc_http_server.infra.resolver.method';
-
     const EXPECTED_HTTP_ENDPOINT_PATH_CONTAINER_PARAM = 'json_rpc_http_server.http_endpoint_path';
 
     /**
@@ -33,12 +26,21 @@ abstract class AbstractTestClass extends AbstractExtensionTestCase
         ];
     }
 
-    protected function load(array $configurationValues = [])
+    protected function load(array $configurationValues = [], $mockResolver = true, $compile = true)
     {
+        // Inject event dispatcher
+        $this->setDefinition('event_dispatcher', new Definition(EventDispatcher::class));
+
+        if (true == $mockResolver) {
+            $this->mockResolver();
+        }
+
         parent::load($configurationValues);
 
-        // And then compile container to have correct injection
-        $this->compile();
+        if (true === $compile) {
+            // And then compile container to have correct injection
+            $this->compile();
+        }
     }
 
 
@@ -66,15 +68,11 @@ abstract class AbstractTestClass extends AbstractExtensionTestCase
             ->setPrivate(false);
     }
 
-    /**
-     * @param Definition $definition
-     * @param string     $methodName
-     */
-    protected function addJsonRpcMethodTag(Definition $definition, $methodName)
+    protected function mockResolver()
     {
-        $definition->addTag(
-            self::EXPECTED_JSONRPC_METHOD_TAG,
-            [self::EXPECTED_JSONRPC_METHOD_TAG_METHOD_NAME_KEY => $methodName]
+        $this->setDefinition(
+            'json_rpc_http_server.alias.method_resolver',
+            new Definition(ConcreteResolver::class)
         );
     }
 
@@ -83,9 +81,6 @@ abstract class AbstractTestClass extends AbstractExtensionTestCase
      */
     protected function createCustomMethodResolverDefinition()
     {
-        $customResolverService = new Definition($this->prophesize(MethodResolverInterface::class)->reveal());
-        $customResolverService->addTag(self::EXPECTED_METHOD_RESOLVER_TAG);
-
-        return $customResolverService;
+        return new Definition($this->prophesize(JsonRpcMethodResolverInterface::class)->reveal());
     }
 }

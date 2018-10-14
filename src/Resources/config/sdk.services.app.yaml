@@ -1,0 +1,41 @@
+services:
+  #Serialization
+  json_rpc_server_sdk.app.serialization.jsonrpc_request_denormalizer:
+      class: Yoanm\JsonRpcServer\App\Serialization\JsonRpcRequestDenormalizer
+
+  json_rpc_server_sdk.app.serialization.jsonrpc_response_normalizer:
+      class: Yoanm\JsonRpcServer\App\Serialization\JsonRpcResponseNormalizer
+
+  json_rpc_server_sdk.app.serialization.jsonrpc_call_dernormalizer:
+      class: Yoanm\JsonRpcServer\App\Serialization\JsonRpcCallDenormalizer
+      arguments:
+        - '@json_rpc_server_sdk.app.serialization.jsonrpc_request_denormalizer'
+
+  json_rpc_server_sdk.app.serialization.jsonrpc_call_response_normalizer:
+      class: Yoanm\JsonRpcServer\App\Serialization\JsonRpcCallResponseNormalizer
+      arguments:
+        - '@json_rpc_server_sdk.app.serialization.jsonrpc_response_normalizer'
+
+  json_rpc_server_sdk.app.serialization.jsonrpc_call_serializer:
+      class: Yoanm\JsonRpcServer\App\Serialization\JsonRpcCallSerializer
+      arguments:
+        - '@json_rpc_server_sdk.app.serialization.jsonrpc_call_dernormalizer'
+        - '@json_rpc_server_sdk.app.serialization.jsonrpc_call_response_normalizer'
+
+  #Handlers
+  json_rpc_server_sdk.app.handler.jsonrpc_request:
+      class: Yoanm\JsonRpcServer\App\Handler\JsonRpcRequestHandler
+      arguments:
+        - '@json_rpc_http_server.alias.method_resolver'
+        - '@json_rpc_server_sdk.app.creator.response'
+      tags: ['json_rpc_http_server.server_dispatcher_aware']
+
+  json_rpc_server_sdk.app.handler.exception:
+      class: Yoanm\JsonRpcServer\App\Handler\ExceptionHandler
+      arguments:
+        - '@json_rpc_server_sdk.app.creator.response'
+      tags: ['json_rpc_http_server.server_dispatcher_aware']
+
+  # Creator
+  json_rpc_server_sdk.app.creator.response:
+      class: Yoanm\JsonRpcServer\App\Creator\ResponseCreator

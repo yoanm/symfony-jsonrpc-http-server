@@ -1,10 +1,10 @@
 <?php
 namespace DemoApp\Resolver;
 
-use Yoanm\JsonRpcServer\Domain\Model\JsonRpcMethodInterface;
-use Yoanm\JsonRpcServer\Domain\Model\MethodResolverInterface;
+use Yoanm\JsonRpcServer\Domain\JsonRpcMethodInterface;
+use Yoanm\JsonRpcServer\Domain\JsonRpcMethodResolverInterface as BasResolverInterface;
 
-class JsonRpcMethodResolver implements MethodResolverInterface
+class JsonRpcMethodResolver implements BasResolverInterface
 {
     /** @var JsonRpcMethodInterface[] */
     private $methodList;
@@ -12,7 +12,7 @@ class JsonRpcMethodResolver implements MethodResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function resolve(string $methodName)
+    public function resolve(string $methodName) : ?JsonRpcMethodInterface
     {
         if (!array_key_exists($methodName, $this->methodList)) {
             return null;
