@@ -1,5 +1,0 @@
-# Configure the HTTP JSON-RPC endpoint on any path
-# And configure the controller
-homepage:
-    path: /my-json-rpc-endpoint
-    defaults: { _controller: 'json_rpc_http_server.endpoint:index' }

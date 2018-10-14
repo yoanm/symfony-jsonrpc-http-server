@@ -1,2 +1,5 @@
 framework:
     secret: '%env(APP_SECRET)%'
+
+json_rpc_http_server:
+    endpoint: '/my-custom-endpoint'
