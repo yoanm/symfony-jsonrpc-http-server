@@ -41,14 +41,17 @@ class ConfigFilesTest extends AbstractTestClass
      *
      * @param string $serviceId
      * @param string $expectedClassName
+     * @param bool   $public            Either is service is intended to be usable by others
      */
-    public function testShouldExposeUsableService($serviceId, $expectedClassName)
+    public function testShouldHaveService($serviceId, $expectedClassName, $public)
     {
         $this->load([], true, false);
 
         $this->assertContainerBuilderHasService($serviceId, $expectedClassName);
-        // Check that service is accessible through the container
-        $this->assertNotNull($this->container->get($serviceId));
+        if (true === $public) {
+            // Check that service is accessible through the container
+            $this->assertNotNull($this->container->get($serviceId));
+        }
     }
 
     /**
@@ -59,35 +62,43 @@ class ConfigFilesTest extends AbstractTestClass
         return [
             'SDK - App - Request Denormalizer' => [
                 'serviceId' => 'json_rpc_server_sdk.app.serialization.jsonrpc_request_denormalizer',
-                'serviceClassName' => JsonRpcRequestDenormalizer::class
+                'serviceClassName' => JsonRpcRequestDenormalizer::class,
+                'public' => false,
             ],
             'SDK - App - Response Normalizer' => [
                 'serviceId' => 'json_rpc_server_sdk.app.serialization.jsonrpc_response_normalizer',
-                'serviceClassName' => JsonRpcResponseNormalizer::class
+                'serviceClassName' => JsonRpcResponseNormalizer::class,
+                'public' => false,
             ],
             'SDK - App - Call Denormalizer' => [
                 'serviceId' => 'json_rpc_server_sdk.app.serialization.jsonrpc_call_dernormalizer',
-                'serviceClassName' => JsonRpcCallDenormalizer::class
+                'serviceClassName' => JsonRpcCallDenormalizer::class,
+                'public' => false,
             ],
             'SDK - App - Call response Normalizer' => [
                 'serviceId' => 'json_rpc_server_sdk.app.serialization.jsonrpc_call_response_normalizer',
-                'serviceClassName' => JsonRpcCallResponseNormalizer::class
+                'serviceClassName' => JsonRpcCallResponseNormalizer::class,
+                'public' => false,
             ],
             'SDK - App - Call Serializer' => [
                 'serviceId' => 'json_rpc_server_sdk.app.serialization.jsonrpc_call_serializer',
-                'serviceClassName' => JsonRpcCallSerializer::class
+                'serviceClassName' => JsonRpcCallSerializer::class,
+                'public' => false,
             ],
             'SDK - App - Request Handler' => [
                 'serviceId' => 'json_rpc_server_sdk.app.handler.jsonrpc_request',
-                'serviceClassName' => JsonRpcRequestHandler::class
+                'serviceClassName' => JsonRpcRequestHandler::class,
+                'public' => false,
             ],
             'SDK - App - Exception Handler' => [
                 'serviceId' => 'json_rpc_server_sdk.app.handler.exception',
-                'serviceClassName' => ExceptionHandler::class
+                'serviceClassName' => ExceptionHandler::class,
+                'public' => false,
             ],
             'SDK - App - Response Creator' => [
                 'serviceId' => 'json_rpc_server_sdk.app.creator.response',
-                'serviceClassName' => ResponseCreator::class
+                'serviceClassName' => ResponseCreator::class,
+                'public' => false,
             ],
         ];
     }
@@ -100,7 +111,8 @@ class ConfigFilesTest extends AbstractTestClass
         return [
             'SDK - Infra - Endpoint' => [
                 'serviceId' => 'json_rpc_server_sdk.infra.endpoint',
-                'serviceClassName' => JsonRpcEndpoint::class
+                'serviceClassName' => JsonRpcEndpoint::class,
+                'public' => true,
             ],
         ];
     }
@@ -113,11 +125,13 @@ class ConfigFilesTest extends AbstractTestClass
         return [
             'Bundle - Public - HTTP endpoint' => [
                 'serviceId' => 'json_rpc_http_server.endpoint',
-                'serviceClassName' => JsonRpcHttpEndpoint::class
+                'serviceClassName' => JsonRpcHttpEndpoint::class,
+                'public' => true,
             ],
             'Bundle - Public - Event Dispatcher' => [
                 'serviceId' => 'json_rpc_http_server.dispatcher.server',
-                'serviceClassName' => SymfonyJsonRpcServerDispatcher::class
+                'serviceClassName' => SymfonyJsonRpcServerDispatcher::class,
+                'public' => true,
             ],
         ];
     }

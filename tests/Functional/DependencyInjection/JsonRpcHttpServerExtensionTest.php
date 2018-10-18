@@ -6,7 +6,9 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Tests\Common\DependencyInjection\AbstractTestClass;
 use Tests\Common\DependencyInjection\ConcreteJsonRpcServerDispatcherAware;
+use Tests\Common\Mock\ConcreteParamsValidator;
 use Yoanm\JsonRpcServer\App\Dispatcher\JsonRpcServerDispatcherAwareTrait;
+use Yoanm\JsonRpcServer\Domain\JsonRpcMethodParamsValidatorInterface;
 use Yoanm\JsonRpcServer\Domain\JsonRpcMethodResolverInterface;
 use Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\JsonRpcHttpServerExtension;
 use Yoanm\SymfonyJsonRpcHttpServer\Endpoint\JsonRpcHttpEndpoint;
@@ -87,5 +89,42 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
         );
 
         $this->load();
+    }
+
+    public function testShouldInjectParamsValidatorAliasIfDefined()
+    {
+        $myValidatorServiceId = 'my-params-validator-service';
+        $paramsValidator = new Definition(ConcreteParamsValidator::class);
+
+        $this->setDefinition($myValidatorServiceId, $paramsValidator);
+        $this->container->setAlias(JsonRpcHttpServerExtension::PARAMS_VALIDATOR_ALIAS, $myValidatorServiceId);
+
+        $this->load();
+
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(
+            JsonRpcHttpServerExtension::REQUEST_HANDLER_SERVICE_ID,
+            'setMethodParamsValidator',
+            [new Reference(JsonRpcHttpServerExtension::PARAMS_VALIDATOR_ALIAS)]
+        );
+
+        $this->assertEndpointIsUsable();
+    }
+
+
+    /**
+     * @group yo
+     */
+    public function testShouldNotInjectParamsValidatorAliasIfNotDefined()
+    {
+        $this->load();
+
+        $handlerDefinition = $this->container->getDefinition(JsonRpcHttpServerExtension::REQUEST_HANDLER_SERVICE_ID);
+        foreach ($handlerDefinition->getMethodCalls() as $methodCall) {
+            if ('setMethodParamsValidator' === $methodCall[0]) {
+                $this->fail('Method call found for method "setMethodParamsValidator"');
+            }
+        }
+
+        $this->assertEndpointIsUsable();
     }
 }

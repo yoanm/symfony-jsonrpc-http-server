@@ -20,18 +20,16 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
     const EXTENSION_IDENTIFIER = 'json_rpc_http_server';
 
     /** Tags */
-    const JSONRPC_METHOD_PARAMS_VALIDATOR_TAG = 'json_rpc_http_server.method_params_validator';
-
     // Server dispatcher - Use this tag and server dispatcher will be injected
     const JSONRPC_SERVER_DISPATCHER_AWARE_TAG = 'json_rpc_http_server.server_dispatcher_aware';
-    // JSON-RPC Methods mapping - Use this tag and all JSON-RPC methods mapping will be injected
-    const JSONRPC_METHOD_MAPPING_AWARE_TAG = 'json_rpc_http_server.method_mapping_aware';
-    // JSON-RPC Methods - Use this tag and all JSON-RPC method instance will be injected
-    const JSONRPC_METHOD_AWARE_TAG = 'json_rpc_http_server.method_aware';
 
 
     /** Method resolver */
     const METHOD_RESOLVER_ALIAS = 'json_rpc_http_server.alias.method_resolver';
+    /** Params validator */
+    const PARAMS_VALIDATOR_ALIAS = 'json_rpc_http_server.alias.params_validator';
+
+    const REQUEST_HANDLER_SERVICE_ID = 'json_rpc_server_sdk.app.handler.jsonrpc_request';
 
     /**
      * {@inheritdoc}
@@ -55,6 +53,7 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
     public function process(ContainerBuilder $container)
     {
         $this->bindJsonRpcServerDispatcher($container);
+        $this->bindValidatorIfDefined($container);
     }
 
     /**
@@ -120,5 +119,19 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
         $httpEndpointPath = $config['endpoint'];
 
         $container->setParameter(self::EXTENSION_IDENTIFIER.'.http_endpoint_path', $httpEndpointPath);
+    }
+
+    private function bindValidatorIfDefined(ContainerBuilder $container)
+    {
+        if ($container->hasAlias(self::PARAMS_VALIDATOR_ALIAS)) {
+            $container->getDefinition(self::REQUEST_HANDLER_SERVICE_ID)
+                ->addMethodCall(
+                    'setMethodParamsValidator',
+                    [
+                        new Reference(self::PARAMS_VALIDATOR_ALIAS)
+                    ]
+                )
+            ;
+        }
     }
 }
