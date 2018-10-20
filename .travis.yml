@@ -11,6 +11,9 @@ env:
     TEST_OUTPUT_STYLE: 'pretty'
     PHPCS_REPORT_STYLE: 'full'
     COMPOSER_OPTIONS: '--optimize-autoloader'
+  matrix:
+  - SYMFONY_VERSION: '~3.0'
+  - SYMFONY_VERSION: '~4.0'
 
 sudo: false
 
@@ -22,6 +25,7 @@ before_install:
   - phpenv config-rm xdebug.ini || true
 
 install:
+  - composer require symfony/http-foundation:$SYMFONY_VERSION symfony/http-kernel:$SYMFONY_VERSION symfony/config:$SYMFONY_VERSION symfony/dependency-injection:$SYMFONY_VERSION
   - make build
 script:
   - make test-technical
