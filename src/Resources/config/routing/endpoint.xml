@@ -3,8 +3,19 @@
 <routes xmlns="http://symfony.com/schema/routing"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
-
-    <route id="json_rpc_http_server_endpoint" path="%json_rpc_http_server.http_endpoint_path%">
-        <default key="_controller">json_rpc_http_server.endpoint:index</default>
+    <!-- JSON-RPC HTTP endpoint -->
+    <route
+        id="json_rpc_http_server_endpoint"
+        path="%json_rpc_http_server.http_endpoint_path%"
+        methods="POST"
+    >
+        <default key="_controller">json_rpc_http_server.endpoint:httpPost</default>
+    </route>
+    <route
+        id="json_rpc_http_server_endpoint_options"
+        path="%json_rpc_http_server.http_endpoint_path%"
+        methods="OPTIONS"
+    >
+        <default key="_controller">json_rpc_http_server.endpoint:httpOptions</default>
     </route>
 </routes>

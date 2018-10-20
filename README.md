@@ -135,7 +135,7 @@ You have many ways to inject you json-rpc methods :
    ```yaml
    # config/config.yaml
    json_rpc_http_server: 
-       http_endpoint_path: '/my-custom-endpoint'
+       endpoint: '/my-custom-endpoint'
    ```
    
  - Or you can define your own route and bind the endpoint as below :

@@ -9,8 +9,4 @@ use Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\JsonRpcHttpServerExtensio
  */
 class JsonRpcHttpServerBundle extends Bundle
 {
-    public function getContainerExtension()
-    {
-        return new JsonRpcHttpServerExtension(true);
-    }
 }
