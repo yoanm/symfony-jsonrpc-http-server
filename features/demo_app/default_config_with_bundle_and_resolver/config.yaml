@@ -1,5 +1,0 @@
-framework:
-    secret: '%env(APP_SECRET)%'
-
-json_rpc_http_server:
-    method_resolver: 'jsonrpc.custom_method_resolver'
