@@ -25,6 +25,7 @@ services:
 
   ## Mapping aware service
   mapping_aware_service:
+    public: true # In order to allow Behat context to load it later
     class: DemoApp\Collector\MappingCollector
     tags: ['json_rpc_http_server.method_aware']
 
