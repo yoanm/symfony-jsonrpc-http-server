@@ -21,6 +21,8 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
     // Extension identifier (used in configuration for instance)
     public const EXTENSION_IDENTIFIER = 'json_rpc_http_server';
 
+    public const ENDPOINT_PATH_CONTAINER_PARAM_ID = self::EXTENSION_IDENTIFIER.'.http_endpoint_path';
+
     /** Tags */
     /**** Methods tags **/
     // Use this tag to inject your JSON-RPC methods into the default method resolver
@@ -101,7 +103,7 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
 
         $httpEndpointPath = $config['endpoint'];
 
-        $container->setParameter(self::EXTENSION_IDENTIFIER.'.http_endpoint_path', $httpEndpointPath);
+        $container->setParameter(self::ENDPOINT_PATH_CONTAINER_PARAM_ID, $httpEndpointPath);
     }
 
     /**
