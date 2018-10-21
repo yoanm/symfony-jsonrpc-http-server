@@ -3,7 +3,6 @@ namespace Tests\Functional\Event;
 
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
-use Symfony\Component\EventDispatcher\Event;
 use Yoanm\JsonRpcServer\Domain\Event\JsonRpcServerEvent;
 use Yoanm\SymfonyJsonRpcHttpServer\Event\SymfonyJsonRpcServerEvent;
 

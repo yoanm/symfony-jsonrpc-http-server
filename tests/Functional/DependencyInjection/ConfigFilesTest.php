@@ -2,7 +2,6 @@
 namespace Tests\Functional\DependencyInjection;
 
 use Tests\Common\DependencyInjection\AbstractTestClass;
-use Tests\Common\Mock\ConcreteResolver;
 use Yoanm\JsonRpcServer\App\Creator\ResponseCreator;
 use Yoanm\JsonRpcServer\App\Handler\ExceptionHandler;
 use Yoanm\JsonRpcServer\App\Handler\JsonRpcRequestHandler;
