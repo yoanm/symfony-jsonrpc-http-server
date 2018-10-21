@@ -2,7 +2,6 @@
 namespace Tests\Functional\Endpoint;
 
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

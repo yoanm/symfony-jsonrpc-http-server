@@ -1,8 +1,8 @@
 <?php
 namespace Tests\Functional\DependencyInjection;
 
-use Tests\Common\DependencyInjection\AbstractTestClass;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Tests\Common\DependencyInjection\AbstractTestClass;
 use Yoanm\JsonRpcServer\Domain\JsonRpcMethodInterface;
 use Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\JsonRpcMethodDefinitionHelper;
 

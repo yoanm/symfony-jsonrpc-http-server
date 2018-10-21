@@ -6,7 +6,6 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Tests\Common\Mock\ConcreteJsonRpcMethod;
 use Tests\Common\Mock\ConcreteResolver;
-use Yoanm\JsonRpcServer\Domain\JsonRpcMethodInterface;
 use Yoanm\JsonRpcServer\Domain\JsonRpcMethodResolverInterface;
 use Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\JsonRpcHttpServerExtension;
 
