@@ -4,17 +4,21 @@ namespace Tests\Common\DependencyInjection;
 use Matthias\SymfonyDependencyInjectionTest\PhpUnit\AbstractExtensionTestCase;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Tests\Common\Mock\ConcreteJsonRpcMethod;
 use Tests\Common\Mock\ConcreteResolver;
+use Yoanm\JsonRpcServer\Domain\JsonRpcMethodInterface;
 use Yoanm\JsonRpcServer\Domain\JsonRpcMethodResolverInterface;
 use Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\JsonRpcHttpServerExtension;
 
 abstract class AbstractTestClass extends AbstractExtensionTestCase
 {
-    // Public services
     const EXPECTED_ENDPOINT_SERVICE_ID = 'json_rpc_http_server.endpoint';
-
-    // Public tags
     const EXPECTED_HTTP_ENDPOINT_PATH_CONTAINER_PARAM = 'json_rpc_http_server.http_endpoint_path';
+    const EXPECTED_PARAMS_VALIDATOR_ALIAS = 'json_rpc_http_server.alias.params_validator';
+    const EXPECTED_REQUEST_HANDLER_SERVICE_ID = 'json_rpc_server_sdk.app.handler.jsonrpc_request';
+
+    const EXPECTED_JSONRPC_METHOD_TAG = 'json_rpc_http_server.jsonrpc_method';
+    const EXPECTED_JSONRPC_METHOD_TAG_METHOD_NAME_KEY = 'method';
 
     /**
      * {@inheritdoc}
@@ -59,12 +63,28 @@ abstract class AbstractTestClass extends AbstractExtensionTestCase
         $this->assertNotNull($this->container->get($jsonRpcMethodServiceId));
     }
 
+
+
     /**
+     * @param Definition $definition
+     * @param string     $methodName
+     */
+    protected function addJsonRpcMethodTag(Definition $definition, $methodName)
+    {
+        $definition->addTag(
+            self::EXPECTED_JSONRPC_METHOD_TAG,
+            [self::EXPECTED_JSONRPC_METHOD_TAG_METHOD_NAME_KEY => $methodName]
+        );
+    }
+
+    /**
+     * @param string $class
+     *
      * @return Definition
      */
-    protected function createJsonRpcMethodDefinition()
+    protected function createJsonRpcMethodDefinition($class = ConcreteJsonRpcMethod::class)
     {
-        return (new Definition(\stdClass::class))
+        return (new Definition($class))
             ->setPrivate(false);
     }
 

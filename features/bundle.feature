@@ -1,7 +1,7 @@
 Feature: demo symfony application
 
   Scenario: Check that all methods are available
-    # Ensure the two methods with tag have been loaded
+    # Ensure methods with tag have been loaded
     When I send following "POST" input on "/my-custom-endpoint" demoApp kernel endpoint:
     """
     {"jsonrpc": "2.0", "method": "bundledMethodA", "id": 1}

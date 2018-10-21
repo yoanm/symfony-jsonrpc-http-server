@@ -5,11 +5,13 @@ use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Yoanm\JsonRpcServer\App\Dispatcher\JsonRpcServerDispatcherAwareTrait;
+use Yoanm\JsonRpcServer\Domain\JsonRpcMethodAwareInterface;
 
 /**
  * Class JsonRpcHttpServerExtension
@@ -17,19 +19,26 @@ use Yoanm\JsonRpcServer\App\Dispatcher\JsonRpcServerDispatcherAwareTrait;
 class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInterface
 {
     // Extension identifier (used in configuration for instance)
-    const EXTENSION_IDENTIFIER = 'json_rpc_http_server';
+    public const EXTENSION_IDENTIFIER = 'json_rpc_http_server';
 
     /** Tags */
+    /**** Methods tags **/
+    // Use this tag to inject your JSON-RPC methods into the default method resolver
+    public const JSONRPC_METHOD_TAG = 'json_rpc_http_server.jsonrpc_method';
+    // And add an attribute with following key
+    public const JSONRPC_METHOD_TAG_METHOD_NAME_KEY = 'method';
+    /**** END - Methods tags **/
+
     // Server dispatcher - Use this tag and server dispatcher will be injected
-    const JSONRPC_SERVER_DISPATCHER_AWARE_TAG = 'json_rpc_http_server.server_dispatcher_aware';
+    public const JSONRPC_SERVER_DISPATCHER_AWARE_TAG = 'json_rpc_http_server.server_dispatcher_aware';
+
+    // JSON-RPC Methods mapping - Use this tag and all JSON-RPC method instance will be injected
+    // Useful for documentation for instance
+    public const JSONRPC_METHOD_AWARE_TAG = 'json_rpc_http_server.method_aware';
 
 
-    /** Method resolver */
-    const METHOD_RESOLVER_ALIAS = 'json_rpc_http_server.alias.method_resolver';
-    /** Params validator */
-    const PARAMS_VALIDATOR_ALIAS = 'json_rpc_http_server.alias.params_validator';
-
-    const REQUEST_HANDLER_SERVICE_ID = 'json_rpc_server_sdk.app.handler.jsonrpc_request';
+    private const PARAMS_VALIDATOR_ALIAS = 'json_rpc_http_server.alias.params_validator';
+    private const REQUEST_HANDLER_SERVICE_ID = 'json_rpc_server_sdk.app.handler.jsonrpc_request';
 
     /**
      * {@inheritdoc}
@@ -54,6 +63,7 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
     {
         $this->bindJsonRpcServerDispatcher($container);
         $this->bindValidatorIfDefined($container);
+        $this->binJsonRpcMethods($container);
     }
 
     /**
@@ -81,11 +91,25 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
     }
 
     /**
+     * @param array            $configs
+     * @param ContainerBuilder $container
+     */
+    private function compileAndProcessConfigurations(array $configs, ContainerBuilder $container) : void
+    {
+        $configuration = new Configuration();
+        $config = (new Processor())->processConfiguration($configuration, $configs);
+
+        $httpEndpointPath = $config['endpoint'];
+
+        $container->setParameter(self::EXTENSION_IDENTIFIER.'.http_endpoint_path', $httpEndpointPath);
+    }
+
+    /**
      * @param ContainerBuilder $container
      *
      * @return Reference|null Null in case no dispatcher found
      */
-    private function bindJsonRpcServerDispatcher(ContainerBuilder $container)
+    private function bindJsonRpcServerDispatcher(ContainerBuilder $container) : void
     {
         $dispatcherRef = new Reference('json_rpc_http_server.dispatcher.server');
         $dispatcherAwareServiceList = $container->findTaggedServiceIds(self::JSONRPC_SERVER_DISPATCHER_AWARE_TAG);
@@ -107,21 +131,7 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
         }
     }
 
-    /**
-     * @param array            $configs
-     * @param ContainerBuilder $container
-     */
-    private function compileAndProcessConfigurations(array $configs, ContainerBuilder $container)
-    {
-        $configuration = new Configuration();
-        $config = (new Processor())->processConfiguration($configuration, $configs);
-
-        $httpEndpointPath = $config['endpoint'];
-
-        $container->setParameter(self::EXTENSION_IDENTIFIER.'.http_endpoint_path', $httpEndpointPath);
-    }
-
-    private function bindValidatorIfDefined(ContainerBuilder $container)
+    private function bindValidatorIfDefined(ContainerBuilder $container) : void
     {
         if ($container->hasAlias(self::PARAMS_VALIDATOR_ALIAS)) {
             $container->getDefinition(self::REQUEST_HANDLER_SERVICE_ID)
@@ -132,6 +142,82 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
                     ]
                 )
             ;
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    private function binJsonRpcMethods(ContainerBuilder $container) : void
+    {
+        $mappingAwareServiceDefinitionList = $this->findAndValidateMappingAwareDefinitionList($container);
+
+        if (0 === count($mappingAwareServiceDefinitionList)) {
+            return;
+        }
+
+        $jsonRpcMethodDefinitionList = (new JsonRpcMethodDefinitionHelper())
+            ->findAndValidateJsonRpcMethodDefinition($container);
+
+        foreach ($jsonRpcMethodDefinitionList as $jsonRpcMethodServiceId => $methodNameList) {
+            foreach ($methodNameList as $methodName) {
+                $this->bindJsonRpcMethod($methodName, $jsonRpcMethodServiceId, $mappingAwareServiceDefinitionList);
+            }
+        }
+    }
+
+    /**
+     * @param string       $methodName
+     * @param Definition   $jsonRpcMethodDefinition
+     * @param Definition[] $mappingAwareServiceDefinitionList
+     */
+    private function bindJsonRpcMethod(
+        string $methodName,
+        string $jsonRpcMethodServiceId,
+        array $mappingAwareServiceDefinitionList
+    ) : void {
+        foreach ($mappingAwareServiceDefinitionList as $methodAwareServiceDefinition) {
+            $methodAwareServiceDefinition->addMethodCall(
+                'addJsonRpcMethod',
+                [$methodName, new Reference($jsonRpcMethodServiceId)]
+            );
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     *
+     * @return array
+     * @throws \ReflectionException
+     */
+    private function findAndValidateMappingAwareDefinitionList(ContainerBuilder $container): array
+    {
+        $mappingAwareServiceDefinitionList = [];
+        $methodAwareServiceIdList = array_keys($container->findTaggedServiceIds(self::JSONRPC_METHOD_AWARE_TAG));
+        foreach ($methodAwareServiceIdList as $serviceId) {
+            $definition = $container->getDefinition($serviceId);
+
+            $this->checkMethodAwareServiceIdList($definition, $serviceId, $container);
+
+            $mappingAwareServiceDefinitionList[$serviceId] = $definition;
+        }
+
+        return $mappingAwareServiceDefinitionList;
+    }
+
+    private function checkMethodAwareServiceIdList(
+        Definition $definition,
+        string $serviceId,
+        ContainerBuilder $container
+    ) : void {
+        $class = $container->getReflectionClass($definition->getClass());
+
+        if (null !== $class && !$class->implementsInterface(JsonRpcMethodAwareInterface::class)) {
+            throw new LogicException(sprintf(
+                'Service "%s" is taggued as JSON-RPC method aware but does not implement %s',
+                $serviceId,
+                JsonRpcMethodAwareInterface::class
+            ));
         }
     }
 }
