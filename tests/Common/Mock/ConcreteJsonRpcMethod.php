@@ -9,5 +9,4 @@ class ConcreteJsonRpcMethod implements JsonRpcMethodInterface
     {
         return null;
     }
-
 }

@@ -47,7 +47,6 @@ class JsonRpcMethodDefinitionHelperTest extends AbstractTestClass
             ],
             $methodList
         );
-
     }
 
     public function testShouldThrowAnExceptionIfJsonRpcMethodUsedWithTagDoesNotHaveTheMethodTagAttribute()
