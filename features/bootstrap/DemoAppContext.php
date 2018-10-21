@@ -8,6 +8,7 @@ use DemoApp\DefaultKernel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Yoanm\JsonRpcServer\Domain\JsonRpcMethodInterface;
 
 /**
  * Defines application features from the specific context.
@@ -44,6 +45,31 @@ class DemoAppContext implements Context
             json_decode($this->lastResponse->getContent(), true)
         );
         Assert::assertSame((int) $httpCode, $this->lastResponse->getStatusCode());
+    }
+
+    /**
+     * @Then Collector should have :methodClass JSON-RPC method with name :methodName
+     */
+    public function thenCollectorShouldHaveAMethodWithName($methodClass, $methodName)
+    {
+        $kernel = $this->getDemoAppKernel();
+        $kernel->boot();
+        $methodInstance = $kernel->getContainer()
+            ->get('mapping_aware_service')
+            ->resolve($methodName)
+        ;
+        $kernel->shutdown();
+
+        Assert::assertInstanceOf(
+            JsonRpcMethodInterface::class,
+            $methodInstance,
+            'Method must be a JsonRpcMethodInterface instance'
+        );
+        Assert::assertInstanceOf(
+            $methodClass,
+            $methodInstance,
+            sprintf('Method "%s" is not an instance of "%s"', $methodName, $methodClass)
+        );
     }
 
     /**

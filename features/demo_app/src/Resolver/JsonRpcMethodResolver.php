@@ -1,10 +1,11 @@
 <?php
 namespace DemoApp\Resolver;
 
+use Yoanm\JsonRpcServer\Domain\JsonRpcMethodAwareInterface;
 use Yoanm\JsonRpcServer\Domain\JsonRpcMethodInterface;
 use Yoanm\JsonRpcServer\Domain\JsonRpcMethodResolverInterface as BasResolverInterface;
 
-class JsonRpcMethodResolver implements BasResolverInterface
+class JsonRpcMethodResolver implements BasResolverInterface, JsonRpcMethodAwareInterface
 {
     /** @var JsonRpcMethodInterface[] */
     private $methodList;
@@ -25,7 +26,7 @@ class JsonRpcMethodResolver implements BasResolverInterface
      * @param JsonRpcMethodInterface $method
      * @param string $methodName
      */
-    public function addMethod(JsonRpcMethodInterface $method, string $methodName)
+    public function addJsonRpcMethod(string $methodName, JsonRpcMethodInterface $method) : void
     {
         $this->methodList[$methodName] = $method;
     }
