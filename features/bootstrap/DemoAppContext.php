@@ -54,20 +54,25 @@ class DemoAppContext implements Context
     {
         $kernel = $this->getDemoAppKernel();
         $kernel->boot();
-        $methodInstance = $kernel->getContainer()
+        $mappingList = $kernel->getContainer()
             ->get('mapping_aware_service')
-            ->resolve($methodName)
+            ->getMappingList()
         ;
         $kernel->shutdown();
 
+        if (!isset($mappingList[$methodName])) {
+            throw new \Exception(sprintf('No mapping defined to method name "%s"', $methodName));
+        }
+        $method = $mappingList[$methodName];
+
         Assert::assertInstanceOf(
             JsonRpcMethodInterface::class,
-            $methodInstance,
+            $method,
             'Method must be a JsonRpcMethodInterface instance'
         );
         Assert::assertInstanceOf(
             $methodClass,
-            $methodInstance,
+            $method,
             sprintf('Method "%s" is not an instance of "%s"', $methodName, $methodClass)
         );
     }

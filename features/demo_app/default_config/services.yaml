@@ -23,8 +23,10 @@ services:
     class: DemoApp\Resolver\JsonRpcMethodResolver
     tags: ['json_rpc_http_server.method_aware']
 
-  ## Mapping aware service (alias to the resolver)
-  mapping_aware_service: '@resolver'
+  ## Mapping aware service
+  mapping_aware_service:
+    class: DemoApp\Collector\MappingCollector
+    tags: ['json_rpc_http_server.method_aware']
 
   # Alias resolver mock to bundle resolver
   json_rpc_http_server.alias.method_resolver: '@resolver'
