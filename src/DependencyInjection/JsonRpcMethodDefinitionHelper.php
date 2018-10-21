@@ -25,9 +25,9 @@ class JsonRpcMethodDefinitionHelper
 
         foreach ($taggedServiceList as $serviceId => $tagAttributeList) {
             $this->validateJsonRpcMethodDefinition($serviceId, $container->getDefinition($serviceId));
-            $this->validateJsonRpcMethodTagAttributes($serviceId, $tagAttributeList);
 
             foreach ($tagAttributeList as $tagAttributeKey => $tagAttributeData) {
+                $this->validateJsonRpcMethodTagAttributes($serviceId, $tagAttributeData);
                 $methodName = $tagAttributeData[JsonRpcHttpServerExtension::JSONRPC_METHOD_TAG_METHOD_NAME_KEY];
                 $definitionList[$serviceId][] = $methodName;
             }

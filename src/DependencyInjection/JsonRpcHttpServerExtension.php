@@ -40,14 +40,6 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
     private const PARAMS_VALIDATOR_ALIAS = 'json_rpc_http_server.alias.params_validator';
     private const REQUEST_HANDLER_SERVICE_ID = 'json_rpc_server_sdk.app.handler.jsonrpc_request';
 
-    /** @var JsonRpcMethodDefinitionHelper */
-    private $jsonRpcMethodDefinitionHelper;
-
-    public function __construct()
-    {
-        $this->jsonRpcMethodDefinitionHelper = new JsonRpcMethodDefinitionHelper();
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -158,10 +150,14 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
      */
     private function binJsonRpcMethods(ContainerBuilder $container) : void
     {
-        $jsonRpcMethodDefinitionList = $this->jsonRpcMethodDefinitionHelper->findAndValidateJsonRpcMethodDefinition(
-            $container
-        );
         $mappingAwareServiceDefinitionList = $this->findAndValidateMappingAwareDefinitionList($container);
+
+        if (0 === count($mappingAwareServiceDefinitionList)) {
+            return;
+        }
+
+        $jsonRpcMethodDefinitionList = (new JsonRpcMethodDefinitionHelper())
+            ->findAndValidateJsonRpcMethodDefinition($container);
 
         foreach ($jsonRpcMethodDefinitionList as $jsonRpcMethodServiceId => $methodNameList) {
             foreach ($methodNameList as $methodName) {

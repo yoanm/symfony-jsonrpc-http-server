@@ -8,6 +8,7 @@ use Tests\Common\DependencyInjection\AbstractTestClass;
 use Tests\Common\DependencyInjection\ConcreteJsonRpcServerDispatcherAware;
 use Tests\Common\Mock\ConcreteParamsValidator;
 use Yoanm\JsonRpcServer\App\Dispatcher\JsonRpcServerDispatcherAwareTrait;
+use Yoanm\JsonRpcServer\Domain\JsonRpcMethodAwareInterface;
 use Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\JsonRpcHttpServerExtension;
 
 /**
@@ -93,28 +94,24 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
         $paramsValidator = new Definition(ConcreteParamsValidator::class);
 
         $this->setDefinition($myValidatorServiceId, $paramsValidator);
-        $this->container->setAlias(JsonRpcHttpServerExtension::PARAMS_VALIDATOR_ALIAS, $myValidatorServiceId);
+        $this->container->setAlias(self::EXPECTED_PARAMS_VALIDATOR_ALIAS, $myValidatorServiceId);
 
         $this->load();
 
         $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(
-            JsonRpcHttpServerExtension::REQUEST_HANDLER_SERVICE_ID,
+            self::EXPECTED_REQUEST_HANDLER_SERVICE_ID,
             'setMethodParamsValidator',
-            [new Reference(JsonRpcHttpServerExtension::PARAMS_VALIDATOR_ALIAS)]
+            [new Reference(self::EXPECTED_PARAMS_VALIDATOR_ALIAS)]
         );
 
         $this->assertEndpointIsUsable();
     }
 
-
-    /**
-     * @group yo
-     */
     public function testShouldNotInjectParamsValidatorAliasIfNotDefined()
     {
         $this->load();
 
-        $handlerDefinition = $this->container->getDefinition(JsonRpcHttpServerExtension::REQUEST_HANDLER_SERVICE_ID);
+        $handlerDefinition = $this->container->getDefinition(self::EXPECTED_REQUEST_HANDLER_SERVICE_ID);
         foreach ($handlerDefinition->getMethodCalls() as $methodCall) {
             if ('setMethodParamsValidator' === $methodCall[0]) {
                 $this->fail('Method call found for method "setMethodParamsValidator"');
@@ -122,5 +119,70 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
         }
 
         $this->assertEndpointIsUsable();
+    }
+
+    public function testShouldBindJsonRpcMethodsToMethodAwareServices()
+    {
+        $methodAwareServiceServiceId = uniqid();
+        $jsonRpcMethodServiceId = uniqid();
+        $jsonRpcMethodServiceId2 = uniqid();
+        $methodName = 'my-method-name';
+        $methodName2 = 'my-method-name-2';
+
+        // A first method
+        $methodService = $this->createJsonRpcMethodDefinition();
+        $this->addJsonRpcMethodTag($methodService, $methodName);
+        $this->setDefinition($jsonRpcMethodServiceId, $methodService);
+        // A second method
+        $methodService2 = $this->createJsonRpcMethodDefinition();
+        $this->addJsonRpcMethodTag($methodService2, $methodName2);
+        $this->setDefinition($jsonRpcMethodServiceId2, $methodService2);
+
+        $methodAwareDefinition = new Definition(JsonRpcMethodAwareInterface::class);
+        $methodAwareDefinition->addTag(JsonRpcHttpServerExtension::JSONRPC_METHOD_AWARE_TAG);
+        $this->setDefinition($methodAwareServiceServiceId, $methodAwareDefinition);
+
+        $this->load();
+
+        // Assert that method mapping have been correctly injected
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(
+            $methodAwareServiceServiceId,
+            'addJsonRpcMethod',
+            [
+                $methodName,
+                $jsonRpcMethodServiceId
+            ],
+            0
+        );
+        // Assert that method mapping have been correctly injected
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(
+            $methodAwareServiceServiceId,
+            'addJsonRpcMethod',
+            [
+                $methodName2,
+                $jsonRpcMethodServiceId2
+            ],
+            1
+        );
+
+        $this->assertEndpointIsUsable();
+    }
+
+    public function testShouldThowAnExceptionIfMethodAwareServiceDoesNotImplementRightInterface()
+    {
+        $methodAwareServiceServiceId = uniqid();
+
+        $methodAwareDefinition = new Definition(\stdClass::class);
+        $methodAwareDefinition->addTag(JsonRpcHttpServerExtension::JSONRPC_METHOD_AWARE_TAG);
+        $this->setDefinition($methodAwareServiceServiceId, $methodAwareDefinition);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Service "%s" is taggued as JSON-RPC method aware but does not implement %s',
+            $methodAwareServiceServiceId,
+            JsonRpcMethodAwareInterface::class
+        ));
+
+        $this->load();
     }
 }
