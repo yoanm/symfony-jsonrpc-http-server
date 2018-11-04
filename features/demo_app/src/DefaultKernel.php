@@ -9,6 +9,7 @@ class DefaultKernel extends AbstractKernel
 {
     public function registerBundles()
     {
+        /** @noinspection PhpIncludeInspection */
         $contents = require $this->getProjectDir().'/'.$this->getConfigDirectory().'/bundles.php';
         foreach ($contents as $class => $envs) {
             if (isset($envs['all']) || isset($envs[$this->environment])) {

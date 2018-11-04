@@ -54,10 +54,8 @@ class JsonRpcHttpEndpointTest extends TestCase
     public function testHttOptionsShouldReturnAllowedMethodsAndContentType()
     {
         $expectedAllowedMethodList = [Request::METHOD_POST, Request::METHOD_OPTIONS];
-        /** @var Request|ObjectProphecy $request */
-        $request = $this->prophesize(Request::class);
 
-        $response = $this->endpoint->httpOptions($request->reveal());
+        $response = $this->endpoint->httpOptions();
 
         $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
         $this->assertSame('application/json', $response->headers->get('Content-Type'));
