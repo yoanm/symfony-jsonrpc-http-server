@@ -26,6 +26,11 @@
       "DemoApp\\": "features/demo_app/src"
     }
   },
+  "suggest": {
+    "yoanm/symfony-jsonrpc-server-psr11-resolver": "Compatible PSR11 method resolver",
+    "yoanm/symfony-jsonrpc-params-validator": "Compatible params validator",
+    "yoanm/symfony-jsonrpc-http-server-doc": "Create documentation for your server"
+  },
   "require": {
     "php": ">=7.1",
     "yoanm/jsonrpc-server-sdk": "dev-release/3.0.0",
