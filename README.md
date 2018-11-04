@@ -1,11 +1,11 @@
 # JSON-RPC server symfony plugin
- [![License](https://img.shields.io/github/license/yoanm/symfony-jsonrpc-http-server.svg)](https://github.com/yoanm/symfony-jsonrpc-http-server) [![Code size](https://img.shields.io/github/languages/code-size/yoanm/symfony-jsonrpc-http-server.svg)](https://github.com/yoanm/symfony-jsonrpc-http-server) [![PHP Versions](https://img.shields.io/badge/php-7.0%20%2F%207.1%20%2F%207.2-8892BF.svg)](https://php.net/)
+ [![License](https://img.shields.io/github/license/yoanm/symfony-jsonrpc-http-server.svg)](https://github.com/yoanm/symfony-jsonrpc-http-server) [![Code size](https://img.shields.io/github/languages/code-size/yoanm/symfony-jsonrpc-http-server.svg)](https://github.com/yoanm/symfony-jsonrpc-http-server)
 
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/yoanm/symfony-jsonrpc-http-server/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/yoanm/symfony-jsonrpc-http-server/?branch=master) [![Build Status](https://scrutinizer-ci.com/g/yoanm/symfony-jsonrpc-http-server/badges/build.png?b=master)](https://scrutinizer-ci.com/g/yoanm/symfony-jsonrpc-http-server/build-status/master) [![Code Coverage](https://scrutinizer-ci.com/g/yoanm/symfony-jsonrpc-http-server/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/yoanm/symfony-jsonrpc-http-server/?branch=master)
 
-[![Travis Build Status](https://img.shields.io/travis/yoanm/symfony-jsonrpc-http-server/master.svg?label=travis)](https://travis-ci.org/yoanm/symfony-jsonrpc-http-server) [![Travis PHP versions](https://img.shields.io/travis/php-v/yoanm/symfony-jsonrpc-http-server.svg)](https://travis-ci.org/yoanm/symfony-jsonrpc-http-server)
+[![Travis Build Status](https://img.shields.io/travis/yoanm/symfony-jsonrpc-http-server/master.svg?label=travis)](https://travis-ci.org/yoanm/symfony-jsonrpc-http-server) [![Travis PHP versions](https://img.shields.io/travis/php-v/yoanm/symfony-jsonrpc-http-server.svg)](https://travis-ci.org/yoanm/symfony-jsonrpc-http-server) [![Symfony Versions](https://img.shields.io/badge/Symfony-v3%20%2F%20v4-8892BF.svg)](https://php.net/)
 
-[![Latest Stable Version](https://img.shields.io/packagist/v/yoanm/symfony-jsonrpc-http-server.svg)](https://packagist.org/packages/yoanm/symfony-jsonrpc-http-server) [![Packagist PHP version](https://img.shields.io/packagist/php-v/yoanm/symfony-jsonrpc-http-server.svg)](https://packagist.org/packages/yoanm/symfony-jsonrpc-http-server)
+[![Latest Stable Version](https://img.shields.io/packagist/v/yoanm/symfony-jsonrpc-http-server.svg)](https://packagist.org/packages/yoanm/symfony-jsonrpc-http-server)
 
 Symfony JSON-RPC HTTP Server to convert an HTTP json-rpc request into HTTP json-rpc response
 
