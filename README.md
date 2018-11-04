@@ -5,7 +5,7 @@
 
 [![Travis Build Status](https://img.shields.io/travis/yoanm/symfony-jsonrpc-http-server/master.svg?label=Travis&logo=travis)](https://travis-ci.org/yoanm/symfony-jsonrpc-http-server) [![Travis PHP versions](https://img.shields.io/travis/php-v/yoanm/symfony-jsonrpc-http-server.svg?logo=travis)](https://travis-ci.org/yoanm/symfony-jsonrpc-http-server) [![Travis Symfony Versions](https://img.shields.io/badge/Symfony-v3%20%2F%20v4-8892BF.svg?logo=travis)](https://php.net/)
 
-[![Latest Stable Version](https://img.shields.io/packagist/v/yoanm/symfony-jsonrpc-http-server.svg)](https://packagist.org/packages/yoanm/symfony-jsonrpc-http-server)
+[![Latest Stable Version](https://img.shields.io/packagist/v/yoanm/symfony-jsonrpc-http-server.svg)](https://packagist.org/packages/yoanm/symfony-jsonrpc-http-server) [![Packagist PHP version](https://img.shields.io/packagist/php-v/yoanm/symfony-jsonrpc-http-server.svg)](https://packagist.org/packages/yoanm/symfony-jsonrpc-http-server)
 
 Symfony JSON-RPC HTTP Server to convert an HTTP json-rpc request into HTTP json-rpc response
 
