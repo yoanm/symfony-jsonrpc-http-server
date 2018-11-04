@@ -108,8 +108,6 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
 
     /**
      * @param ContainerBuilder $container
-     *
-     * @return Reference|null Null in case no dispatcher found
      */
     private function bindJsonRpcServerDispatcher(ContainerBuilder $container) : void
     {
@@ -170,7 +168,7 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
 
     /**
      * @param string       $methodName
-     * @param Definition   $jsonRpcMethodDefinition
+     * @param string       $jsonRpcMethodServiceId
      * @param Definition[] $mappingAwareServiceDefinitionList
      */
     private function bindJsonRpcMethod(
@@ -190,7 +188,6 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
      * @param ContainerBuilder $container
      *
      * @return array
-     * @throws \ReflectionException
      */
     private function findAndValidateMappingAwareDefinitionList(ContainerBuilder $container): array
     {

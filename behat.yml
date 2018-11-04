@@ -3,3 +3,17 @@ default:
     default:
       contexts:
         - Tests\Functional\BehatContext\DemoAppContext: ~
+coverage:
+  extensions:
+    LeanPHP\Behat\CodeCoverage\Extension:
+      drivers:
+      - local
+      filter:
+        whitelist:
+          include:
+            directories:
+              'src': ~
+      report:
+        format:   html
+        options:
+          target: build/behat-coverage

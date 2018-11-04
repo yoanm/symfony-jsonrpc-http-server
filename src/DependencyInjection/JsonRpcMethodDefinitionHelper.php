@@ -15,7 +15,6 @@ class JsonRpcMethodDefinitionHelper
      * @param ContainerBuilder $container
      *
      * @return array
-     * @throws \ReflectionException
      */
     public function findAndValidateJsonRpcMethodDefinition(ContainerBuilder $container) : array
     {
@@ -56,7 +55,6 @@ class JsonRpcMethodDefinitionHelper
      * @param string     $serviceId
      * @param Definition $definition
      *
-     * @throws \ReflectionException
      * @throws \LogicException      In case definition is not valid
      */
     private function validateJsonRpcMethodDefinition(string $serviceId, Definition $definition) : void
