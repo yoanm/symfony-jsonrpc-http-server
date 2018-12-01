@@ -7,7 +7,9 @@
 
 [![Latest Stable Version](https://img.shields.io/packagist/v/yoanm/symfony-jsonrpc-http-server.svg)](https://packagist.org/packages/yoanm/symfony-jsonrpc-http-server) [![Packagist PHP version](https://img.shields.io/packagist/php-v/yoanm/symfony-jsonrpc-http-server.svg)](https://packagist.org/packages/yoanm/symfony-jsonrpc-http-server)
 
-Symfony JSON-RPC HTTP Server to convert an HTTP json-rpc request into HTTP json-rpc response
+Symfony JSON-RPC HTTP Server to convert an HTTP json-rpc request into HTTP json-rpc response.
+
+Symfony bundle for [`yoanm/jsonrpc-server-sdk`](https://raw.githubusercontent.com/yoanm/php-jsonrpc-server-sdk)
 
 ## How to use
 
