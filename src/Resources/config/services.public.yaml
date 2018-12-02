@@ -15,4 +15,4 @@ services:
   json_rpc_http_server.method_resolver:
     class: Yoanm\SymfonyJsonRpcHttpServer\Resolver\MethodResolver
     arguments:
-      - '@json_rpc_http_server.service_subscriber.method_resolver'
+      - '@json_rpc_http_server.service_locator.method_resolver'

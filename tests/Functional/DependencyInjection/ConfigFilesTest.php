@@ -142,7 +142,7 @@ class ConfigFilesTest extends AbstractTestClass
     {
         return [
             'Bundle - Private - JSON-RPC method resolver ServiceLocator' => [
-                'serviceId' => 'json_rpc_http_server.service_subscriber.method_resolver',
+                'serviceId' => 'json_rpc_http_server.service_locator.method_resolver',
                 'serviceClassName' => ServiceLocator::class,
                 'public' => true,
             ],

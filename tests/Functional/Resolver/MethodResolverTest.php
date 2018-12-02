@@ -8,7 +8,7 @@ use Yoanm\JsonRpcServer\Domain\JsonRpcMethodInterface;
 use Yoanm\SymfonyJsonRpcHttpServer\Resolver\MethodResolver;
 
 /**
- * @covers \Yoanm\SymfonyJsonRpcHttpServer\Resolver\MethodResolver
+ * @covers Yoanm\SymfonyJsonRpcHttpServer\Resolver\MethodResolver
  */
 class MethodResolverTest extends TestCase
 {
@@ -48,8 +48,6 @@ class MethodResolverTest extends TestCase
             $this->resolver->resolve($methodName)
         );
     }
-
-
 
     public function testShouldReturnNullIfNoMethodRegisteredForGivenName()
     {

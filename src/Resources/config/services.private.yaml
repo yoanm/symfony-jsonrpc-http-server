@@ -2,7 +2,7 @@ services:
   _defaults:
       public: false
 
-  json_rpc_http_server.service_subscriber.method_resolver:
+  json_rpc_http_server.service_locator.method_resolver:
     class: Symfony\Component\DependencyInjection\ServiceLocator
     tags: ['container.service_locator']
     arguments:

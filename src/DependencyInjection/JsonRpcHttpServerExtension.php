@@ -170,7 +170,7 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
 
         // Service locator for method resolver
         // => first argument is an array of wanted service with keys as alias for internal use
-        $container->getDefinition('json_rpc_http_server.service_subscriber.method_resolver')
+        $container->getDefinition('json_rpc_http_server.service_locator.method_resolver')
             ->setArgument(0, $methodMappingList);
     }
 
