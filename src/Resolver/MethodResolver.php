@@ -6,7 +6,7 @@ use Yoanm\JsonRpcServer\Domain\JsonRpcMethodInterface;
 use Yoanm\JsonRpcServer\Domain\JsonRpcMethodResolverInterface;
 
 /**
- * Class ServiceSubscriberMethodResolver
+ * Class MethodResolver
  */
 class MethodResolver implements JsonRpcMethodResolverInterface
 {
