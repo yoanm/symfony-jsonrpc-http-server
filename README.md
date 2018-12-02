@@ -19,7 +19,7 @@ See below how to configure it.
 
 ## Configuration
 
-Bundle requires only one things : 
+Bundle requires only one thing : 
  - JSON-RPC Methods which are compatible with [`yoanm/jsonrpc-server-sdk`](https://raw.githubusercontent.com/yoanm/php-jsonrpc-server-sdk)
  
 It comes with [built-in method resolver](./src/Resolver/MethodResolver.php) which use a [service locator](https://symfony.com/doc/3.4/service_container/service_subscribers_locators.html#defining-a-service-locator). Using a service locator allow to load (and so instanciate dependencies, dependencies of dependencies, etc) method only when required (usually only one method is required by request, except for batch requests which will load one or more methods).
