@@ -13,9 +13,16 @@ Symfony bundle for [`yoanm/jsonrpc-server-sdk`](https://raw.githubusercontent.co
 
 ## How to use
 
-Bundle requires only two things : 
- - A method resolver which is compatible with [`yoanm/jsonrpc-server-sdk`](https://raw.githubusercontent.com/yoanm/php-jsonrpc-server-sdk)
+Once configured, your project is ready to handle HTTP `POST` request on `/json-rpc` endpoint.
+
+See below how to configure it.
+
+## Configuration
+
+Bundle requires only one things : 
  - JSON-RPC Methods which are compatible with [`yoanm/jsonrpc-server-sdk`](https://raw.githubusercontent.com/yoanm/php-jsonrpc-server-sdk)
+ 
+It comes with [built-in method resolver](./src/Resolver/MethodResolver.php) which use a [service locator](https://symfony.com/doc/3.4/service_container/service_subscribers_locators.html#defining-a-service-locator). Using a service locator allow to load (and so instanciate dependencies, dependencies of dependencies, etc) method only when required (usually only one method is required by request, except for batch requests which will load one or more methods).
  
 *[Behat demo app configuration folders](./features/demo_app/) can be used as examples.*
 
@@ -46,10 +53,10 @@ Bundle requires only two things :
    json_rpc_http_server: ~
    # Or the following in case you want to customize endpoint path
    #json_rpc_http_server:
-   #  endpoint: '/my-custom-endpoint'
+   #  endpoint: '/my-custom-endpoint' # Default to '/json-rpc'
    ```
 
-## JSON-RPC Method mapping
+### JSON-RPC Method mapping
 In order to inject yours JSON-RPC method into the server add the tag `json_rpc_http_server.jsonrpc_method` and the key/value `method` like following example :
 ```yaml
 services:
@@ -60,12 +67,41 @@ services:
        - { name: 'json_rpc_http_server.jsonrpc_method', method: 'method-a-alias' }
 ```
 
+### Methods mapping aware
+In case you want to be aware of which methods are registered inside the JSON-RPC server, you can use the `json_rpc_http_server.method_aware`. Your class must implements `JsonRpcMethodAwareInterface`.
+
+```php
+use Yoanm\JsonRpcServer\Domain\JsonRpcMethodAwareInterface;
+use Yoanm\JsonRpcServer\Domain\JsonRpcMethodInterface;
+
+class MappingCollector implements JsonRpcMethodAwareInterface
+{
+  /** @var JsonRpcMethodInterface[] */
+  private $mappingList = [];
+
+  public function addJsonRpcMethod(string $methodName, JsonRpcMethodInterface $method): void
+  {
+    $this->mappingList[$methodName] = $method;
+  }
+
+  /**
+   * @return JsonRpcMethodInterface[]
+   */
+  public function getMappingList() : array
+  {
+    return $this->mappingList;
+  }
+}
+```
+
+```yaml
+mapping_aware_service:
+  class: App\Collector\MappingCollector
+  tags: ['json_rpc_http_server.method_aware']
+```
    
-## Method resolver
-
-A method resolver is required, you can either use [`yoanm/symfony-jsonrpc-server-psr11-resolver`](https://github.com/yoanm/symfony-jsonrpc-server-psr11-resolver) or write your own
-
-In case you want to use your own, it will be automatically injected if you use the tag `json_rpc_http_server.method_resolver` :
+### Custom method resolver
+In case you want to use your method resolver implementation, use the tag `json_rpc_http_server.method_resolver`, it will be automatically injected inside JSON-RPC server:
 ```yaml
 services:
   my.custom_method_resolver.service:
@@ -73,6 +109,7 @@ services:
     tags: ['json_rpc_http_server.method_resolver']
 ```
 
+You can take advantage of method mapping aware mechanism or write your custom resolution logic.
 
 ## Contributing
 See [contributing note](./CONTRIBUTING.md)
