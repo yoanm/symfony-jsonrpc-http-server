@@ -1,19 +1,15 @@
 <?php
 namespace Tests\Functional\BehatContext;
 
-use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
-use DemoApp\AbstractKernel;
-use DemoApp\DefaultKernel;
 use PHPUnit\Framework\Assert;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yoanm\JsonRpcServer\Domain\JsonRpcMethodInterface;
 
 /**
  * Defines application features from the specific context.
  */
-class DemoAppContext implements Context
+class DemoAppContext extends AbstractContext
 {
     /** @var Response|null */
     private $lastResponse;
@@ -23,14 +19,11 @@ class DemoAppContext implements Context
      */
     public function whenISendFollowingPayloadToDemoApp($httpMethod, $uri, PyStringNode $payload)
     {
-        $this->lastResponse = null;
-
-        $kernel = $this->getDemoAppKernel();
-        $kernel->boot();
-        $request = Request::create($uri, $httpMethod, [], [], [], [], $payload->getRaw());
-        $this->lastResponse = $kernel->handle($request);
-        $kernel->terminate($request, $this->lastResponse);
-        $kernel->shutdown();
+        $this->lastResponse = $this->sendHttpContentTo(
+            $uri,
+            $httpMethod,
+            $payload->getRaw()
+        );
     }
 
     /**
@@ -41,8 +34,8 @@ class DemoAppContext implements Context
         Assert::assertInstanceOf(Response::class, $this->lastResponse);
         // Decode payload to get ride of indentation, spacing, etc
         Assert::assertEquals(
-            json_decode($payload->getRaw(), true),
-            json_decode($this->lastResponse->getContent(), true)
+            $this->jsonDecode($payload->getRaw()),
+            $this->jsonDecode($this->lastResponse->getContent())
         );
         Assert::assertSame((int) $httpCode, $this->lastResponse->getStatusCode());
     }
@@ -75,16 +68,5 @@ class DemoAppContext implements Context
             $method,
             sprintf('Method "%s" is not an instance of "%s"', $methodName, $methodClass)
         );
-    }
-
-    /**
-     * @return AbstractKernel
-     */
-    protected function getDemoAppKernel()
-    {
-        $env = 'prod';
-        $debug = true;
-
-        return new DefaultKernel($env, $debug);
     }
 }
