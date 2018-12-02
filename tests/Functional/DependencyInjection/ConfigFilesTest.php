@@ -1,6 +1,7 @@
 <?php
 namespace Tests\Functional\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Tests\Common\DependencyInjection\AbstractTestClass;
 use Yoanm\JsonRpcServer\App\Creator\ResponseCreator;
 use Yoanm\JsonRpcServer\App\Handler\ExceptionHandler;
@@ -14,6 +15,7 @@ use Yoanm\JsonRpcServer\Infra\Endpoint\JsonRpcEndpoint;
 use Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\JsonRpcHttpServerExtension;
 use Yoanm\SymfonyJsonRpcHttpServer\Dispatcher\SymfonyJsonRpcServerDispatcher;
 use Yoanm\SymfonyJsonRpcHttpServer\Endpoint\JsonRpcHttpEndpoint;
+use Yoanm\SymfonyJsonRpcHttpServer\Resolver\MethodResolver;
 
 /**
  * /!\ This test class does not cover JsonRpcHttpServerExtension, it covers yaml configuration files
@@ -128,6 +130,25 @@ class ConfigFilesTest extends AbstractTestClass
             'Bundle - Public - Event Dispatcher' => [
                 'serviceId' => 'json_rpc_http_server.dispatcher.server',
                 'serviceClassName' => SymfonyJsonRpcServerDispatcher::class,
+                'public' => true,
+            ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function provideBundlePrivateServiceIdAndClass()
+    {
+        return [
+            'Bundle - Private - JSON-RPC method resolver ServiceLocator' => [
+                'serviceId' => 'json_rpc_http_server.service_locator.method_resolver',
+                'serviceClassName' => ServiceLocator::class,
+                'public' => true,
+            ],
+            'Bundle - Private - MethodResolver alias' => [
+                'serviceId' => 'json_rpc_http_server.alias.method_resolver',
+                'serviceClassName' => MethodResolver::class,
                 'public' => true,
             ],
         ];

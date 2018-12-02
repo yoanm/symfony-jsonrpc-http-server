@@ -18,16 +18,8 @@ services:
     tags:
     - { name: 'json_rpc_http_server.jsonrpc_method', method: 'bundledGetAnotherDummy' }
 
-  ## Resolver mock
-  resolver:
-    class: DemoApp\Resolver\JsonRpcMethodResolver
-    tags: ['json_rpc_http_server.method_aware']
-
   ## Mapping aware service
   mapping_aware_service:
     public: true # In order to allow Behat context to load it later
     class: DemoApp\Collector\MappingCollector
     tags: ['json_rpc_http_server.method_aware']
-
-  # Alias resolver mock to bundle resolver
-  json_rpc_http_server.alias.method_resolver: '@resolver'
