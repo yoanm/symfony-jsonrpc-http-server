@@ -55,6 +55,7 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
         );
         $loader->load('sdk.services.app.yaml');
         $loader->load('sdk.services.infra.yaml');
+        $loader->load('services.private.yaml');
         $loader->load('services.public.yaml');
     }
 
@@ -159,11 +160,18 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
         $jsonRpcMethodDefinitionList = (new JsonRpcMethodDefinitionHelper())
             ->findAndValidateJsonRpcMethodDefinition($container);
 
+        $methodMappingList = [];
         foreach ($jsonRpcMethodDefinitionList as $jsonRpcMethodServiceId => $methodNameList) {
             foreach ($methodNameList as $methodName) {
+                $methodMappingList[$methodName] = new Reference($jsonRpcMethodServiceId);
                 $this->bindJsonRpcMethod($methodName, $jsonRpcMethodServiceId, $mappingAwareServiceDefinitionList);
             }
         }
+
+        // Service locator for method resolver
+        // => first argument is an array of wanted service with keys as alias for internal use
+        $container->getDefinition('json_rpc_http_server.service_subscriber.method_resolver')
+            ->setArgument(0, $methodMappingList);
     }
 
     /**
