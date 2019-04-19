@@ -2,7 +2,6 @@
   "name": "yoanm/symfony-jsonrpc-http-server",
   "description": "Symfony Bundle to convert an HTTP json-rpc request into HTTP json-rpc response",
   "license": "MIT",
-  "minimum-stability": "dev",
   "type": "library",
   "support": {
     "issues": "https://github.com/yoanm/symfony-jsonrpc-http-server/issues"
@@ -33,7 +32,7 @@
   },
   "require": {
     "php": ">=7.1",
-    "yoanm/jsonrpc-server-sdk": "dev-release/3.0.0",
+    "yoanm/jsonrpc-server-sdk": "v3.0.0",
     "symfony/http-foundation": "^3.0 || ^4.0",
     "symfony/http-kernel": "^3.0 || ^4.0",
     "symfony/config": "^3.0 || ^4.0",
