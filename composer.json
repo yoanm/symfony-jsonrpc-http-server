@@ -32,7 +32,7 @@
   },
   "require": {
     "php": ">=7.1",
-    "yoanm/jsonrpc-server-sdk": "v3.0.0",
+    "yoanm/jsonrpc-server-sdk": "^3.0",
     "symfony/http-foundation": "^3.0 || ^4.0",
     "symfony/http-kernel": "^3.0 || ^4.0",
     "symfony/config": "^3.0 || ^4.0",
