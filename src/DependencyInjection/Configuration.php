@@ -6,6 +6,8 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
+    const DEFAULT_ENDPOINT = '/json-rpc';
+
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
@@ -13,40 +15,12 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root(JsonRpcHttpServerExtension::EXTENSION_IDENTIFIER);
 
         $rootNode
+            ->addDefaultsIfNotSet()
             ->children()
-                ->variableNode('http_endpoint_path')
-                    ->info('Your custom http endpoint path')
-                    ->defaultValue(JsonRpcHttpServerExtension::HTTP_ENDPOINT_PATH)
-                ->end()
-                ->variableNode('method_resolver')
-                    ->info('Your custom method resolver service')
-                    ->treatNullLike(false)
-                    ->defaultFalse()
-                ->end()
-                ->arrayNode('methods_mapping')
-                    ->requiresAtLeastOneElement()
-                    ->normalizeKeys(false)
-                    ->arrayPrototype()
-                        ->beforeNormalization()
-                            // Convert simple string to an array with the string as service
-                            ->ifString()->then(function ($v) {
-                                return ['service' => $v];
-                            })
-                        ->end()
-                        ->children()
-                            ->scalarNode('service')
-                                ->isRequired()
-                                ->cannotBeEmpty()
-                            ->end()
-                            ->arrayNode('aliases')
-                                ->requiresAtLeastOneElement()
-                                ->beforeNormalization()
-                                    ->castToArray()
-                                ->end()
-                                ->scalarPrototype()->end()
-                            ->end()
-                        ->end()
-                    ->end()
+                ->variableNode('endpoint')
+                    ->info('Your custom JSON-RPC http endpoint path')
+                    ->treatNullLike(self::DEFAULT_ENDPOINT)
+                    ->defaultValue(self::DEFAULT_ENDPOINT)
                 ->end()
             ->end()
         ;

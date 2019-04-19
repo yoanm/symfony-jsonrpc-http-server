@@ -1,27 +1,41 @@
-# JSON-RPC server symfony plugin
- [![License](https://img.shields.io/github/license/yoanm/symfony-jsonrpc-http-server.svg)](https://github.com/yoanm/symfony-jsonrpc-http-server) [![Code size](https://img.shields.io/github/languages/code-size/yoanm/symfony-jsonrpc-http-server.svg)](https://github.com/yoanm/symfony-jsonrpc-http-server) [![PHP Versions](https://img.shields.io/badge/php-7.0%20%2F%207.1%20%2F%207.2-8892BF.svg)](https://php.net/)
+# Symfony JSON-RPC server
+[![License](https://img.shields.io/github/license/yoanm/symfony-jsonrpc-http-server.svg)](https://github.com/yoanm/symfony-jsonrpc-http-server) [![Code size](https://img.shields.io/github/languages/code-size/yoanm/symfony-jsonrpc-http-server.svg)](https://github.com/yoanm/symfony-jsonrpc-http-server) [![Dependencies](https://img.shields.io/librariesio/github/yoanm/symfony-jsonrpc-http-server.svg)](https://libraries.io/packagist/yoanm%2Fsymfony-jsonrpc-http-server)
 
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/yoanm/symfony-jsonrpc-http-server/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/yoanm/symfony-jsonrpc-http-server/?branch=master) [![Build Status](https://scrutinizer-ci.com/g/yoanm/symfony-jsonrpc-http-server/badges/build.png?b=master)](https://scrutinizer-ci.com/g/yoanm/symfony-jsonrpc-http-server/build-status/master) [![Code Coverage](https://scrutinizer-ci.com/g/yoanm/symfony-jsonrpc-http-server/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/yoanm/symfony-jsonrpc-http-server/?branch=master)
+[![Scrutinizer Build Status](https://img.shields.io/scrutinizer/build/g/yoanm/symfony-jsonrpc-http-server.svg?label=Scrutinizer&logo=scrutinizer)](https://scrutinizer-ci.com/g/yoanm/symfony-jsonrpc-http-server/build-status/master) [![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/g/yoanm/symfony-jsonrpc-http-server/master.svg?logo=scrutinizer)](https://scrutinizer-ci.com/g/yoanm/symfony-jsonrpc-http-server/?branch=master) [![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/yoanm/symfony-jsonrpc-http-server/master.svg?logo=scrutinizer)](https://scrutinizer-ci.com/g/yoanm/symfony-jsonrpc-http-server/?branch=master)
 
-[![Travis Build Status](https://img.shields.io/travis/yoanm/symfony-jsonrpc-http-server/master.svg?label=travis)](https://travis-ci.org/yoanm/symfony-jsonrpc-http-server) [![Travis PHP versions](https://img.shields.io/travis/php-v/yoanm/symfony-jsonrpc-http-server.svg)](https://travis-ci.org/yoanm/symfony-jsonrpc-http-server)
+[![Travis Build Status](https://img.shields.io/travis/yoanm/symfony-jsonrpc-http-server/master.svg?label=Travis&logo=travis)](https://travis-ci.org/yoanm/symfony-jsonrpc-http-server) [![Travis PHP versions](https://img.shields.io/travis/php-v/yoanm/symfony-jsonrpc-http-server.svg?logo=travis)](https://php.net/) [![Travis Symfony Versions](https://img.shields.io/badge/Symfony-v3%20%2F%20v4-8892BF.svg?logo=travis)](https://symfony.com/)
 
 [![Latest Stable Version](https://img.shields.io/packagist/v/yoanm/symfony-jsonrpc-http-server.svg)](https://packagist.org/packages/yoanm/symfony-jsonrpc-http-server) [![Packagist PHP version](https://img.shields.io/packagist/php-v/yoanm/symfony-jsonrpc-http-server.svg)](https://packagist.org/packages/yoanm/symfony-jsonrpc-http-server)
 
-Symfony JSON-RPC HTTP Server to convert an HTTP json-rpc request into HTTP json-rpc response
+Symfony JSON-RPC HTTP Server to convert an HTTP json-rpc request into HTTP json-rpc response.
+
+Symfony bundle for [`yoanm/jsonrpc-server-sdk`](https://raw.githubusercontent.com/yoanm/php-jsonrpc-server-sdk)
+
+See [yoanm/symfony-jsonrpc-params-validator](https://github.com/yoanm/symfony-jsonrpc-params-validator) for params validation.
+
+See [yoanm/symfony-jsonrpc-http-server-doc](https://github.com/yoanm/symfony-jsonrpc-http-server-doc) for documentation generation.
 
 ## How to use
 
-You can either use this library as a simple extension or like any symfony bundle.
+Once configured, your project is ready to handle HTTP `POST` request on `/json-rpc` endpoint.
 
+See below how to configure it.
+
+## Configuration
+
+Bundle requires only one thing : 
+ - JSON-RPC Methods which are compatible with [`yoanm/jsonrpc-server-sdk`](https://raw.githubusercontent.com/yoanm/php-jsonrpc-server-sdk)
+ 
+It comes with [built-in method resolver](./src/Resolver/MethodResolver.php) which use a [service locator](https://symfony.com/doc/3.4/service_container/service_subscribers_locators.html#defining-a-service-locator). Using a service locator allow to load (and so instanciate dependencies, dependencies of dependencies, etc) method only when required (usually only one method is required by request, except for batch requests which will load one or more methods).
+ 
 *[Behat demo app configuration folders](./features/demo_app/) can be used as examples.*
-
-### With Symfony bundle
 
  - Add the bundles in your `config/bundles.php` file:
    ```php
    // config/bundles.php
    return [
        ...
+       Symfony\Bundle\FrameworkBundle\FrameworkBundle::class => ['all' => true],
        Yoanm\SymfonyJsonRpcHttpServer\JsonRpcHttpServerBundle::class => ['all' => true],
        ...
    ];
@@ -37,123 +51,61 @@ You can either use this library as a simple extension or like any symfony bundle
  - Add the following in your configuration :
    ```yaml
    # config/config.yaml
+   framework:
+     secret: '%env(APP_SECRET)%'
+
    json_rpc_http_server: ~
+   # Or the following in case you want to customize endpoint path
+   #json_rpc_http_server:
+   #  endpoint: '/my-custom-endpoint' # Default to '/json-rpc'
    ```
 
-### With Symfony extension only
- - Load the extension in your kernel :
-   ```php
-   // src/Kernel.php
-   ...
-   use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
-   use Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\JsonRpcHttpServerExtension;
-   ...
-   class Kernel
-   {
-       use MicroKernelTrait;
-       ....
-       /**
-       * {@inheritdoc}
-       */
-      protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader)
-      {
-          /**** Add and load extension **/
-          $container->registerExtension($extension = new JsonRpcHttpServerExtension());
-          // If you use Symfony Config component, add "json_rpc_http_server: ~" in your configuration.
-          // Else load it there
-          $container->loadFromExtension($extension->getAlias());
-          
-          ...
-      }
-       ....
-   }
-   ```
+### JSON-RPC Method mapping
+In order to inject yours JSON-RPC method into the server add the tag `json_rpc_http_server.jsonrpc_method` and the key/value `method` like following example :
+```yaml
+services:
+   method-a.service-id:
+      class: Method\A\Class
+      tags:
+       - { name: 'json_rpc_http_server.jsonrpc_method', method: 'method-a' }
+       - { name: 'json_rpc_http_server.jsonrpc_method', method: 'method-a-alias' }
+```
+
+### Methods mapping aware
+In case you want to be aware of which methods are registered inside the JSON-RPC server, you can use the `json_rpc_http_server.method_aware`. Your class must implements `JsonRpcMethodAwareInterface`.
+
+```php
+use Yoanm\JsonRpcServer\Domain\JsonRpcMethodAwareInterface;
+use Yoanm\JsonRpcServer\Domain\JsonRpcMethodInterface;
+
+class MappingCollector implements JsonRpcMethodAwareInterface
+{
+  /** @var JsonRpcMethodInterface[] */
+  private $mappingList = [];
+
+  public function addJsonRpcMethod(string $methodName, JsonRpcMethodInterface $method): void
+  {
+    $this->mappingList[$methodName] = $method;
+  }
+
+  /**
+   * @return JsonRpcMethodInterface[]
+   */
+  public function getMappingList() : array
+  {
+    return $this->mappingList;
+  }
+}
+```
+
+```yaml
+mapping_aware_service:
+  class: App\Collector\MappingCollector
+  tags: ['json_rpc_http_server.method_aware']
+```
    
- - Map your your JSON-RPC methods, see **JSON-RPC Method mapping** section below
- - Manually configure an endpoint, see **Routing** section below
-
-## JSON-RPC Method mapping
-You have many ways to inject you json-rpc methods :
- - If you use the bundle, you can do it by configuration :
-   ```yaml
-   # config/config.yaml
-   json_rpc_http_server:
-       methods_mapping:
-           method-a: '@method-a.service-id'
-           method-b: 
-               service: '@method-b.service-id'
-               aliases: 'method-b-alias'
-           method-c: 
-               service: '@method-c.service-id'
-               aliases: ['method-c-alias-1', 'method-c-alias-2']
-   ```
- - You can use tag in the service definition as below :
-   ```yaml
-   services:
-     method-a.service-id:
-       class: Method\A\Class
-       public: true # <= do no forget the set visibility to public !
-       tags:
-         - { name: 'json_rpc_http_server.jsonrpc_method', method: 'method-a' }
-         - { name: 'json_rpc_http_server.jsonrpc_method', method: 'method-a-alias' }
-   ```
- - Inject manually your mapping during container building
-   ```php
-   // src/Kernel.php
-   ...
-   use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-   use Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\JsonRpcHttpServerExtension;
-   ...
-   class Kernel implements CompilerPassInterface
-   {
-       ....
-       /**
-        * {@inheritdoc}
-        */
-       public function process(ContainerBuilder $container)
-       {
-           $container->getDefinition(JsonRpcHttpServerExtension::SERVICE_NAME_RESOLVER_SERVICE_NAME)
-               ->addMethodCall('addMethodMapping', ['method-a', 'method-a.service-id'])
-               ->addMethodCall('addMethodMapping', ['method-b', 'method-b.service-id'])
-               ->addMethodCall('addMethodMapping', ['method-b-alias', 'method-b.service-id'])
-           ;
-       }
-       ....
-   }
-   ```
- - Or inject manually your mapping after container building
-   ```php
-   $container->get(JsonRpcHttpServerExtension::SERVICE_NAME_RESOLVER_SERVICE_NAME)
-       ->addMethodMapping('method-a', 'method-a.service-id')
-       ->addMethodMapping('method-b', 'method-b.service-id')
-       ->addMethodMapping('method-b-alias', 'method-b.service-id')
-   ;
-   ```
- 
-## Routing
- - If you use the bundle, the default endpoint is `/json-rcp`. You can custome it by using : 
-   ```yaml
-   # config/config.yaml
-   json_rpc_http_server: 
-       http_endpoint_path: '/my-custom-endpoint'
-   ```
-   
- - Or you can define your own route and bind the endpoint as below :
-   ```yaml
-   # config/routes.yaml
-   index:
-       path: /my-json-rpc-endpoint
-       defaults: { _controller: 'json_rpc_http_server.endpoint:index' }
-   ```
-   
-## Custom method resolver
-
-By default this bundle use [`yoanm/jsonrpc-server-sdk-psr11-resolver`](https://github.com/yoanm/php-jsonrpc-server-sdk-psr11-resolver).
-
-In case you want to use your own, you can do it by using : 
-
-### Service definition tag
-Use `json_rpc_http_server.method_resolver` tag as following:
+### Custom method resolver
+In case you want to use your method resolver implementation, use the tag `json_rpc_http_server.method_resolver`, it will be automatically injected inside JSON-RPC server:
 ```yaml
 services:
   my.custom_method_resolver.service:
@@ -161,14 +113,7 @@ services:
     tags: ['json_rpc_http_server.method_resolver']
 ```
 
-### Bundle configuration
-Configure the bundle as below
-```yaml
-# config/config.yaml
-json_rpc_http_server:
-    method_resolver: '@my.custom_method_resolver.service'
-```
-   
+You can take advantage of method mapping aware mechanism or write your custom resolution logic.
 
 ## Contributing
 See [contributing note](./CONTRIBUTING.md)

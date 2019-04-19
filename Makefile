@@ -6,6 +6,7 @@ COVERAGE_OUTPUT_STYLE ?= html
 BUILD_DIRECTORY ?= build
 REPORTS_DIRECTORY ?= ${BUILD_DIRECTORY}/reports
 COVERAGE_DIRECTORY ?= ${BUILD_DIRECTORY}/coverage
+BEHAT_COVERAGE_DIRECTORY ?= ${BUILD_DIRECTORY}/behat-coverage
 COVERAGE_CLOVER_FILE_PATH ?= ${COVERAGE_DIRECTORY}/clover.xml
 
 ## Commands options
@@ -13,6 +14,7 @@ COVERAGE_CLOVER_FILE_PATH ?= ${COVERAGE_DIRECTORY}/clover.xml
 #COMPOSER_OPTIONS=
 ### Phpcs
 PHPCS_REPORT_STYLE ?= full
+PHPCS_DISABLE_WARNING ?= "false"
 #PHPCS_REPORT_FILE=
 #PHPCS_REPORT_FILE_OPTION=
 
@@ -51,6 +53,12 @@ ifneq ("${PHPCS_REPORT_FILE}","")
 	PHPCS_REPORT_FILE_OPTION ?= --report-file=${PHPCS_REPORT_FILE}
 endif
 
+ifneq ("${PHPCS_DISABLE_WARNING}","true")
+	PHPCS_DISABLE_WARNING_OPTION=
+else
+	PHPCS_DISABLE_WARNING_OPTION=-n
+endif
+
 
 ## Project build (install and configure)
 build: install configure
@@ -76,20 +84,26 @@ test-functional:
 	./vendor/bin/behat ${BEHAT_COLOR_OPTION} ${BEHAT_OUTPUT_STYLE_OPTION} --no-snippets
 
 codestyle: create-reports-directory
-	./vendor/bin/phpcs --standard=phpcs.xml.dist ${PHPCS_COLOR_OPTION} ${PHPCS_REPORT_FILE_OPTION} --report=${PHPCS_REPORT_STYLE}
+	./vendor/bin/phpcs ${PHPCS_DISABLE_WARNING_OPTION} --standard=phpcs.xml.dist ${PHPCS_COLOR_OPTION} ${PHPCS_REPORT_FILE_OPTION} --report=${PHPCS_REPORT_STYLE}
 
 coverage: create-coverage-directory
 	./vendor/bin/phpunit ${PHPUNIT_COLOR_OPTION} ${PHPUNIT_OUTPUT_STYLE_OPTION} ${PHPUNIT_COVERAGE_OPTION}
 
+behat-coverage: create-behat-coverage-directory
+	composer required leanphp/behat-code-coverage
+	./vendor/bin/behat ${BEHAT_COLOR_OPTION} ${BEHAT_OUTPUT_STYLE_OPTION} --no-snippets --profile coverage
 
 
 # Internal commands
 create-coverage-directory:
 	mkdir -p ${COVERAGE_DIRECTORY}
 
+create-behat-coverage-directory:
+	mkdir -p ${BEHAT_COVERAGE_DIRECTORY}
+
 create-reports-directory:
 	mkdir -p ${REPORTS_DIRECTORY}
 
 
-.PHONY: build install configure test test-technical test-functional codestyle coverage create-coverage-directory create-reports-directory
+.PHONY: build install configure test test-technical test-functional codestyle coverage behat-coverage create-coverage-directory create-behat-coverage-directory create-reports-directory
 .DEFAULT: build

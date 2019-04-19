@@ -1,9 +1,9 @@
 language: php
 
 php:
-  - '7.0'
   - '7.1'
   - '7.2'
+  - '7.3'
 
 env:
   global:
@@ -12,8 +12,8 @@ env:
     PHPCS_REPORT_STYLE: 'full'
     COMPOSER_OPTIONS: '--optimize-autoloader'
   matrix:
-    - SDK_VERSION: '~1.2'
-    - SDK_VERSION: '~2.0'
+  - SYMFONY_VERSION: '~3.0'
+  - SYMFONY_VERSION: '~4.0'
 
 sudo: false
 
@@ -22,10 +22,10 @@ matrix:
 
 before_install:
   # remove xdebug to speed up build
-  - phpenv config-rm xdebug.ini
+  - phpenv config-rm xdebug.ini || true
 
 install:
-  - composer require yoanm/jsonrpc-server-sdk:$SDK_VERSION
+  - composer require symfony/http-foundation:$SYMFONY_VERSION symfony/http-kernel:$SYMFONY_VERSION symfony/config:$SYMFONY_VERSION symfony/dependency-injection:$SYMFONY_VERSION
   - make build
 script:
   - make test-technical
@@ -35,3 +35,7 @@ cache:
   directories:
     - $HOME/.composer
     - vendor
+
+branches:
+  except:
+  - /.*\-dev$/

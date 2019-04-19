@@ -1,0 +1,13 @@
+services:
+  _defaults:
+      public: false
+
+  json_rpc_http_server.service_locator.method_resolver:
+    class: Symfony\Component\DependencyInjection\ServiceLocator
+    tags: ['container.service_locator']
+    arguments:
+      - [] # <-- Will be defined during container compilation
+
+  # Alias method resolver (used in sdk.services.app.yml)
+  json_rpc_http_server.alias.method_resolver: '@json_rpc_http_server.method_resolver'
+

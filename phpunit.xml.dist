@@ -8,10 +8,6 @@
          processIsolation="false"
 
          stopOnRisky="true"
-         processUncoveredFilesFromWhitelist="true"
-         addUncoveredFilesFromWhitelist="true"
-         checkForUnintentionallyCoveredCode="true"
-
          stopOnError="true"
          stopOnFailure="true"
 

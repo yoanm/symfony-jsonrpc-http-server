@@ -1,49 +1,52 @@
 {
-    "name": "yoanm/symfony-jsonrpc-http-server",
-    "description": "Symfony Server SDK to convert an HTTP json-rpc request into HTTP json-rpc response",
-    "license": "GPL-3.0-only",
-    "type": "library",
-    "support": {
-        "issues": "https://github.com/yoanm/symfony-jsonrpc-http-server/issues"
-    },
-    "authors": [
-        {
-            "name": "Yoanm",
-            "email": "yoanm@users.noreply.github.com",
-            "role": "Developer"
-        }
-    ],
-    "autoload": {
-        "psr-4": {
-            "Yoanm\\SymfonyJsonRpcHttpServer\\": "src"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Tests\\": "tests",
-            "Tests\\Functional\\BehatContext\\": "features/bootstrap",
-            "DemoApp\\": "features/demo_app/src"
-        }
-    },
-    "require": {
-        "php": ">7.0",
-        "yoanm/jsonrpc-server-sdk": "~1.2 || ~2.0",
-        "symfony/http-foundation": "^3.0 || ^4.0",
-        "symfony/dependency-injection": "^3.0 || ^4.0",
-        "yoanm/jsonrpc-server-sdk-psr11-resolver": "^2.0"
-    },
-    "suggest": {
-        "symfony/http-kernel": "To ease integration inside your application by using JsonRpcHttpServerBundle"
-    },
-    "require-dev": {
-        "behat/behat": "~3.0",
-        "squizlabs/php_codesniffer": "3.*",
-        "phpunit/phpunit": "^6.0 || ^7.0",
-        "matthiasnoback/symfony-dependency-injection-test": "^2.0 || ^3.0",
-        "matthiasnoback/symfony-config-test": "^3.0 || ^4.0",
-        "symfony/framework-bundle": "^3.4",
-        "symfony/http-kernel": "^3.4",
-        "symfony/routing": "^3.4",
-        "yoanm/php-unit-extended": "~1.0"
+  "name": "yoanm/symfony-jsonrpc-http-server",
+  "description": "Symfony Bundle to convert an HTTP json-rpc request into HTTP json-rpc response",
+  "license": "MIT",
+  "type": "library",
+  "support": {
+    "issues": "https://github.com/yoanm/symfony-jsonrpc-http-server/issues"
+  },
+  "authors": [
+    {
+      "name": "Yoanm",
+      "email": "yoanm@users.noreply.github.com",
+      "role": "Developer"
     }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Yoanm\\SymfonyJsonRpcHttpServer\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests",
+      "Tests\\Functional\\BehatContext\\": "features/bootstrap",
+      "DemoApp\\": "features/demo_app/src"
+    }
+  },
+  "suggest": {
+    "yoanm/symfony-jsonrpc-server-psr11-resolver": "PSR-11 compliant method resolver for yoanm/symfony-jsonrpc-http-server",
+    "yoanm/symfony-jsonrpc-params-validator": "Symfony bundle for easy JSON-RPC params validation",
+    "yoanm/symfony-jsonrpc-http-server-doc": "JSON-RPC documentation Bundle"
+  },
+  "require": {
+    "php": ">=7.1",
+    "yoanm/jsonrpc-server-sdk": "v3.0.0",
+    "symfony/http-foundation": "^3.0 || ^4.0",
+    "symfony/http-kernel": "^3.0 || ^4.0",
+    "symfony/config": "^3.0 || ^4.0",
+    "symfony/dependency-injection": "^3.0 || ^4.0"
+  },
+  "require-dev": {
+    "behat/behat": "~3.0",
+    "squizlabs/php_codesniffer": "3.*",
+    "phpunit/phpunit": "^6.0 || ^7.0",
+    "matthiasnoback/symfony-dependency-injection-test": "^2.0 || ^3.0",
+    "matthiasnoback/symfony-config-test": "^3.0 || ^4.0",
+    "symfony/framework-bundle": "^3.0 || ^4.0",
+    "symfony/http-kernel": "^3.0 || ^4.0",
+    "symfony/routing": "^3.0 || ^4.0",
+    "yoanm/php-unit-extended": "~1.0"
+  }
 }
