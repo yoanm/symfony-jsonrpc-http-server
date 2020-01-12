@@ -18,7 +18,7 @@ class MethodResolverTest extends TestCase
     /** @var ContainerInterface|ObjectProphecy */
     private $locator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->locator = $this->prophesize(ContainerInterface::class);
 

@@ -20,7 +20,7 @@ class SymfonyJsonRpcServerDispatcherTest extends TestCase
     /** @var EventDispatcherInterface|ObjectProphecy */
     private $sfDispatcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->sfDispatcher = $this->prophesize(EventDispatcherInterface::class);
         $this->dispatcher = new SymfonyJsonRpcServerDispatcher(
