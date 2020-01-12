@@ -29,7 +29,7 @@ abstract class AbstractTestClass extends AbstractExtensionTestCase
         ];
     }
 
-    protected function load(array $configurationValues = [], $mockResolver = true, $compile = true): void
+    protected function loadContainer(array $configurationValues = [], $mockResolver = true, $compile = true): void
     {
         // Inject event dispatcher
         $this->setDefinition('event_dispatcher', new Definition(EventDispatcher::class));
