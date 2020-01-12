@@ -19,7 +19,7 @@ class JsonRpcHttpEndpointTest extends TestCase
     /** @var SdkJsonRpcEndpoint|ObjectProphecy */
     private $sdkEndpoint;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->sdkEndpoint = $this->prophesize(SdkJsonRpcEndpoint::class);
 
