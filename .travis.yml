@@ -1,22 +1,19 @@
 language: php
 
 php:
-  - 7.1
-  - 7.2
-  - 7.3
+  - '7.2'
+  - '7.3'
+  - '7.4'
 
 env:
   global:
-    CI: 'true'
-    TEST_OUTPUT_STYLE: 'pretty'
-    PHPCS_REPORT_STYLE: 'full'
-    COMPOSER_OPTIONS: '--optimize-autoloader'
-  matrix:
-  - SYMFONY_VERSION: '~4.0'
-  - SYMFONY_VERSION: '~5.0'
-  exlude:
-  - php: 7.1
-    env: CI=true TEST_OUTPUT_STYLE=pretty PHPCS_REPORT_STYLE=full COMPOSER_OPTIONS=--optimize-autoloader SYMFONY_VERSION=~5.0
+    - CI: 'true'
+    - TEST_OUTPUT_STYLE: 'pretty'
+    - PHPCS_REPORT_STYLE: 'full'
+    - COMPOSER_OPTIONS: '--optimize-autoloader'
+  jobs:
+    - SYMFONY_VERSION: '~4.0'
+    - SYMFONY_VERSION: '~5.0'
 
 sudo: false
 
