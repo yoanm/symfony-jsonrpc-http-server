@@ -36,7 +36,8 @@
     "symfony/http-foundation": "^4.0 || ^5.0",
     "symfony/http-kernel": "^4.0 || ^5.0",
     "symfony/config": "^4.0 || ^5.0",
-    "symfony/dependency-injection": "^4.0 || ^5.0"
+    "symfony/dependency-injection": "^4.0 || ^5.0",
+    "symfony/event-dispatcher": "^4.0 || ^5.0"
   },
   "require-dev": {
     "behat/behat": "~3.0",
@@ -45,7 +46,6 @@
     "matthiasnoback/symfony-dependency-injection-test": "^3.0 || ^4.0",
     "matthiasnoback/symfony-config-test": "^3.0 || ^4.0",
     "symfony/framework-bundle": "^4.0 || ^5.0",
-    "symfony/http-kernel": "^4.0 || ^5.0",
     "symfony/routing": "^4.0 || ^5.0",
     "yoanm/php-unit-extended": "~1.0"
   }
