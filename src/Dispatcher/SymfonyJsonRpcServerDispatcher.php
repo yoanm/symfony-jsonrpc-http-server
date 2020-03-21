@@ -26,10 +26,10 @@ class SymfonyJsonRpcServerDispatcher implements JsonRpcServerDispatcherInterface
      * @param string $eventName
      * @param JsonRpcServerEvent $event
      */
-    public function dispatchJsonRpcEvent(string $eventName, JsonRpcServerEvent $event) : void
+    public function dispatchJsonRpcEvent(string $eventName, JsonRpcServerEvent $event = null) : void
     {
         $this->symfonyEventDispatcher->dispatch(
-            new SymfonyJsonRpcServerEvent($event),
+            $event ? new SymfonyJsonRpcServerEvent($event) : new \stdClass(),
             $eventName
         );
     }
