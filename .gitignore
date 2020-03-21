@@ -5,3 +5,6 @@ composer.lock
 
 # Demo app excluded dirs
 features/demo_app/var/
+
+#Phpunit
+.phpunit.result.cache

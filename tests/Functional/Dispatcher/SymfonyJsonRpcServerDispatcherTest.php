@@ -55,24 +55,14 @@ class SymfonyJsonRpcServerDispatcherTest extends TestCase
 
         $this->sfDispatcher
             ->dispatch(
-                $eventName,
                 Argument::allOf(
                     Argument::type(SymfonyJsonRpcServerEvent::class),
                     Argument::which('getJsonRpcServerEvent', $event->reveal())
-                )
+                ),
+                $eventName
             )
             ->shouldBeCalled();
 
         $this->dispatcher->dispatchJsonRpcEvent($eventName, $event->reveal());
-    }
-
-    public function testShouldDispatchEventsWithOnlyName()
-    {
-        $eventName = 'event-name';
-
-        $this->sfDispatcher->dispatch($eventName, null)
-            ->shouldBeCalled();
-
-        $this->dispatcher->dispatchJsonRpcEvent($eventName);
     }
 }

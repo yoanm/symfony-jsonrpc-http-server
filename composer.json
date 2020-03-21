@@ -31,12 +31,12 @@
     "yoanm/symfony-jsonrpc-http-server-doc": "JSON-RPC documentation Bundle"
   },
   "require": {
-    "php": ">=7.1",
+    "php": ">=7.2",
     "yoanm/jsonrpc-server-sdk": "^3.0",
-    "symfony/http-foundation": "^3.0 || ^4.0",
-    "symfony/http-kernel": "^3.0 || ^4.0",
-    "symfony/config": "^3.0 || ^4.0",
-    "symfony/dependency-injection": "^3.0 || ^4.0"
+    "symfony/http-foundation": "^4.0 || ^5.0",
+    "symfony/http-kernel": "^4.0 || ^5.0",
+    "symfony/config": "^4.0 || ^5.0",
+    "symfony/dependency-injection": "^4.0 || ^5.0"
   },
   "require-dev": {
     "behat/behat": "~3.0",
@@ -44,9 +44,9 @@
     "phpunit/phpunit": "^7.0 || ^8.0",
     "matthiasnoback/symfony-dependency-injection-test": "^3.0 || ^4.0",
     "matthiasnoback/symfony-config-test": "^3.0 || ^4.0",
-    "symfony/framework-bundle": "^3.0 || ^4.0",
-    "symfony/http-kernel": "^3.0 || ^4.0",
-    "symfony/routing": "^3.0 || ^4.0",
+    "symfony/framework-bundle": "^4.0 || ^5.0",
+    "symfony/http-kernel": "^4.0 || ^5.0",
+    "symfony/routing": "^4.0 || ^5.0",
     "yoanm/php-unit-extended": "~1.0"
   }
 }
