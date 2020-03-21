@@ -16,7 +16,7 @@ class SymfonyJsonRpcServerEventTest extends TestCase
     /** @var SymfonyJsonRpcServerEvent */
     private $event;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->jsonRpcServerEvent = $this->prophesize(JsonRpcServerEvent::class);
 

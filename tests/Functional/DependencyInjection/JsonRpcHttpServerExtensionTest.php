@@ -19,7 +19,7 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
     /**
      * {@inheritdoc}
      */
-    protected function getContainerExtensions()
+    protected function getContainerExtensions(): array
     {
         return [
             new JsonRpcHttpServerExtension()
@@ -29,7 +29,7 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
 
     public function testShouldBeLoadable()
     {
-        $this->load();
+        $this->loadContainer();
 
         $this->assertEndpointIsUsable();
     }
@@ -37,7 +37,7 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
     public function testShouldManageCustomEndpointPathFromConfiguration()
     {
         $myCustomEndpoint = 'my-custom-endpoint';
-        $this->load(['endpoint' => $myCustomEndpoint]);
+        $this->loadContainer(['endpoint' => $myCustomEndpoint]);
 
         // Assert custom resolver is an alias of the stub
         $this->assertContainerBuilderHasParameter(self::EXPECTED_HTTP_ENDPOINT_PATH_CONTAINER_PARAM, $myCustomEndpoint);
@@ -57,7 +57,7 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
 
         $this->setDefinition('my-dispatcher-aware-service', $dispatcherAwareServiceDefinition);
 
-        $this->load();
+        $this->loadContainer();
 
         // Assert custom resolver is an alias of the stub
         $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(
@@ -85,7 +85,7 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
                 .'"'.JsonRpcServerDispatcherAwareTrait::class.'"'
         );
 
-        $this->load();
+        $this->loadContainer();
     }
 
     public function testShouldInjectParamsValidatorAliasIfDefined()
@@ -96,7 +96,7 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
         $this->setDefinition($myValidatorServiceId, $paramsValidator);
         $this->container->setAlias(self::EXPECTED_PARAMS_VALIDATOR_ALIAS, $myValidatorServiceId);
 
-        $this->load();
+        $this->loadContainer();
 
         $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(
             self::EXPECTED_REQUEST_HANDLER_SERVICE_ID,
@@ -109,7 +109,7 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
 
     public function testShouldNotInjectParamsValidatorAliasIfNotDefined()
     {
-        $this->load();
+        $this->loadContainer();
 
         $handlerDefinition = $this->container->getDefinition(self::EXPECTED_REQUEST_HANDLER_SERVICE_ID);
         foreach ($handlerDefinition->getMethodCalls() as $methodCall) {
@@ -142,7 +142,7 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
         $methodAwareDefinition->addTag(JsonRpcHttpServerExtension::JSONRPC_METHOD_AWARE_TAG);
         $this->setDefinition($methodAwareServiceServiceId, $methodAwareDefinition);
 
-        $this->load();
+        $this->loadContainer();
 
         // Assert that method mapping have been correctly injected
         $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(
@@ -183,6 +183,6 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
             JsonRpcMethodAwareInterface::class
         ));
 
-        $this->load();
+        $this->loadContainer();
     }
 }
