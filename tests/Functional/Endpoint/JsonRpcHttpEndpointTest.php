@@ -19,7 +19,7 @@ class JsonRpcHttpEndpointTest extends TestCase
     /** @var SdkJsonRpcEndpoint|ObjectProphecy */
     private $sdkEndpoint;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->sdkEndpoint = $this->prophesize(SdkJsonRpcEndpoint::class);
 
@@ -53,7 +53,7 @@ class JsonRpcHttpEndpointTest extends TestCase
 
     public function testHttOptionsShouldReturnAllowedMethodsAndContentType()
     {
-        $expectedAllowedMethodList = [Request::METHOD_POST, Request::METHOD_OPTIONS];
+        $expectedAllowedMethodList = implode(', ', [Request::METHOD_POST, Request::METHOD_OPTIONS]);
 
         $response = $this->endpoint->httpOptions();
 
@@ -61,10 +61,10 @@ class JsonRpcHttpEndpointTest extends TestCase
         $this->assertSame('application/json', $response->headers->get('Content-Type'));
 
         // Check allowed methods
-        $this->assertSame($expectedAllowedMethodList, $response->headers->get('Allow', null, false));
+        $this->assertSame($expectedAllowedMethodList, $response->headers->get('Allow', null));
         $this->assertSame(
             $expectedAllowedMethodList,
-            $response->headers->get('Access-Control-Request-Method', null, false)
+            $response->headers->get('Access-Control-Request-Method', null)
         );
 
         // Check allowed content types
