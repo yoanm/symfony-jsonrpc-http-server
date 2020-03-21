@@ -31,7 +31,7 @@
     "yoanm/symfony-jsonrpc-http-server-doc": "JSON-RPC documentation Bundle"
   },
   "require": {
-    "php": ">=7.1",
+    "php": ">=7.2",
     "yoanm/jsonrpc-server-sdk": "^3.0",
     "symfony/http-foundation": "^4.0 || ^5.0",
     "symfony/http-kernel": "^4.0 || ^5.0",

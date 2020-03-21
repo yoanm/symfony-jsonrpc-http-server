@@ -36,7 +36,7 @@ build:
             COVERAGE_OUTPUT_STYLE: 'clover'
             COVERAGE_CLOVER_FILE_PATH: 'build/coverage/clover.xml'
         php:
-            version: "7.1"
+            version: "7.3"
         timezone: UTC
         postgresql: false
         redis: false
