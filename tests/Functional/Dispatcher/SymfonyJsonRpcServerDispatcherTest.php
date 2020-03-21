@@ -20,7 +20,7 @@ class SymfonyJsonRpcServerDispatcherTest extends TestCase
     /** @var EventDispatcherInterface|ObjectProphecy */
     private $sfDispatcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->sfDispatcher = $this->prophesize(EventDispatcherInterface::class);
         $this->dispatcher = new SymfonyJsonRpcServerDispatcher(
@@ -55,24 +55,14 @@ class SymfonyJsonRpcServerDispatcherTest extends TestCase
 
         $this->sfDispatcher
             ->dispatch(
-                $eventName,
                 Argument::allOf(
                     Argument::type(SymfonyJsonRpcServerEvent::class),
                     Argument::which('getJsonRpcServerEvent', $event->reveal())
-                )
+                ),
+                $eventName
             )
             ->shouldBeCalled();
 
         $this->dispatcher->dispatchJsonRpcEvent($eventName, $event->reveal());
-    }
-
-    public function testShouldDispatchEventsWithOnlyName()
-    {
-        $eventName = 'event-name';
-
-        $this->sfDispatcher->dispatch($eventName, null)
-            ->shouldBeCalled();
-
-        $this->dispatcher->dispatchJsonRpcEvent($eventName);
     }
 }

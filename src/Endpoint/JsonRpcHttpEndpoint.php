@@ -34,8 +34,9 @@ class JsonRpcHttpEndpoint
         $response->headers->set('Content-Type', 'application/json');
 
         // Set allowed http methods
-        $response->headers->set('Allow', $this->allowedMethodList);
-        $response->headers->set('Access-Control-Request-Method', $this->allowedMethodList);
+        $allowedMethodListString = implode(', ', $this->allowedMethodList);
+        $response->headers->set('Allow', $allowedMethodListString);
+        $response->headers->set('Access-Control-Request-Method', $allowedMethodListString);
 
         // Set allowed content type
         $response->headers->set('Accept', 'application/json');
