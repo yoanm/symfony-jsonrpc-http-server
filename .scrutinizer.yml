@@ -11,7 +11,9 @@ build_failure_conditions:
 build:
     dependencies:
         override:
-            - make build
+            -
+              command: make build
+              idle_timeout: 240
     tests:
         stop_on_failure: true
         override:
@@ -23,7 +25,11 @@ build:
                     format: 'php-clover'
             - php-scrutinizer-run --enable-security-analysis
             - make codestyle
-            - composer global require maglnet/composer-require-checker && composer-require-checker check composer.json
+            -
+              command: composer global require maglnet/composer-require-checker && composer-require-checker check composer.json
+              title: Composer-require-checker
+              background: true
+
     cache:
         directories:
             - ~/.composer
