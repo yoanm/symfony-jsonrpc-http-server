@@ -26,7 +26,6 @@
     }
   },
   "suggest": {
-    "yoanm/symfony-jsonrpc-server-psr11-resolver": "PSR-11 compliant method resolver for yoanm/symfony-jsonrpc-http-server",
     "yoanm/symfony-jsonrpc-params-validator": "Symfony bundle for easy JSON-RPC params validation",
     "yoanm/symfony-jsonrpc-http-server-doc": "JSON-RPC documentation Bundle"
   },
@@ -36,13 +35,15 @@
     "symfony/http-foundation": "^3.0 || ^4.0",
     "symfony/http-kernel": "^3.0 || ^4.0",
     "symfony/config": "^3.0 || ^4.0",
-    "symfony/dependency-injection": "^3.0 || ^4.0"
+    "symfony/dependency-injection": "^3.0 || ^4.0",
+    "symfony/event-dispatcher": "^3.0 || ^4.0",
+    "psr/container": "^1.0"
   },
   "require-dev": {
     "behat/behat": "~3.0",
     "squizlabs/php_codesniffer": "3.*",
-    "phpunit/phpunit": "^7.0 || ^8.0",
-    "matthiasnoback/symfony-dependency-injection-test": "^2.0 || ^3.0",
+    "phpunit/phpunit": "^7.0",
+    "matthiasnoback/symfony-dependency-injection-test": "^3.0 || ^4.0",
     "matthiasnoback/symfony-config-test": "^3.0 || ^4.0",
     "symfony/framework-bundle": "^3.0 || ^4.0",
     "symfony/http-kernel": "^3.0 || ^4.0",

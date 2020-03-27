@@ -15,6 +15,12 @@ See [yoanm/symfony-jsonrpc-params-validator](https://github.com/yoanm/symfony-js
 
 See [yoanm/symfony-jsonrpc-http-server-doc](https://github.com/yoanm/symfony-jsonrpc-http-server-doc) for documentation generation.
 
+## Versions
+
+- Symfony v3/4 - PHP >=7.1 : `^v2.0` 
+  ⚠️⚠️ `v2.1.0` and `v2.1.1` was badly taggued, used `v3.0.0` instead ! ⚠️⚠️
+- Symfony v4/5 - PHP >=7.2 : `^v3.0`
+
 ## How to use
 
 Once configured, your project is ready to handle HTTP `POST` request on `/json-rpc` endpoint.
