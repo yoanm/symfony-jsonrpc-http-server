@@ -4,20 +4,19 @@ php:
   - '7.1'
   - '7.2'
   - '7.3'
+  - '7.4'
 
 env:
   global:
-    CI: 'true'
-    TEST_OUTPUT_STYLE: 'pretty'
-    PHPCS_REPORT_STYLE: 'full'
-    COMPOSER_OPTIONS: '--optimize-autoloader'
-  matrix:
-  - SYMFONY_VERSION: '~3.0'
-  - SYMFONY_VERSION: '~4.0'
+    - CI: 'true'
+    - TEST_OUTPUT_STYLE: 'pretty'
+    - PHPCS_REPORT_STYLE: 'full'
+    - COMPOSER_OPTIONS: '--optimize-autoloader'
+  jobs:
+    - SYMFONY_VERSION: '~3.0'
+    - SYMFONY_VERSION: '~4.0'
 
-sudo: false
-
-matrix:
+jobs:
   fast_finish: true
 
 before_install:
@@ -39,3 +38,4 @@ cache:
 branches:
   except:
   - /.*\-dev$/
+  - /^dev-.*/
