@@ -24,7 +24,7 @@ before_install:
   - phpenv config-rm xdebug.ini || true
 
 install:
-  - composer require symfony/http-foundation:$SYMFONY_VERSION symfony/http-kernel:$SYMFONY_VERSION symfony/config:$SYMFONY_VERSION symfony/dependency-injection:$SYMFONY_VERSION
+  - composer require symfony/http-foundation:$SYMFONY_VERSION symfony/http-kernel:$SYMFONY_VERSION symfony/config:$SYMFONY_VERSION symfony/dependency-injection:$SYMFONY_VERSION symfony/event-dispatcher:$SYMFONY_VERSION
   - make build
 script:
   - make test-technical
