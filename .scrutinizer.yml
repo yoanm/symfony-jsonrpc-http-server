@@ -11,18 +11,30 @@ build_failure_conditions:
 build:
     dependencies:
         override:
-            - make build
+            -
+              command: make build
+              title: Build deps
+              idle_timeout: 240
     tests:
         stop_on_failure: true
         override:
             -
                 command: make coverage
+                title: Coverage
                 idle_timeout: 1200
                 coverage:
                     file: 'build/coverage/clover.xml'
                     format: 'php-clover'
-            - php-scrutinizer-run --enable-security-analysis
-            - make codestyle
+            -
+              command: make codestyle
+              title: Code style
+            -
+              command: composer global require maglnet/composer-require-checker && composer-require-checker check composer.json
+              title: Composer-require-checker
+            -
+              command: php-scrutinizer-run --enable-security-analysis
+              title: Scrutinizer checks
+
     cache:
         directories:
             - ~/.composer
