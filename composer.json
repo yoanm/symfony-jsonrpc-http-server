@@ -26,7 +26,6 @@
     }
   },
   "suggest": {
-    "yoanm/symfony-jsonrpc-server-psr11-resolver": "PSR-11 compliant method resolver for yoanm/symfony-jsonrpc-http-server",
     "yoanm/symfony-jsonrpc-params-validator": "Symfony bundle for easy JSON-RPC params validation",
     "yoanm/symfony-jsonrpc-http-server-doc": "JSON-RPC documentation Bundle"
   },
@@ -37,7 +36,8 @@
     "symfony/http-kernel": "^4.0 || ^5.0",
     "symfony/config": "^4.0 || ^5.0",
     "symfony/dependency-injection": "^4.0 || ^5.0",
-    "symfony/event-dispatcher": "^4.0 || ^5.0"
+    "symfony/event-dispatcher": "^4.0 || ^5.0",
+    "psr/container": "^1.0"
   },
   "require-dev": {
     "behat/behat": "~3.0",
