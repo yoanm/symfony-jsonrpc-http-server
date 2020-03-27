@@ -21,7 +21,6 @@ build:
             -
                 command: make coverage
                 title: Coverage
-                background: true
                 idle_timeout: 1200
                 coverage:
                     file: 'build/coverage/clover.xml'
