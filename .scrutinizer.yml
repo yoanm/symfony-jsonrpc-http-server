@@ -28,11 +28,9 @@ build:
             -
               command: make codestyle
               title: Code style
-              background: true
             -
               command: composer global require maglnet/composer-require-checker && composer-require-checker check composer.json
               title: Composer-require-checker
-              background: true
             -
               command: php-scrutinizer-run --enable-security-analysis
               title: Scrutinizer checks
