@@ -23,6 +23,7 @@ build:
                     format: 'php-clover'
             - php-scrutinizer-run --enable-security-analysis
             - make codestyle
+            - composer global require maglnet/composer-require-checker && composer-require-checker check composer.json
     cache:
         directories:
             - ~/.composer
