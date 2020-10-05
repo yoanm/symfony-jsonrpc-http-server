@@ -9,7 +9,7 @@
 
 Symfony JSON-RPC HTTP Server to convert an HTTP json-rpc request into HTTP json-rpc response.
 
-Symfony bundle for [`yoanm/jsonrpc-server-sdk`](https://raw.githubusercontent.com/yoanm/php-jsonrpc-server-sdk)
+Symfony bundle for [`yoanm/jsonrpc-server-sdk`](https://github.com/yoanm/php-jsonrpc-server-sdk)
 
 See [yoanm/symfony-jsonrpc-params-validator](https://github.com/yoanm/symfony-jsonrpc-params-validator) for params validation.
 
@@ -111,17 +111,6 @@ mapping_aware_service:
   class: App\Collector\MappingCollector
   tags: ['json_rpc_http_server.method_aware']
 ```
-   
-### Custom method resolver
-In case you want to use your method resolver implementation, use the tag `json_rpc_http_server.method_resolver`, it will be automatically injected inside JSON-RPC server:
-```yaml
-services:
-  my.custom_method_resolver.service:
-    class: Custom\Method\Resolver\Class
-    tags: ['json_rpc_http_server.method_resolver']
-```
-
-You can take advantage of method mapping aware mechanism or write your custom resolution logic.
 
 ## Contributing
 See [contributing note](./CONTRIBUTING.md)
