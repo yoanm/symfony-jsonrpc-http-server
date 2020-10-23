@@ -2,6 +2,9 @@
 namespace Tests\Functional\BehatContext;
 
 use Behat\Gherkin\Node\PyStringNode;
+use DemoApp\AbstractKernel;
+use DemoApp\DefaultKernel;
+use DemoApp\KernelWithMappingCollectorListener;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
 use Yoanm\JsonRpcServer\Domain\JsonRpcMethodInterface;
@@ -13,6 +16,16 @@ class DemoAppContext extends AbstractContext
 {
     /** @var Response|null */
     private $lastResponse;
+    /** @var bool */
+    private $useKernelWithMappingCollectorListener = false;
+
+    /**
+     * @Given I will use kernel with MappingCollector listener
+     */
+    public function givenIWillUseServerDocCreatedListener()
+    {
+        $this->useKernelWithMappingCollectorListener = true;
+    }
 
     /**
      * @When I send following :httpMethod input on :uri demoApp kernel endpoint:
@@ -68,5 +81,21 @@ class DemoAppContext extends AbstractContext
             $method,
             sprintf('Method "%s" is not an instance of "%s"', $methodName, $methodClass)
         );
+    }
+    /**
+     * @return AbstractKernel
+     */
+    public function getDemoAppKernel()
+    {
+        $env = 'prod';
+        $debug = true;
+
+        if (true === $this->useKernelWithMappingCollectorListener) {
+            $kernelClass = KernelWithMappingCollectorListener::class;
+        } else {
+            $kernelClass = DefaultKernel::class;
+        }
+
+        return new $kernelClass($env, $debug);
     }
 }
