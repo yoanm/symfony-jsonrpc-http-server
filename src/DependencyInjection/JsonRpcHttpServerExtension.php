@@ -153,10 +153,6 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
     {
         $mappingAwareServiceDefinitionList = $this->findAndValidateMappingAwareDefinitionList($container);
 
-        if (0 === count($mappingAwareServiceDefinitionList)) {
-            return;
-        }
-
         $jsonRpcMethodDefinitionList = (new JsonRpcMethodDefinitionHelper())
             ->findAndValidateJsonRpcMethodDefinition($container);
 
