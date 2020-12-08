@@ -9,13 +9,13 @@
         path="%json_rpc_http_server.http_endpoint_path%"
         methods="POST"
     >
-        <default key="_controller">json_rpc_http_server.endpoint:httpPost</default>
+        <default key="_controller">json_rpc_http_server.endpoint::httpPost</default>
     </route>
     <route
         id="json_rpc_http_server_endpoint_options"
         path="%json_rpc_http_server.http_endpoint_path%"
         methods="OPTIONS"
     >
-        <default key="_controller">json_rpc_http_server.endpoint:httpOptions</default>
+        <default key="_controller">json_rpc_http_server.endpoint::httpOptions</default>
     </route>
 </routes>
