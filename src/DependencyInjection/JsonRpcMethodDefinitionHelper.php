@@ -1,7 +1,6 @@
 <?php
 namespace Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -22,9 +21,9 @@ class JsonRpcMethodDefinitionHelper
 
     public function __construct(ContainerBuilder $container) {
         $this->annotationsEnabled = $container->has('routing.loader.annotation')
-            && class_exists('Doctrine\Common\Annotations\Annotation');
+            && class_exists('Doctrine\Common\Annotations\AnnotationReader');
         if ($this->annotationsEnabled) {
-            $this->reader = new AnnotationReader();
+            $this->reader = new \Doctrine\Common\Annotations\AnnotationReader();
         }
     }
 
