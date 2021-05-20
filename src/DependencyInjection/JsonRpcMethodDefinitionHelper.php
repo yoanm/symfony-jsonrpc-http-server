@@ -2,10 +2,11 @@
 namespace Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Yoanm\JsonRpcServer\Domain\JsonRpcMethodInterface;
+use Yoanm\SymfonyJsonRpcHttpServer\Annotation;
+use Doctrine\Common\Annotations\AnnotationReader;
 
 /**
  * Class JsonRpcMethodDefinitionHelper
@@ -13,18 +14,18 @@ use Yoanm\JsonRpcServer\Domain\JsonRpcMethodInterface;
 class JsonRpcMethodDefinitionHelper
 {
 
+    /** @var bool */
     private $annotationsEnabled;
 
+    /** @var \Doctrine\Common\Annotations\AnnotationReader|null */
     private $reader;
-
-    private const METHOD_ANNOTATION_CLASS = 'Yoanm\\SymfonyJsonRpcHttpServer\\Annotation\\JsonRpcMethod';
 
     public function __construct(ContainerBuilder $container)
     {
         $this->annotationsEnabled = $container->has('routing.loader.annotation')
             && class_exists('Doctrine\Common\Annotations\AnnotationReader');
         if ($this->annotationsEnabled) {
-            $this->reader = new \Doctrine\Common\Annotations\AnnotationReader();
+            $this->reader = new AnnotationReader();
         }
     }
 
@@ -52,8 +53,8 @@ class JsonRpcMethodDefinitionHelper
                     // method discovery.
                     if ($this->annotationsEnabled) {
                         $reflection = $container->getReflectionClass($container->getDefinition($serviceId)->getClass());
-                        $annotation = $this->reader->getClassAnnotation($reflection, self::METHOD_ANNOTATION_CLASS);
-                        if ($annotation) {
+                        $annotation = $this->reader->getClassAnnotation($reflection, Annotation\JsonRpcMethod::class);
+                        if (null !== $annotation) {
                             /** @var \Yoanm\SymfonyJsonRpcHttpServer\Annotation\JsonRpcMethod $annotation */
                             $methodName = $annotation->getName();
                         } else {

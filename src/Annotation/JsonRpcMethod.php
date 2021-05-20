@@ -10,6 +10,7 @@ namespace Yoanm\SymfonyJsonRpcHttpServer\Annotation;
  */
 class JsonRpcMethod
 {
+    /** @var string */
     private $name;
 
     /**
