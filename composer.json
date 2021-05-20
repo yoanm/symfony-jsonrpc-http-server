@@ -27,7 +27,8 @@
   },
   "suggest": {
     "yoanm/symfony-jsonrpc-params-validator": "Symfony bundle for easy JSON-RPC params validation",
-    "yoanm/symfony-jsonrpc-http-server-doc": "JSON-RPC documentation Bundle"
+    "yoanm/symfony-jsonrpc-http-server-doc": "JSON-RPC documentation Bundle",
+    "doctrine/annotations": "Autowire methods using annotations in PHP > 8."
   },
   "require": {
     "php": ">=7.2",
