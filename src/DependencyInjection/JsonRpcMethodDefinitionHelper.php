@@ -19,7 +19,8 @@ class JsonRpcMethodDefinitionHelper
 
     private const METHOD_ANNOTATION_CLASS = 'Yoanm\\SymfonyJsonRpcHttpServer\\Annotation\\JsonRpcMethod';
 
-    public function __construct(ContainerBuilder $container) {
+    public function __construct(ContainerBuilder $container)
+    {
         $this->annotationsEnabled = $container->has('routing.loader.annotation')
             && class_exists('Doctrine\Common\Annotations\AnnotationReader');
         if ($this->annotationsEnabled) {
@@ -45,8 +46,7 @@ class JsonRpcMethodDefinitionHelper
                 try {
                     $this->validateJsonRpcMethodTagAttributes($serviceId, $tagAttributeData);
                     $methodName = $tagAttributeData[JsonRpcHttpServerExtension::JSONRPC_METHOD_TAG_METHOD_NAME_KEY];
-                }
-                catch (\LogicException $e) {
+                } catch (\LogicException $e) {
                     // Annotation routing loader is conditionally added by the framework
                     // bundle; if it's enabled, allow for our own annotation-based
                     // method discovery.
@@ -56,12 +56,10 @@ class JsonRpcMethodDefinitionHelper
                         if ($annotation) {
                             /** @var \Yoanm\SymfonyJsonRpcHttpServer\Annotation\JsonRpcMethod $annotation */
                             $methodName = $annotation->getName();
-                        }
-                        else {
+                        } else {
                             throw $e;
                         }
-                    }
-                    else {
+                    } else {
                         throw $e;
                     }
                 }
