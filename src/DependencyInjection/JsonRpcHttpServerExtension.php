@@ -66,7 +66,7 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
     {
         $this->bindJsonRpcServerDispatcher($container);
         $this->bindValidatorIfDefined($container);
-        $this->binJsonRpcMethods($container);
+        $this->bindJsonRpcMethods($container);
     }
 
     /**
@@ -149,11 +149,11 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
     /**
      * @param ContainerBuilder $container
      */
-    private function binJsonRpcMethods(ContainerBuilder $container) : void
+    private function bindJsonRpcMethods(ContainerBuilder $container) : void
     {
         $mappingAwareServiceDefinitionList = $this->findAndValidateMappingAwareDefinitionList($container);
 
-        $jsonRpcMethodDefinitionList = (new JsonRpcMethodDefinitionHelper())
+        $jsonRpcMethodDefinitionList = (new JsonRpcMethodDefinitionHelper($container))
             ->findAndValidateJsonRpcMethodDefinition($container);
 
         $methodMappingList = [];

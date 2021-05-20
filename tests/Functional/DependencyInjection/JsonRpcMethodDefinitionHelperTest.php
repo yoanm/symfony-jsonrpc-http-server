@@ -16,8 +16,8 @@ class JsonRpcMethodDefinitionHelperTest extends AbstractTestClass
 
     protected function setUp(): void
     {
-        $this->helper = new JsonRpcMethodDefinitionHelper();
         parent::setUp();
+        $this->helper = new JsonRpcMethodDefinitionHelper($this->container);
     }
 
     public function testShouldManageJsonRpcMethodMappingFromTag()
