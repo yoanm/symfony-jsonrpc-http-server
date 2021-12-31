@@ -17,7 +17,6 @@ class RequestListener
 
     public function __construct(SDKJsonRpcEndpoint $sdkEndpoint, $uri)
     {
-        var_dump("CONSTRUCT");
         $this->uri = $uri;
         $this->sdkEndpoint = $sdkEndpoint;
         $this->allowedMethodList = [Request::METHOD_POST, Request::METHOD_OPTIONS];

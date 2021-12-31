@@ -2,19 +2,6 @@ services:
   _defaults:
       public: true
 
-  json_rpc_http_server.endpoint:
-    class: Yoanm\SymfonyJsonRpcHttpServer\Endpoint\JsonRpcHttpEndpoint
-    arguments:
-      - '@json_rpc_server_sdk.infra.endpoint'
-
-  json_rpc_http_server.request_listener:
-      class: Yoanm\SymfonyJsonRpcHttpServer\EventListener\RequestListener
-      arguments:
-        - '@json_rpc_server_sdk.infra.endpoint'
-        - '%json_rpc_http_server.http_endpoint_path%'
-      tags:
-        - { name: kernel.event_listener, event: kernel.request, method: 'onKernelRequest', priority: 9999 }
-
   json_rpc_http_server.dispatcher.server:
     class: Yoanm\SymfonyJsonRpcHttpServer\Dispatcher\SymfonyJsonRpcServerDispatcher
     arguments:

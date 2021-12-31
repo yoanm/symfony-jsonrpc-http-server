@@ -31,7 +31,7 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
     {
         $this->loadContainer();
 
-        $this->assertEndpointIsUsable();
+        $this->assertDispatcherInstalled();
     }
 
     public function testShouldManageCustomEndpointPathFromConfiguration()
@@ -42,7 +42,7 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
         // Assert custom resolver is an alias of the stub
         $this->assertContainerBuilderHasParameter(self::EXPECTED_HTTP_ENDPOINT_PATH_CONTAINER_PARAM, $myCustomEndpoint);
 
-        $this->assertEndpointIsUsable();
+        $this->assertDispatcherInstalled();
     }
 
     public function testShouldReturnAnXsdValidationBasePath()
@@ -67,7 +67,7 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
             0
         );
 
-        $this->assertEndpointIsUsable();
+        $this->assertDispatcherInstalled();
     }
 
     public function testShouldThrowAnExceptionIfDispatcherAwareServiceDoesNotUseRightTrait()
@@ -104,7 +104,7 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
             [new Reference(self::EXPECTED_PARAMS_VALIDATOR_ALIAS)]
         );
 
-        $this->assertEndpointIsUsable();
+        $this->assertDispatcherInstalled();
     }
 
     public function testShouldNotInjectParamsValidatorAliasIfNotDefined()
@@ -118,7 +118,7 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
             }
         }
 
-        $this->assertEndpointIsUsable();
+        $this->assertDispatcherInstalled();
     }
 
     public function testShouldBindJsonRpcMethodsToMethodAwareServices()
@@ -165,7 +165,7 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
             1
         );
 
-        $this->assertEndpointIsUsable();
+        $this->assertDispatcherInstalled();
     }
 
     public function testShouldThowAnExceptionIfMethodAwareServiceDoesNotImplementRightInterface()
