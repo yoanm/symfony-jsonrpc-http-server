@@ -3,7 +3,8 @@ namespace DemoApp;
 
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Routing\RouteCollectionBuilder;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
 class DefaultKernel extends AbstractKernel
 {
@@ -21,21 +22,23 @@ class DefaultKernel extends AbstractKernel
     /**
      * {@inheritdoc}
      */
-    protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader)
-    {
-        $container->setParameter('container.dumper.inline_class_loader', true);
-        $confDir = $this->getProjectDir().'/'.$this->getConfigDirectory();
-        $loader->load($confDir.'/config'.self::CONFIG_EXTS, 'glob');
-        $loader->load($confDir.'/services'.self::CONFIG_EXTS, 'glob');
+    protected function configureContainer(
+        ContainerConfigurator $container,
+        LoaderInterface $loader,
+        ContainerBuilder $builder
+    ) {
+        $confDir = $this->getConfigDir();
+        $container->parameters()->set('container.dumper.inline_class_loader', true);
+        $container->import($confDir.'/config'.self::CONFIG_EXTS, 'glob');
+        $container->import($confDir.'/services'.self::CONFIG_EXTS, 'glob');
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function configureRoutes(RouteCollectionBuilder $routes)
+    protected function configureRoutes(RoutingConfigurator $routes)
     {
-        $confDir = $this->getProjectDir().'/'.$this->getConfigDirectory();
-        $routes->import($confDir.'/routes'.self::CONFIG_EXTS, '/', 'glob');
+        $routes->import($this->getConfigDir().'/routes'.self::CONFIG_EXTS);
     }
 
     /**

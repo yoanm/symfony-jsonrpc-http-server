@@ -4,6 +4,8 @@ php:
   - '7.2'
   - '7.3'
   - '7.4'
+  - '8.0'
+  - '8.1'
 
 env:
   global:
@@ -12,8 +14,8 @@ env:
     - PHPCS_REPORT_STYLE: 'full'
     - COMPOSER_OPTIONS: '--optimize-autoloader'
   jobs:
-    - SYMFONY_VERSION: '~4.0'
-    - SYMFONY_VERSION: '~5.0'
+    - SYMFONY_VERSION: '^5.4'
+    - SYMFONY_VERSION: '^6.0'
 
 jobs:
   fast_finish: true

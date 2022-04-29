@@ -9,7 +9,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AbstractContext implements Context
 {
-    public function jsonDecode($encodedData)
+    /**
+     * @throws \Exception
+     */
+    public function jsonDecode($encodedData): array
     {
         $decoded = json_decode($encodedData, true);
 
