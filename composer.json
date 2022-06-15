@@ -49,8 +49,8 @@
     "phpunit/php-code-coverage": "^9.2.4",
     "phpunit/phpunit": "^9.0",
     "squizlabs/php_codesniffer": "^3.5",
-    "symfony/framework-bundle": "^4.4 || ^5.4",
-    "symfony/routing": "^4.4 || ^5.4",
+    "symfony/framework-bundle": "^4.4 || ^5.4 || ^6.0",
+    "symfony/routing": "^4.4 || ^5.4 || ^6.0",
     "yoanm/php-unit-extended": "^2.0"
   },
   "config": {
