@@ -21,6 +21,13 @@ env:
   COMPOSER_OPTIONS: '--optimize-autoloader'
 
 jobs:
+  composer-require-checker:
+    name: ComposerRequireChecker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: ComposerRequireChecker
+        uses: docker://webfactory/composer-require-checker:3.2.0
   unit-tests:
     name: Unit / PHP ${{ matrix.php-version }}
     runs-on: ubuntu-latest
