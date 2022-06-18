@@ -7,6 +7,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseHttpKernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+use Symfony\Component\Routing\RouteCollectionBuilder;
 
 abstract class AbstractKernel extends BaseHttpKernel
 {
@@ -55,13 +56,18 @@ abstract class AbstractKernel extends BaseHttpKernel
     {
         return realpath(__DIR__.'/../');
     }
+
     /**
-     * {@inheritdoc}
+     * @param RouteCollectionBuilder|RoutingConfigurator $routes
      */
     protected function configureRoutes($routes)
     {
         $confDir = $this->getConfigDir();
-        $routes->import($confDir.'/routes'.self::CONFIG_EXTS, '/', 'glob');
+        if ($routes instanceof RoutingConfigurator) {
+            $routes->import($confDir . '/routes' . self::CONFIG_EXTS, 'glob');
+        } else {
+            $routes->import($confDir . '/routes' . self::CONFIG_EXTS, '/', 'glob');
+        }
     }
     
     /**
