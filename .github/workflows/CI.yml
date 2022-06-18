@@ -155,10 +155,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
-      exclude:
-        - php-version: '8.1' # Already done above
-          symfony-version: '5.4'
       matrix:
+        exclude:
+          - php-version: '8.1' # Already done above
+            symfony-version: '5.4'
         php-version:
           - '8.1'
           - '8.2'
