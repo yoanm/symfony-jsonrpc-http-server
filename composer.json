@@ -43,11 +43,13 @@
   "require-dev": {
     "behat/behat": "~3.0",
     "squizlabs/php_codesniffer": "3.*",
-    "phpunit/phpunit": "^7.0 || ^8.0",
+    "phpunit/phpunit": "^9.0",
     "matthiasnoback/symfony-dependency-injection-test": "^3.0 || ^4.0",
     "matthiasnoback/symfony-config-test": "^3.0 || ^4.0",
     "symfony/framework-bundle": "^4.4 || ^5.4",
     "symfony/routing": "^4.4 || ^5.4",
-    "yoanm/php-unit-extended": "~1.0"
+    "yoanm/php-unit-extended": "~1.0",
+    "phpspec/prophecy-phpunit": "^2.0",
+    "dvdoug/behat-code-coverage": "^5.2"
   }
 }
