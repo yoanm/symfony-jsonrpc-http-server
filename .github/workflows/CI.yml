@@ -28,6 +28,7 @@ jobs:
       fail-fast: true
       matrix:
         php-version:
+          - '7.2'
           - '7.4'
           - '8.0'
           - '8.1'
@@ -88,6 +89,7 @@ jobs:
       fail-fast: true
       matrix:
         php-version:
+          - '7.2'
           - '7.4'
           - '8.0'
           - '8.1'
@@ -139,3 +141,65 @@ jobs:
           name: "functional-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}"
           flags: "functional-tests,php-${{ matrix.php-version }},sf-^${{ matrix.symfony-version }}"
           fail_ci_if_error: true
+
+  nightly-tests:
+    name: Nightly / PHP ${{ matrix.php-version }} / Symfony ${{ matrix.symfony-version }}
+    needs: [ functional-tests ]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      exclude:
+        - php-version: '8.1' # Already done above
+          symfony-version: '5.4'
+      matrix:
+        php-version:
+          - '8.1'
+          - '8.2'
+        symfony-version:
+          - '5.4'
+          - '6.2'
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '${{ matrix.php-version }}'
+          tools: composer
+          coverage: xdebug
+        env:
+          # Always use latest available patch for the version
+          update: true
+
+      - name: Setup cache
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.composer
+            ./vendor
+          # Clear the cache if composer json (as composer.lock is in the repo) has been updated
+          key: ${{ env.CACHE_VERSION }}-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}-${{ hashFiles('composer.json') }}
+
+      - name: Build
+        run: |
+          composer require \
+            symfony/http-foundation:^${{ matrix.symfony-version }} \
+            symfony/http-kernel:^${{ matrix.symfony-version }} \
+            symfony/config:^${{ matrix.symfony-version }} \
+            symfony/dependency-injection:^${{ matrix.symfony-version }} \
+            symfony/event-dispatcher:^${{ matrix.symfony-version }} \
+            symfony/routing:^${{ matrix.symfony-version }} \
+          && make build
+
+      - name: Test
+        run: make test-functional
+
+      # See the reports at https://codecov.io/gh/yoanm/php-jsonrpc-doc-sdk
+      - name: Upload coverage to codecov
+        uses: codecov/codecov-action@v2
+        with:
+          name: "nightly-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}"
+          flags: "nightly-tests,php-${{ matrix.php-version }},sf-^${{ matrix.symfony-version }}"
+          fail_ci_if_error: false
