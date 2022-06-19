@@ -5,8 +5,8 @@
 ### PHP Versions
 
 * 🗑️ Drop PHP 7.2 support
-  * ✔️ PHP 7.3
-  * ✔️ PHP 7.4
+* ✔️ PHP 7.3
+* ✔️ PHP 7.4
 * 🚀 Add PHP 8.0
   * 🚀 Add PHP 8.1
 * 🧪 Set PHP 8.2 for nightly
@@ -15,7 +15,7 @@
 
 * ✔️ Symfony 4.4
 * ✔️ Symfony 5.4
-  * 🧪 Set Symfony 6.0 for nightly
+* 🧪 Set Symfony 6.0 for nightly
 
 ### Chore
 
