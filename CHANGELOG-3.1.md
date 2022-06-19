@@ -1,7 +1,6 @@
-CHANGELOG for 3.1.x
-===================
+# CHANGELOG for 3.1.x
 
-# 3.1.0 (2022-06-19)
+## 3.1.0 (2022-06-19)
 
 ### PHP Versions
 
