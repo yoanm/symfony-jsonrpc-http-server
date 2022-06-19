@@ -39,8 +39,8 @@ jobs:
       - name: ComposerRequireChecker
         uses: docker://webfactory/composer-require-checker:3.2.0
 
-  unit-tests:
-    name: Unit / PHP ${{ matrix.php-version }}
+  tests:
+    name: Tests / PHP ${{ matrix.php-version }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
@@ -90,81 +90,27 @@ jobs:
           && make build
 
       - name: Test
-        run: make test-unit
+        run: make test-unit && make test-functional
 
-      # See the reports at https://codecov.io/gh/yoanm/php-jsonrpc-doc-sdk
-      - name: Upload coverage to codecov
+      # See the reports at https://codecov.io/gh/yoanm/symfony-jsonrpc-http-server
+      - name: Upload unit tests coverage to codecov
         uses: codecov/codecov-action@v2
         with:
+          file: "build/coverage/clover-unit.xml"
           name: "unit-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}"
           flags: "unit-tests,php-${{ matrix.php-version }},sf-^${{ matrix.symfony-version }}"
           fail_ci_if_error: true
-
-  functional-tests:
-    name: Functional / PHP ${{ matrix.php-version }} / Symfony ${{ matrix.symfony-version }}
-    needs: [ unit-tests ]
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
-      max-parallel: 4
-      matrix:
-        php-version:
-          - '7.2'
-          - '7.4'
-          - '8.0'
-          - '8.1'
-        symfony-version:
-          - '4.4'
-          - '5.4'
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v2
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '${{ matrix.php-version }}'
-          tools: composer
-          coverage: xdebug
-        env:
-          # Always use latest available patch for the version
-          update: true
-
-      - name: Setup cache
-        id: cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.composer
-            ./vendor
-          # Clear the cache if composer json (as composer.lock is in the repo) has been updated
-          key: ${{ env.CACHE_VERSION }}-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}-${{ hashFiles('composer.json') }}
-
-      - name: Build
-        run: |
-          composer require \
-            symfony/http-foundation:^${{ matrix.symfony-version }} \
-            symfony/http-kernel:^${{ matrix.symfony-version }} \
-            symfony/config:^${{ matrix.symfony-version }} \
-            symfony/dependency-injection:^${{ matrix.symfony-version }} \
-            symfony/event-dispatcher:^${{ matrix.symfony-version }} \
-            symfony/routing:^${{ matrix.symfony-version }} \
-          && make build
-
-      - name: Test
-        run: make test-functional
-
-      # See the reports at https://codecov.io/gh/yoanm/php-jsonrpc-doc-sdk
-      - name: Upload coverage to codecov
+      - name: Upload unit tests coverage to codecov
         uses: codecov/codecov-action@v2
         with:
+          file: "build/coverage/clover-functional.xml,build/behat-coverage/clover.xml"
           name: "functional-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}"
           flags: "functional-tests,php-${{ matrix.php-version }},sf-^${{ matrix.symfony-version }}"
           fail_ci_if_error: true
 
   nightly-tests:
     name: Nightly / PHP ${{ matrix.php-version }} / Symfony ${{ matrix.symfony-version }}
-    needs: [ functional-tests ]
+    needs: [ tests ]
     runs-on: ubuntu-latest
     env:
       COMPOSER_OPTIONS: '--optimize-autoloader --ignore-platform-req=php+' # Ignore upper PHP bound requirement
@@ -172,15 +118,11 @@ jobs:
       fail-fast: false
       max-parallel: 2
       matrix:
-        exclude:
-          - php-version: '8.1' # Already done above
-            symfony-version: '5.4'
         php-version:
-          - '8.1'
           - '8.2'
         symfony-version:
+          - '4.4'
           - '5.4'
-          - '6.2'
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -217,12 +159,20 @@ jobs:
           && make build
 
       - name: Test
-        run: make test-functional
+        run: make test-unit && make test-functional
 
-      # See the reports at https://codecov.io/gh/yoanm/php-jsonrpc-doc-sdk
-      - name: Upload coverage to codecov
+      # See the reports at https://codecov.io/gh/yoanm/symfony-jsonrpc-http-server
+      - name: Upload unit tests coverage to codecov
         uses: codecov/codecov-action@v2
         with:
-          name: "nightly-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}"
-          flags: "nightly-tests,php-${{ matrix.php-version }},sf-^${{ matrix.symfony-version }}"
+          file: "build/coverage/clover-unit.xml"
+          name: "unit-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}"
+          flags: "unit-tests,php-${{ matrix.php-version }},sf-^${{ matrix.symfony-version }}"
+          fail_ci_if_error: false
+      - name: Upload unit tests coverage to codecov
+        uses: codecov/codecov-action@v2
+        with:
+          file: "build/coverage/clover-functional.xml,build/behat-coverage/clover.xml"
+          name: "functional-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}"
+          flags: "functional-tests,php-${{ matrix.php-version }},sf-^${{ matrix.symfony-version }}"
           fail_ci_if_error: false

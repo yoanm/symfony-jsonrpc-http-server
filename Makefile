@@ -6,7 +6,8 @@ BUILD_DIRECTORY ?= build
 REPORTS_DIRECTORY ?= ${BUILD_DIRECTORY}/reports
 COVERAGE_DIRECTORY ?= ${BUILD_DIRECTORY}/coverage
 BEHAT_COVERAGE_DIRECTORY ?= ${BUILD_DIRECTORY}/coverage-behat
-COVERAGE_CLOVER_FILE_PATH ?= ${COVERAGE_DIRECTORY}/clover.xml
+PHPUNIT_UNIT_COVERAGE_FILE_PATH ?= ${COVERAGE_DIRECTORY}/clover-unit.xml
+PHPUNIT_FUNCTIONAL_COVERAGE_FILE_PATH ?= ${COVERAGE_DIRECTORY}/clover-functional.xml
 
 ## Commands options
 ### Composer
@@ -42,12 +43,15 @@ ifdef COVERAGE_OUTPUT_STYLE
 	export XDEBUG_MODE=coverage
 	ifeq ("${COVERAGE_OUTPUT_STYLE}","html")
 		PHPUNIT_COVERAGE_OPTION ?= --coverage-html ${COVERAGE_DIRECTORY}
+		PHPUNIT_FUNCTIONAL_COVERAGE_OPTION ?= --coverage-html ${COVERAGE_DIRECTORY}
 		BEHAT_COVERAGE_OPTION ?= --profile coverage-html
 	else ifeq ("${COVERAGE_OUTPUT_STYLE}","clover")
-        	PHPUNIT_COVERAGE_OPTION ?= --coverage-clover ${COVERAGE_CLOVER_FILE_PATH}
-        	BEHAT_COVERAGE_OPTION ?= --profile coverage-clover
+		PHPUNIT_COVERAGE_OPTION ?= --coverage-clover ${PHPUNIT_UNIT_COVERAGE_FILE_PATH}
+		PHPUNIT_FUNCTIONAL_COVERAGE_OPTION ?= --coverage-clover ${PHPUNIT_FUNCTIONAL_COVERAGE_FILE_PATH}
+		BEHAT_COVERAGE_OPTION ?= --profile coverage-clover
         else
 		PHPUNIT_COVERAGE_OPTION ?= --coverage-text
+		PHPUNIT_FUNCTIONAL_COVERAGE_OPTION ?= --coverage-text
 		BEHAT_COVERAGE_OPTION ?= --profile coverage
 	endif
 endif
@@ -84,11 +88,11 @@ test-unit:
 
 ifdef BEHAT_COVERAGE_OPTION
 test-functional: create-build-directories
-else ifdef PHPUNIT_COVERAGE_OPTION
+else ifdef PHPUNIT_FUNCTIONAL_COVERAGE_OPTION
 test-functional: create-build-directories
 endif
 test-functional:
-	./vendor/bin/phpunit ${PHPUNIT_COLOR_OPTION} ${PHPUNIT_OUTPUT_STYLE_OPTION} ${PHPUNIT_COVERAGE_OPTION} --testsuite functional
+	./vendor/bin/phpunit ${PHPUNIT_COLOR_OPTION} ${PHPUNIT_OUTPUT_STYLE_OPTION} ${PHPUNIT_FUNCTIONAL_COVERAGE_OPTION} --testsuite functional
 	./vendor/bin/behat ${BEHAT_COLOR_OPTION} ${BEHAT_OUTPUT_STYLE_OPTION} ${BEHAT_COVERAGE_OPTION} --no-snippets
 
 codestyle: create-build-directories
