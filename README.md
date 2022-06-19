@@ -5,7 +5,7 @@
 
 [![Scrutinizer Build Status](https://img.shields.io/scrutinizer/build/g/yoanm/symfony-jsonrpc-http-server.svg?label=Scrutinizer&logo=scrutinizer)](https://scrutinizer-ci.com/g/yoanm/symfony-jsonrpc-http-server/build-status/master)
 [![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/g/yoanm/symfony-jsonrpc-http-server/master.svg?logo=scrutinizer)](https://scrutinizer-ci.com/g/yoanm/symfony-jsonrpc-http-server/?branch=master)
-[![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/yoanm/symfony-jsonrpc-http-server/master.svg?logo=scrutinizer)](https://scrutinizer-ci.com/g/yoanm/symfony-jsonrpc-http-server/?branch=master)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/8f39424add044b43a70bdb238e2f48db)](https://www.codacy.com/gh/yoanm/symfony-jsonrpc-http-server/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=yoanm/symfony-jsonrpc-http-server&amp;utm_campaign=Badge_Grade)
 
 [![CI](https://github.com/yoanm/symfony-jsonrpc-http-server/actions/workflows/CI.yml/badge.svg?branch=master)](https://github.com/yoanm/symfony-jsonrpc-http-server/actions/workflows/CI.yml)
 [![codecov](https://codecov.io/gh/yoanm/symfony-jsonrpc-http-server/branch/master/graph/badge.svg?token=NHdwEBUFK5)](https://codecov.io/gh/yoanm/symfony-jsonrpc-http-server)
@@ -24,11 +24,12 @@ See [yoanm/symfony-jsonrpc-http-server-doc](https://github.com/yoanm/symfony-jso
 
 ## Versions
 
-- Symfony v3/4 - PHP >=7.1 : `^v2.0`
+- Symfony v3/4 - PHP >=7.1 : `^2.0`
 
-  ⚠️⚠️ `v2.1.0` and `v2.1.1` was badly taggued, used `v3.0.0` instead ! ⚠️⚠️
+  ⚠️⚠️ `v2.1.0` and `v2.1.1` were badly taggued, used `v3.0.0` instead ! ⚠️⚠️
 
-- Symfony v4/5 - PHP >=7.2 : `^v3.0`
+- Symfony v4/5 - PHP >=7.2 : `~3.0.0`
+- Symfony v4/5 - PHP >=7.3 : `^3.1`
 
 ## How to use
 
