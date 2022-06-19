@@ -2,6 +2,7 @@
 namespace Tests\Functional\Endpoint;
 
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Container\ContainerInterface;
 use Yoanm\JsonRpcServer\Domain\JsonRpcMethodInterface;
@@ -12,6 +13,8 @@ use Yoanm\SymfonyJsonRpcHttpServer\Resolver\MethodResolver;
  */
 class MethodResolverTest extends TestCase
 {
+    use ProphecyTrait;
+
     /** @var MethodResolver */
     private $resolver;
 

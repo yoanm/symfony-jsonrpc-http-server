@@ -20,6 +20,7 @@ use Yoanm\SymfonyJsonRpcHttpServer\Resolver\MethodResolver;
 /**
  * /!\ This test class does not cover JsonRpcHttpServerExtension, it covers yaml configuration files
  * => So no [at]covers tag !
+ * @coversNothing
  */
 class ConfigFilesTest extends AbstractTestClass
 {

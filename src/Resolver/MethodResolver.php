@@ -1,6 +1,7 @@
 <?php
 namespace Yoanm\SymfonyJsonRpcHttpServer\Resolver;
 
+use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
 use Yoanm\JsonRpcServer\Domain\JsonRpcMethodInterface;
 use Yoanm\JsonRpcServer\Domain\JsonRpcMethodResolverInterface;
