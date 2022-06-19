@@ -135,8 +135,11 @@ jobs:
           && chmod +x ${{ env.CODACY_REPORTER_TMP_FOLDER }}/codacy.sh \
           && ${{ env.CODACY_REPORTER_TMP_FOLDER }}/codacy.sh download
 
-#      - name: Upload coverages to Codacy
-#        run: ${{ env.CODACY_REPORTER_TMP_FOLDER }}/codacy.sh report -r build/coverage-phpunit/unit.clover -r build/coverage-behat/clover.xml -r build/coverage-phpunit/functional.clover -t ${{ secrets.CODACY_PROJECT_TOKEN }} --partial
+      - name: DEBUG
+        run: ls -ail ${{ env.CODACY_REPORTER_TMP_FOLDER }} ${{ env.CODACY_REPORTER_TMP_FOLDER }}/*
+
+      - name: Upload coverages to Codacy
+        run: ${{ env.CODACY_REPORTER_TMP_FOLDER }}/codacy.sh report -r build/coverage-phpunit/unit.clover -r build/coverage-behat/clover.xml -r build/coverage-phpunit/functional.clover -t ${{ secrets.CODACY_PROJECT_TOKEN }} --partial
 
   finalize-codacy-coverage-report:
     runs-on: ubuntu-latest
@@ -159,8 +162,8 @@ jobs:
           && chmod +x ${{ env.CODACY_REPORTER_TMP_FOLDER }}/codacy.sh \
           && ${{ env.CODACY_REPORTER_TMP_FOLDER }}/codacy.sh download
 
-#      - name: Finalize reporting
-#        run: ${{ env.CODACY_REPORTER_TMP_FOLDER }}/codacy.sh final -t ${{ secrets.CODACY_PROJECT_TOKEN }}
+      - name: Finalize reporting
+        run: ${{ env.CODACY_REPORTER_TMP_FOLDER }}/codacy.sh final -t ${{ secrets.CODACY_PROJECT_TOKEN }}
 
   nightly-tests:
     name: Nightly - PHP ${{ matrix.php-version }} / Symfony ${{ matrix.symfony-version }}
