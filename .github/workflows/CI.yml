@@ -16,7 +16,7 @@ concurrency:
 
 env:
   # Cache params
-  CACHE_VERSION: 2022061902 # To be able to create a new cache (YYYYMMDDXX)
+  CACHE_VERSION: 2022061903 # To be able to create a new cache (YYYYMMDDXX)
   COVERAGE_OUTPUT_STYLE: clover
   TEST_OUTPUT_STYLE: pretty
   COMPOSER_OPTIONS: --optimize-autoloader
@@ -103,10 +103,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           mkdir -p $CODACY_CACHE_PATH \
-          && echo $CODACY_BIN \
-          && touch $( echo $CODACY_BIN ) \
-          && (ls -ail $CODACY_CACHE_PATH $CODACY_BIN || true) \
-          && curl -LN https://coverage.codacy.com/get.sh -o $( echo $CODACY_BIN ) \
+          && curl -LN https://coverage.codacy.com/get.sh -o $CODACY_BIN \
           && chmod +x $CODACY_BIN \
           && $CODACY_BIN download
 
@@ -160,7 +157,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           mkdir -p $CODACY_CACHE_PATH \
-          && curl -LN https://coverage.codacy.com/get.sh -o $( echo $CODACY_BIN ) \
+          && curl -LN https://coverage.codacy.com/get.sh -o $CODACY_BIN \
           && chmod +x $CODACY_BIN \
           && $CODACY_BIN download
 
