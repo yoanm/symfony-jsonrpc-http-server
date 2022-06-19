@@ -12,7 +12,7 @@ on: # Build any PRs and main branch changes
     - cron: '0 0 1 * *' # Every month
 
 concurrency:
-  group: "CI-${{ github.head_ref }}"
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
   cancel-in-progress: true
 
 env:
