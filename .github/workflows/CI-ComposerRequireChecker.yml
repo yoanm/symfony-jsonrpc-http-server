@@ -1,5 +1,6 @@
 name: 'CI - ComposerRequireChecker'
 on:
+  workflow_dispatch: # Allows to run the workflow manually from the Actions tab
   workflow_run:
     workflows: ["CI"]
     types:
@@ -24,7 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Setup PHP
+      - name: Setup PHP ${{ matrix.php-version }}
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}

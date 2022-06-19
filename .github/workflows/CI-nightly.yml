@@ -1,5 +1,6 @@
 name: 'CI - Nightly'
 on:
+  workflow_dispatch: # Allows to run the workflow manually from the Actions tab
   workflow_run:
     workflows: ["CI"]
     types:
@@ -20,6 +21,7 @@ jobs:
     name: Nightly - Symfony ${{ matrix.symfony-version }}
     needs: [ static-tests, tests ]
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     strategy:
       fail-fast: false
       max-parallel: 4
@@ -40,7 +42,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
 
-      - name: Setup PHP
+      - name: Setup PHP ${{ matrix.php-version }}
         uses: shivammathur/setup-php@v2
         with:
           php-version: '${{ matrix.php-version }}'
