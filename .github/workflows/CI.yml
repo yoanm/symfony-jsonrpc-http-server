@@ -28,19 +28,6 @@ env:
 #  actions: write # Required to be able to trigger sub CI workflows
 
 jobs:
-  parallel-tasks:
-    name: Parallel tasks
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code # Mandatory for gh binary to work
-        uses: actions/checkout@v2
-
-      - name: Trigger parallel sub workflows
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh workflow run CI-DepsChecker.yml --ref "${{ github.head_ref || github.ref }}"
-          gh workflow run CI-ComposerRequireChecker.yml --ref "${{ github.head_ref || github.ref }}"
   tests:
     name: UTs & FTs - Symfony ${{ matrix.symfony-version }}
     runs-on: ubuntu-latest
@@ -51,10 +38,10 @@ jobs:
       max-parallel: 4
       matrix:
         php-version:
-          - '7.3' # Lowest supported
-          - '7.4' # Latest php 7 version
-          - '8.0' # First php 8 version
           - '8.1' # Latest supported
+          - '8.0' # First php 8 version
+          - '7.4' # Latest php 7 version
+          - '7.3' # Lowest supported
         symfony-version:
           - '4.4' # Lowest LTS
           - '5.4' # Latest LTS
@@ -141,6 +128,45 @@ jobs:
         if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
         run: ${{ env.CODACY_BIN }} report -r build/coverage-phpunit/unit.clover -r build/coverage-behat/clover.xml -r build/coverage-phpunit/functional.clover -t ${{ secrets.CODACY_PROJECT_TOKEN }} --partial
 
+  static-checks:
+    name: Static checks
+    runs-on: ubuntu-latest
+    needs: [ tests ]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup PHP 8.1
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1 # Latest supported
+          tools: composer
+          coverage: none
+        env:
+          # Always use latest available patch for the version
+          update: true
+
+      - name: Setup cache
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.composer
+          # Clear the cache if composer json (as composer.lock is in the repo) has been updated
+          key: ${{ env.CACHE_VERSION }}-tests-${{ env.PHP_VERSION }}-${{ hashFiles('composer.json') }}
+
+      - name: Build
+        run: make build
+
+      - name: ComposerRequireChecker
+        uses: docker://webfactory/composer-require-checker:3.2.0
+
+      - name: Dependencies check
+        uses: actions/dependency-review-action@v1
+
+      - name: Trigger nightly tests for the PR
+        if: ${{ github.event_name == 'pull_request' }}
+        run: gh pr edit ${{ github.event.pull_request.id }} --add-label run-nightly-tests
+
   post-tasks:
     runs-on: ubuntu-latest
     name: Post tasks
@@ -164,9 +190,3 @@ jobs:
 
       - name: Finalize reporting
         run: ${{ env.CODACY_BIN }} final -t ${{ secrets.CODACY_PROJECT_TOKEN }}
-
-      - name: Trigger post sub workflows
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh workflow run CI-nightly.yml --ref "${{ github.head_ref || github.ref }}"

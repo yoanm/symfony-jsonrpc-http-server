@@ -1,6 +1,11 @@
 name: 'CI - Nightly'
 on:
   workflow_dispatch: # Allows to run the workflow manually from the Actions tab
+  pull_request:
+    types:
+      - labeled
+  push:
+    branches: [ master ]
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
@@ -13,11 +18,16 @@ env:
   COMPOSER_OPTIONS: --optimize-autoloader --ignore-platform-req=php+
 
 jobs:
+  remove-label:
+    if: ${{ github.event_name == 'pull_request' }}
+    name: Clear label
+    runs-on: ubuntu-latest
+    steps:
+      - run: gh pr edit ${{ github.event.pull_request.id }} --remove-label run-nightly-tests
   tests:
     name: Nightly - Symfony ${{ matrix.symfony-version }}
-    needs: [ static-tests, tests ]
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.labels.name == 'run-nightly-tests') }}
     strategy:
       fail-fast: false
       max-parallel: 4
