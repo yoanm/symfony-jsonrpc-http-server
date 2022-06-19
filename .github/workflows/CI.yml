@@ -1,11 +1,14 @@
 name: 'CI'
-on: # rebuild any PRs and main branch changes
+on: # Build any PRs and main branch changes
   pull_request:
     types:
       - opened
+      - edited
       - synchronize
   push:
     branches: [ master ]
+  schedule:
+    - "0 0 1 * *" # Every month
 
 concurrency:
   group: "CI-${{ github.head_ref }}"
