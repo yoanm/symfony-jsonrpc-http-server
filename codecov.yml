@@ -1,0 +1,16 @@
+codecov:
+  bot: "codecov-io"
+  notify:
+    after_n_builds: 4
+
+coverage:
+  precision: 2
+  round: down
+  range: "80...100"
+
+flags:
+  nightly:
+    joined: false
+
+github_checks:
+  annotations: true
