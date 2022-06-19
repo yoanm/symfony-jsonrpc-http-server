@@ -5,5 +5,8 @@ flags:
   nightly:
     joined: false
 
+comment:
+  show_carryforward_flags: true
+
 github_checks:
   annotations: true
