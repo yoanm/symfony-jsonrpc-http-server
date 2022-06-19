@@ -9,6 +9,7 @@
 
 [![CI](https://github.com/yoanm/symfony-jsonrpc-http-server/actions/workflows/CI.yml/badge.svg?branch=master)](https://github.com/yoanm/symfony-jsonrpc-http-server/actions/workflows/CI.yml)
 [![codecov](https://codecov.io/gh/yoanm/symfony-jsonrpc-http-server/branch/master/graph/badge.svg?token=NHdwEBUFK5)](https://codecov.io/gh/yoanm/symfony-jsonrpc-http-server)
+[![Symfony Versions](https://img.shields.io/badge/Symfony-v4%20%2F%20v5%20-8892BF.svg?logo=github)](https://symfony.com/)
 
 [![Latest Stable Version](https://img.shields.io/packagist/v/yoanm/symfony-jsonrpc-http-server.svg)](https://packagist.org/packages/yoanm/symfony-jsonrpc-http-server)
 [![Packagist PHP version](https://img.shields.io/packagist/php-v/yoanm/symfony-jsonrpc-http-server.svg)](https://packagist.org/packages/yoanm/symfony-jsonrpc-http-server)
