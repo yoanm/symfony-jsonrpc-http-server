@@ -13,22 +13,19 @@ concurrency:
 env:
   # Cache params
   CACHE_VERSION: 2022061906 # To be able to create a new cache (YYYYMMDDXX)
+  PHP_VERSION: '8.1' # Latest supported
 
 jobs:
   check:
     name: ComposerRequireChecker
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php-version:
-          - '8.1' # Latest supported
     steps:
       - uses: actions/checkout@v2
 
-      - name: Setup PHP ${{ matrix.php-version }}
+      - name: Setup PHP ${{ env.PHP_VERSION }}
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-version }}
+          php-version: ${{ env.PHP_VERSION }}
           tools: composer
           coverage: none
         env:
@@ -42,7 +39,7 @@ jobs:
           path: |
             ~/.composer
           # Clear the cache if composer json (as composer.lock is in the repo) has been updated
-          key: ${{ env.CACHE_VERSION }}-tests-${{ matrix.php-version }}-${{ hashFiles('composer.json') }}
+          key: ${{ env.CACHE_VERSION }}-tests-${{ env.PHP_VERSION }}-${{ hashFiles('composer.json') }}
 
       - name: Build
         run: make build
