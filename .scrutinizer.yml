@@ -22,7 +22,12 @@ build:
       - command: make scrutinizer-phpunit
         idle_timeout: 1200
         coverage:
-          file: 'build/coverage/clover.xml'
+          file: 'build/coverage-phpunit/scrutinizer.xml'
+          format: 'php-clover'
+      - command: make scrutinizer-behat
+        idle_timeout: 1200
+        coverage:
+          file: 'build/coverage-behat/clover.xml'
           format: 'php-clover'
       - command: php-scrutinizer-run --enable-security-analysis
         title: Scrutinizer checks
@@ -41,6 +46,8 @@ build:
       COVERAGE_CLOVER_FILE_PATH: 'build/coverage/clover.xml'
     php:
       version: "8.1"
+      ini:
+        memory_limit: "-1"
     timezone: UTC
     postgresql: false
     redis: false

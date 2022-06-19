@@ -94,18 +94,18 @@ jobs:
 
       # See the reports at https://codecov.io/gh/yoanm/symfony-jsonrpc-http-server
       - name: Upload unit tests coverage to codecov
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           file: "build/coverage-phpunit/clover-unit.xml"
           name: "unit-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}"
-          flags: "unit-tests,php-${{ matrix.php-version }},sf-${{ matrix.symfony-version }}+"
+          flags: "unit-tests,php-${{ matrix.php-version }},sf-${{ matrix.symfony-version }}"
           fail_ci_if_error: true
           move_coverage_to_trash: true
       - name: Upload functional tests coverage to codecov
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           name: "functional-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}"
-          flags: "functional-tests,php-${{ matrix.php-version }},sf-${{ matrix.symfony-version }}+"
+          flags: "functional-tests,php-${{ matrix.php-version }},sf-${{ matrix.symfony-version }}"
           fail_ci_if_error: true
 
   nightly-tests:
@@ -113,7 +113,7 @@ jobs:
     needs: [ tests ]
     runs-on: ubuntu-latest
     env:
-      COMPOSER_OPTIONS: '--optimize-autoloader --ignore-platform-req=php+' # Ignore upper PHP bound requirement
+      COMPOSER_OPTIONS: '--optimize-autoloader --ignore-platform-req=php+'
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -138,7 +138,6 @@ jobs:
           update: true
 
       - name: Setup cache
-        continue-on-error: true
         id: cache
         uses: actions/cache@v2
         with:
@@ -149,9 +148,8 @@ jobs:
           key: ${{ env.CACHE_VERSION }}-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}-${{ hashFiles('composer.json') }}
 
       - name: Build
-        continue-on-error: true
         run: |
-          composer require \
+          composer require ${COMPOSER_OPTIONS} \
             symfony/http-foundation:^${{ matrix.symfony-version }} \
             symfony/http-kernel:^${{ matrix.symfony-version }} \
             symfony/config:^${{ matrix.symfony-version }} \
@@ -161,24 +159,20 @@ jobs:
           && make build
 
       - name: Test
-        continue-on-error: true
         run: make test-unit && make test-functional
 
       # See the reports at https://codecov.io/gh/yoanm/symfony-jsonrpc-http-server
       - name: Upload unit tests coverage to codecov
-        uses: codecov/codecov-action@v2
-        continue-on-error: true
+        uses: codecov/codecov-action@v3
         with:
           file: "build/coverage-phpunit/clover-unit.xml"
           name: "unit-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}"
-          flags: "nightly,unit-tests,php-${{ matrix.php-version }},sf-${{ matrix.symfony-version }}+"
+          flags: "nightly,unit-tests,php-${{ matrix.php-version }},sf-${{ matrix.symfony-version }}"
           fail_ci_if_error: false
           move_coverage_to_trash: true
       - name: Upload functional tests coverage to codecov
-        continue-on-error: true
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
-          file: "build/coverage-phpunit/clover-functional.xml,build/coverage-behat/clover.xml"
           name: "functional-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}"
-          flags: "nightly,functional-tests,php-${{ matrix.php-version }},sf-${{ matrix.symfony-version }}+"
+          flags: "nightly,functional-tests,php-${{ matrix.php-version }},sf-${{ matrix.symfony-version }}"
           fail_ci_if_error: false
