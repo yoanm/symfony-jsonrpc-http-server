@@ -42,8 +42,10 @@ jobs:
           update: true
       - name: Build
         run: make build
-      - name: ComposerRequireChecker
+      - name: Composer Require Checker
         uses: docker://webfactory/composer-require-checker:3.2.0
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v1
 
   tests:
     name: Tests / PHP ${{ matrix.php-version }} / Symfony ${{ matrix.symfony-version }}
