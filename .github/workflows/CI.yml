@@ -8,7 +8,7 @@ on: # Build any PRs and main branch changes
   push:
     branches: [ master ]
   schedule:
-    - "0 0 1 * *" # Every month
+    - cron: '0 0 1 * *' # Every month
 
 concurrency:
   group: "CI-${{ github.head_ref }}"
@@ -17,21 +17,18 @@ concurrency:
 env:
   # Cache params
   CACHE_VERSION: 2022061901 # To be able to create a new cache (YYYYMMDDXX)
-  CI: 'true'
   COVERAGE_OUTPUT_STYLE: clover
-  TEST_OUTPUT_STYLE: 'pretty'
-  PHPCS_REPORT_STYLE: 'full'
-  COMPOSER_OPTIONS: '--optimize-autoloader'
-  CODACY_TMP_DIR: '~/.codacy'
-  CODACY_BIN: '$CODACY_TMP_DIR/codacy.sh'
-  CODACY_REPORTER_TMP_FOLDER: '$CODACY_TMP_DIR'
+  TEST_OUTPUT_STYLE: pretty
+  COMPOSER_OPTIONS: --optimize-autoloader
+  CODACY_REPORTER_TMP_FOLDER: ~/.codacy
 
 jobs:
-  composer-require-checker:
-    name: ComposerRequireChecker
+  static-tests:
+    name: Static tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -40,15 +37,28 @@ jobs:
         env:
           # Always use latest available patch for the version
           update: true
+
+      - name: Setup cache
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.composer
+            ./vendor
+          # Clear the cache if composer json (as composer.lock is in the repo) has been updated
+          key: ${{ env.CACHE_VERSION }}-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}-${{ hashFiles('composer.json') }}
+
       - name: Build
         run: make build
-      - name: Composer Require Checker
+
+      - name: ComposerRequireChecker
         uses: docker://webfactory/composer-require-checker:3.2.0
+
       - name: Dependency Review
         uses: actions/dependency-review-action@v1
 
   tests:
-    name: Tests / PHP ${{ matrix.php-version }} / Symfony ${{ matrix.symfony-version }}
+    name: UTs & FTs - PHP ${{ matrix.php-version }} / Symfony ${{ matrix.symfony-version }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
@@ -83,7 +93,7 @@ jobs:
           path: |
             ~/.composer
             ./vendor
-            $CODACY_TMP_DIR
+            ${{ env.CODACY_REPORTER_TMP_FOLDER }}
           # Clear the cache if composer json (as composer.lock is in the repo) has been updated
           key: ${{ env.CACHE_VERSION }}-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}-${{ hashFiles('composer.json') }}
 
@@ -117,18 +127,16 @@ jobs:
           flags: "functional-tests,php-${{ matrix.php-version }},sf-${{ matrix.symfony-version }}"
           fail_ci_if_error: true
 
-      - name: Download codacy installer
+      - name: Download codacy binary
         if: steps.cache.outputs.cache-hit != 'true'
-        run: mkdir -p $CODACY_TMP_DIR && curl -Ls https://coverage.codacy.com/get.sh -o $CODACY_BIN
-
-      - name: Upload coverages to Codacy
         run: |
-        bash <$CODACY_BIN report \
-          -r build/coverage-phpunit/unit.clover \
-          -r build/coverage-behat/clover.xml \
-          -r build/coverage-phpunit/functional.clover \
-          -t ${{ secrets.CODACY_PROJECT_TOKEN }} \
-          --partial
+          mkdir -p ${{ env.CODACY_REPORTER_TMP_FOLDER }} \
+          && curl -Ls https://coverage.codacy.com/get.sh -o ${{ env.CODACY_REPORTER_TMP_FOLDER }}/codacy.sh \
+          && chmod +x ${{ env.CODACY_REPORTER_TMP_FOLDER }}/codacy.sh \
+          && ${{ env.CODACY_REPORTER_TMP_FOLDER }}/codacy.sh download
+
+#      - name: Upload coverages to Codacy
+#        run: ${{ env.CODACY_REPORTER_TMP_FOLDER }}/codacy.sh report -r build/coverage-phpunit/unit.clover -r build/coverage-behat/clover.xml -r build/coverage-phpunit/functional.clover -t ${{ secrets.CODACY_PROJECT_TOKEN }} --partial
 
   finalize-codacy-coverage-report:
     runs-on: ubuntu-latest
@@ -140,18 +148,22 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            $CODACY_TMP_DIR
+            ${{ env.CODACY_REPORTER_TMP_FOLDER }}
           key: ${{ env.CACHE_VERSION }}-codacy
 
-      - name: Download codacy installer
+      - name: Download codacy binary
         if: steps.cache.outputs.cache-hit != 'true'
-        run: mkdir -p $CODACY_TMP_DIR && curl -Ls https://coverage.codacy.com/get.sh -o $CODACY_BIN
+        run: |
+          mkdir -p ${{ env.CODACY_REPORTER_TMP_FOLDER }} \
+          && curl -Ls https://coverage.codacy.com/get.sh -o ${{ env.CODACY_REPORTER_TMP_FOLDER }}/codacy.sh \
+          && chmod +x ${{ env.CODACY_REPORTER_TMP_FOLDER }}/codacy.sh \
+          && ${{ env.CODACY_REPORTER_TMP_FOLDER }}/codacy.sh download
 
-      - name: Finalize reporting
-        run: bash < $CODACY_BIN final -t ${{ secrets.CODACY_PROJECT_TOKEN }}
+#      - name: Finalize reporting
+#        run: ${{ env.CODACY_REPORTER_TMP_FOLDER }}/codacy.sh final -t ${{ secrets.CODACY_PROJECT_TOKEN }}
 
   nightly-tests:
-    name: Nightly / PHP ${{ matrix.php-version }} / Symfony ${{ matrix.symfony-version }}
+    name: Nightly - PHP ${{ matrix.php-version }} / Symfony ${{ matrix.symfony-version }}
     needs: [ tests ]
     runs-on: ubuntu-latest
     env:
@@ -186,7 +198,7 @@ jobs:
           path: |
             ~/.composer
             ./vendor
-            $CODACY_TMP_DIR
+            ${{ env.CODACY_REPORTER_TMP_FOLDER }}
           # Clear the cache if composer json (as composer.lock is in the repo) has been updated
           key: ${{ env.CACHE_VERSION }}-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}-${{ hashFiles('composer.json') }}
 
