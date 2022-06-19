@@ -12,7 +12,7 @@ on: # Build any PRs and main branch changes
     - cron: '0 0 1 * *' # Every month
 
 concurrency:
-  group: "CI-${{ github.head_ref }}"
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
   cancel-in-progress: true
 
 env:
@@ -22,6 +22,10 @@ env:
   COMPOSER_OPTIONS: --optimize-autoloader
   CODACY_CACHE_PATH: ~/.cache/codacy
   CODACY_BIN: ~/.cache/codacy/codacy.sh
+
+
+#permissions:
+#  actions: write # Required to be able to trigger sub CI workflows
 
 jobs:
   tests:
@@ -34,10 +38,10 @@ jobs:
       max-parallel: 4
       matrix:
         php-version:
-          - '7.3' # Lowest supported
-          - '7.4' # Latest php 7 version
-          - '8.0' # First php 8 version
           - '8.1' # Latest supported
+          - '8.0' # First php 8 version
+          - '7.4' # Latest php 7 version
+          - '7.3' # Lowest supported
         symfony-version:
           - '4.4' # Lowest LTS
           - '5.4' # Latest LTS
@@ -124,6 +128,41 @@ jobs:
         if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
         run: ${{ env.CODACY_BIN }} report -r build/coverage-phpunit/unit.clover -r build/coverage-behat/clover.xml -r build/coverage-phpunit/functional.clover -t ${{ secrets.CODACY_PROJECT_TOKEN }} --partial
 
+  static-checks:
+    name: Static checks
+    runs-on: ubuntu-latest
+    needs: [ tests ]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup PHP 8.1
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1 # Latest supported
+          tools: composer
+          coverage: none
+        env:
+          # Always use latest available patch for the version
+          update: true
+
+      - name: Setup cache
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.composer
+          # Clear the cache if composer json (as composer.lock is in the repo) has been updated
+          key: ${{ env.CACHE_VERSION }}-tests-${{ env.PHP_VERSION }}-${{ hashFiles('composer.json') }}
+
+      - name: Build
+        run: make build
+
+      - name: ComposerRequireChecker
+        uses: docker://webfactory/composer-require-checker:3.2.0
+
+      - name: Dependencies check
+        uses: actions/dependency-review-action@v1
+
   finalize-codacy-coverage-report:
     runs-on: ubuntu-latest
     name: Finalize Codacy coverage report
@@ -147,3 +186,64 @@ jobs:
 
       - name: Finalize reporting
         run: ${{ env.CODACY_BIN }} final -t ${{ secrets.CODACY_PROJECT_TOKEN }}
+
+  nightly-tests:
+    name: Nightly - Symfony ${{ matrix.symfony-version }}
+    runs-on: ubuntu-latest
+    env:
+      COMPOSER_OPTIONS: '--optimize-autoloader --ignore-platform-req=php+'
+    continue-on-error: true
+    needs: [ static-checks, finalize-codacy-coverage-report ]
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      # Perform tests against:
+      #  - current php dev version with all supported symfony version
+      #  - next Symfony minor version to manage with latest supported php version
+      matrix:
+        php-version:
+          - '8.2' # Current php dev version
+        symfony-version:
+          - '4.4' # Lowest LTS
+          - '5.4' # Latest LTS
+        include:
+          - symfony-version: '6.0' # Next symfony minor version to manage with latest supported PHP version
+            php-version: '8.1'
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP ${{ matrix.php-version }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '${{ matrix.php-version }}'
+          tools: composer
+          coverage: none
+        env:
+          # Always use latest available patch for the version
+          update: true
+
+      - name: Setup cache
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.composer
+            ./vendor
+          # Clear the cache if composer json (as composer.lock is in the repo) has been updated
+          key: ${{ env.CACHE_VERSION }}-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}-${{ hashFiles('composer.json') }}
+
+      - name: Build
+        run: |
+          composer require -W ${{ env.COMPOSER_OPTIONS }} \
+            symfony/http-foundation:^${{ matrix.symfony-version }} \
+            symfony/http-kernel:^${{ matrix.symfony-version }} \
+            symfony/config:^${{ matrix.symfony-version }} \
+            symfony/dependency-injection:^${{ matrix.symfony-version }} \
+            symfony/event-dispatcher:^${{ matrix.symfony-version }} \
+            symfony/routing:^${{ matrix.symfony-version }} \
+          && make build
+
+      - name: Test
+        run: make test-unit && make test-functional
