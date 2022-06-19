@@ -66,13 +66,11 @@ jobs:
       max-parallel: 4
       matrix:
         php-version:
-          - '7.3'
-          - '7.4'
-          - '8.0'
-          - '8.1'
+          - '7.3' # Lowest supported
+          - '8.1' # Latest supported
         symfony-version:
-          - '4.4'
-          - '5.4'
+          - '4.4' # Lowest LTS
+          - '5.4' # Latest LTS
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -164,6 +162,68 @@ jobs:
       - name: Finalize reporting
         run: ${{ env.CODACY_BIN }} final -t ${{ secrets.CODACY_PROJECT_TOKEN }}
 
+  # Test against others impactful php versions (without coverage)
+  tests-extra-versions:
+    name: UTs & FTs - PHP ${{ matrix.php-version }} / Symfony ${{ matrix.symfony-version }}
+    runs-on: ubuntu-latest
+    needs: [ tests ]
+    strategy:
+      fail-fast: true
+      max-parallel: 4
+      matrix:
+        include:
+          - php-version: '7.4' # Latest php 7 version
+            symfony-version: '4.4'
+          - php-version: '8.0' # First php 8 version
+            symfony-version: '5.4'
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '${{ matrix.php-version }}'
+          tools: composer
+        env:
+          # Always use latest available patch for the version
+          update: true
+
+      - name: Setup cache
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.composer
+            ./vendor
+            ${{ env.CODACY_CACHE_PATH }}
+            build/behat-code-coverage-cache
+          # Clear the cache if composer json (as composer.lock is in the repo) has been updated
+          key: ${{ env.CACHE_VERSION }}-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}-${{ hashFiles('composer.json') }}
+
+      - name: Download codacy binary
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ${{ env.CODACY_CACHE_PATH }} \
+          && curl -LN https://coverage.codacy.com/get.sh -o ${{ env.CODACY_BIN }} \
+          && chmod +x ${{ env.CODACY_BIN }} \
+          && ${{ env.CODACY_BIN }} download
+
+      - name: Build
+        run: |
+          composer require \
+            symfony/http-foundation:^${{ matrix.symfony-version }} \
+            symfony/http-kernel:^${{ matrix.symfony-version }} \
+            symfony/config:^${{ matrix.symfony-version }} \
+            symfony/dependency-injection:^${{ matrix.symfony-version }} \
+            symfony/event-dispatcher:^${{ matrix.symfony-version }} \
+            symfony/routing:^${{ matrix.symfony-version }} \
+          && make build
+
+      - name: Tests
+        run: make test-unit && make test-functional
+
+  # Perform tests against current php dev version and next Symfony minor version to manage
   nightly-tests:
     name: Nightly - PHP ${{ matrix.php-version }} / Symfony ${{ matrix.symfony-version }}
     needs: [ tests ]
@@ -175,10 +235,14 @@ jobs:
       max-parallel: 2
       matrix:
         php-version:
-          - '8.2'
+          - '8.2' # Current php dev version
         symfony-version:
-          - '4.4'
-          - '5.4'
+          - '4.4' # Lowest LTS
+          - '5.4' # Latest LTS
+        include:
+          - symfony-version: '6.0' # Next symfony minor version to manage with latest supported PHP version
+            php-version: '8.1'
+
     steps:
       - name: Check out code
         uses: actions/checkout@v2
