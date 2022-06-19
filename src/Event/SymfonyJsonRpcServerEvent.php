@@ -1,7 +1,6 @@
 <?php
 namespace Yoanm\SymfonyJsonRpcHttpServer\Event;
 
-use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Contracts\EventDispatcher\Event;
 use Yoanm\JsonRpcServer\Domain\Event\JsonRpcServerEvent;
 

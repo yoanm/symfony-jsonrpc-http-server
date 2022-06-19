@@ -30,7 +30,7 @@
     "yoanm/symfony-jsonrpc-http-server-doc": "JSON-RPC documentation Bundle"
   },
   "require": {
-    "php": "^7.2 || ^8.0",
+    "php": "^7.3 || ^8.0",
     "psr/container": "^1.0",
     "symfony/config": "^4.4 || ^5.4",
     "symfony/dependency-injection": "^4.4 || ^5.4",
@@ -49,7 +49,7 @@
     "symfony/framework-bundle": "^4.4 || ^5.4",
     "symfony/routing": "^4.4 || ^5.4",
     "yoanm/php-unit-extended": "~1.0",
-    "phpspec/prophecy-phpunit": "^1.0 || ^2.0",
+    "phpspec/prophecy-phpunit": "^2.0",
     "dvdoug/behat-code-coverage": "^5.0"
   },
   "config": {

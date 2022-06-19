@@ -1,5 +1,5 @@
 <?php
-namespace Tests\Functional\Endpoint;
+namespace Tests\Functional\Resolver;
 
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
