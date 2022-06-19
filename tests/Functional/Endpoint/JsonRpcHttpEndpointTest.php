@@ -2,6 +2,7 @@
 namespace Tests\Functional\Endpoint;
 
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,6 +14,8 @@ use Yoanm\SymfonyJsonRpcHttpServer\Endpoint\JsonRpcHttpEndpoint;
  */
 class JsonRpcHttpEndpointTest extends TestCase
 {
+    use ProphecyTrait;
+
     /** @var JsonRpcHttpEndpoint */
     private $endpoint;
 
