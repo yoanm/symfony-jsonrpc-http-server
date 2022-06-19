@@ -96,7 +96,7 @@ jobs:
       - name: Upload unit tests coverage to codecov
         uses: codecov/codecov-action@v3
         with:
-          file: "build/coverage-phpunit/clover-unit.xml"
+          file: "build/coverage-phpunit/unit.clover"
           name: "unit-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}"
           flags: "unit-tests,php-${{ matrix.php-version }},sf-${{ matrix.symfony-version }}"
           fail_ci_if_error: true
@@ -165,7 +165,7 @@ jobs:
       - name: Upload unit tests coverage to codecov
         uses: codecov/codecov-action@v3
         with:
-          file: "build/coverage-phpunit/clover-unit.xml"
+          file: "build/coverage-phpunit/unit.clover"
           name: "unit-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}"
           flags: "nightly,unit-tests,php-${{ matrix.php-version }},sf-${{ matrix.symfony-version }}"
           fail_ci_if_error: false
