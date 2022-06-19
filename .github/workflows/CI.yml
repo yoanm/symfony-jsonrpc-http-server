@@ -23,7 +23,24 @@ env:
   CODACY_CACHE_PATH: ~/.cache/codacy
   CODACY_BIN: ~/.cache/codacy/codacy.sh
 
+
+#permissions:
+#  actions: write # Required to be able to trigger sub CI workflows
+
 jobs:
+  parallel-tasks:
+    name: Parallel tasks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code # Mandatory for gh binary to work
+        uses: actions/checkout@v2
+
+      - name: Trigger parallel sub workflows
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run CI-DepsChecker.yml --ref "${{ github.head_ref || github.ref }}"
+          gh workflow run CI-ComposerRequireChecker.yml --ref "${{ github.head_ref || github.ref }}"
   tests:
     name: UTs & FTs - Symfony ${{ matrix.symfony-version }}
     runs-on: ubuntu-latest
@@ -124,9 +141,9 @@ jobs:
         if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
         run: ${{ env.CODACY_BIN }} report -r build/coverage-phpunit/unit.clover -r build/coverage-behat/clover.xml -r build/coverage-phpunit/functional.clover -t ${{ secrets.CODACY_PROJECT_TOKEN }} --partial
 
-  finalize-codacy-coverage-report:
+  post-tasks:
     runs-on: ubuntu-latest
-    name: Finalize Codacy coverage report
+    name: Post tasks
     needs: [ tests ]
     steps:
       - name: Setup cache
@@ -147,3 +164,9 @@ jobs:
 
       - name: Finalize reporting
         run: ${{ env.CODACY_BIN }} final -t ${{ secrets.CODACY_PROJECT_TOKEN }}
+
+      - name: Trigger post sub workflows
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run CI-nightly.yml --ref "${{ github.head_ref || github.ref }}"
