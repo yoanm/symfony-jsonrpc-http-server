@@ -165,7 +165,9 @@ jobs:
 
       - name: Trigger nightly tests for the PR
         if: ${{ github.event_name == 'pull_request' }}
-        run: gh pr edit ${{ github.event.pull_request.id }} --add-label run-nightly-tests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr edit ${{ github.event.pull_request.html_url }} --add-label run-nightly-tests
 
   post-tasks:
     runs-on: ubuntu-latest

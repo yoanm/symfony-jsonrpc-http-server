@@ -19,15 +19,18 @@ env:
 
 jobs:
   remove-label:
-    if: ${{ github.event_name == 'pull_request' }}
-    name: Clear label
+    name: Clear PR label
     runs-on: ubuntu-latest
     steps:
-      - run: gh pr edit ${{ github.event.pull_request.id }} --remove-label run-nightly-tests
+      - if: ${{ github.event_name == 'pull_request' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr edit ${{ github.event.pull_request.html_url }} --remove-label run-nightly-tests
   tests:
     name: Nightly - Symfony ${{ matrix.symfony-version }}
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.labels.name == 'run-nightly-tests') }}
+    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.label.name == 'run-nightly-tests') }}
+    continue-on-error: true
     strategy:
       fail-fast: false
       max-parallel: 4
