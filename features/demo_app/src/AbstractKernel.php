@@ -2,8 +2,12 @@
 namespace DemoApp;
 
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseHttpKernel;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+use Symfony\Component\Routing\RouteCollectionBuilder;
 
 abstract class AbstractKernel extends BaseHttpKernel
 {
@@ -13,6 +17,17 @@ abstract class AbstractKernel extends BaseHttpKernel
     /** @var string|null */
     private $customCacheDir = null;
 
+    public function registerBundles(): iterable
+    {
+        /** @noinspection PhpIncludeInspection */
+        $contents = require $this->getConfigDir().'/bundles.php';
+        foreach ($contents as $class => $envs) {
+            if (isset($envs['all']) || isset($envs[$this->environment])) {
+                yield new $class();
+            }
+        }
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -20,7 +35,7 @@ abstract class AbstractKernel extends BaseHttpKernel
     {
         // Use a specific cache for each kernels
         if (null === $this->customCacheDir) {
-            $this->customCacheDir = $this->getProjectDir().'/var/cache/'.$this->environment.'/'.$this->getConfigDirectory();
+            $this->customCacheDir = $this->getProjectDir().'/var/cache/'.$this->environment.'/'.$this->getConfigDirectoryName();
         }
 
         return $this->customCacheDir;
@@ -43,6 +58,30 @@ abstract class AbstractKernel extends BaseHttpKernel
     }
 
     /**
+     * @param RouteCollectionBuilder|RoutingConfigurator $routes
+     */
+    protected function configureRoutes($routes)
+    {
+        $confDir = $this->getConfigDir();
+        if ($routes instanceof RoutingConfigurator) {
+            $routes->import($confDir . '/routes' . self::CONFIG_EXTS, 'glob');
+        } else {
+            $routes->import($confDir . '/routes' . self::CONFIG_EXTS, '/', 'glob');
+        }
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader)
+    {
+        $container->setParameter('container.dumper.inline_class_loader', true);
+        $confDir = $this->getConfigDir();
+        $loader->load($confDir.'/config'.self::CONFIG_EXTS, 'glob');
+        $loader->load($confDir.'/services'.self::CONFIG_EXTS, 'glob');
+    }
+
+    /**
      * Gets the container class.
      *
      * @return string The container class
@@ -50,8 +89,9 @@ abstract class AbstractKernel extends BaseHttpKernel
     protected function getContainerClass()
     {
         // In order to avoid collisions between kernels use a dedicated name
-        return parent::getContainerClass().Container::camelize($this->getConfigDirectory());
+        return parent::getContainerClass().Container::camelize($this->getConfigDirectoryName());
     }
 
-    abstract public function getConfigDirectory() : string;
+    abstract public function getConfigDirectoryName() : string;
+    abstract public function getConfigDir(): string;
 }

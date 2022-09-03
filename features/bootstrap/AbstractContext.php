@@ -6,6 +6,7 @@ use DemoApp\AbstractKernel;
 use DemoApp\DefaultKernel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
 class AbstractContext implements Context
 {
@@ -21,6 +22,15 @@ class AbstractContext implements Context
         }
 
         return $decoded;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function configureRoutes(RoutingConfigurator $routes)
+    {
+        $confDir = $this->getConfigDir();
+        $routes->import($confDir.'/routes'.self::CONFIG_EXTS, 'glob');
     }
 
     /**

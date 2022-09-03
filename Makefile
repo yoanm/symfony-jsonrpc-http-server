@@ -1,13 +1,13 @@
 COLOR_ENABLED ?= true
 TEST_OUTPUT_STYLE ?= dot
-COVERAGE_OUTPUT_STYLE ?= html
 
 ## DIRECTORY AND FILE
 BUILD_DIRECTORY ?= build
-REPORTS_DIRECTORY ?= ${BUILD_DIRECTORY}/reports
-COVERAGE_DIRECTORY ?= ${BUILD_DIRECTORY}/coverage
-BEHAT_COVERAGE_DIRECTORY ?= ${BUILD_DIRECTORY}/behat-coverage
-COVERAGE_CLOVER_FILE_PATH ?= ${COVERAGE_DIRECTORY}/clover.xml
+REPORTS_DIRECTORY ?= ${BUILD_DIRECTORY}/reports # Codestyle
+BEHAT_COVERAGE_DIRECTORY ?= ${BUILD_DIRECTORY}/coverage-behat
+PHPUNIT_COVERAGE_DIRECTORY ?= ${BUILD_DIRECTORY}/coverage-phpunit
+PHPUNIT_UNIT_COVERAGE_FILE_PATH ?= ${PHPUNIT_COVERAGE_DIRECTORY}/unit.clover
+PHPUNIT_FUNCTIONAL_COVERAGE_FILE_PATH ?= ${PHPUNIT_COVERAGE_DIRECTORY}/functional.clover
 
 ## Commands options
 ### Composer
@@ -39,14 +39,21 @@ else
 	BEHAT_OUTPUT_STYLE_OPTION ?= --format progress
 endif
 
-ifeq ("${COVERAGE_OUTPUT_STYLE}","clover")
-	PHPUNIT_COVERAGE_OPTION ?= --coverage-clover ${COVERAGE_CLOVER_FILE_PATH}
-else
+ifdef COVERAGE_OUTPUT_STYLE
+	export XDEBUG_MODE=coverage
 	ifeq ("${COVERAGE_OUTPUT_STYLE}","html")
-    	PHPUNIT_COVERAGE_OPTION ?= --coverage-html ${COVERAGE_DIRECTORY}
-    else
-    	PHPUNIT_COVERAGE_OPTION ?= --coverage-text
-    endif
+		PHPUNIT_COVERAGE_OPTION ?= --coverage-html ${PHPUNIT_COVERAGE_DIRECTORY}
+		PHPUNIT_FUNCTIONAL_COVERAGE_OPTION ?= --coverage-html ${PHPUNIT_COVERAGE_DIRECTORY}
+		BEHAT_COVERAGE_OPTION ?= --profile coverage-html
+	else ifeq ("${COVERAGE_OUTPUT_STYLE}","clover")
+		PHPUNIT_COVERAGE_OPTION ?= --coverage-clover ${PHPUNIT_UNIT_COVERAGE_FILE_PATH}
+		PHPUNIT_FUNCTIONAL_COVERAGE_OPTION ?= --coverage-clover ${PHPUNIT_FUNCTIONAL_COVERAGE_FILE_PATH}
+		BEHAT_COVERAGE_OPTION ?= --profile coverage-clover
+        else
+		PHPUNIT_COVERAGE_OPTION ?= --coverage-text
+		PHPUNIT_FUNCTIONAL_COVERAGE_OPTION ?= --coverage-text
+		BEHAT_COVERAGE_OPTION ?= --profile coverage
+	endif
 endif
 
 ifneq ("${PHPCS_REPORT_FILE}","")
@@ -71,39 +78,36 @@ install:
 configure:
 
 # Project tests
-test:
-	make test-functional
-	make test-technical
-	make codestyle
+test: test-functional test-unit codestyle
 
-test-technical:
-	./vendor/bin/phpunit ${PHPUNIT_COLOR_OPTION} ${PHPUNIT_OUTPUT_STYLE_OPTION} --testsuite technical
+ifdef PHPUNIT_COVERAGE_OPTION
+test-unit: create-build-directories
+endif
+test-unit:
+	./vendor/bin/phpunit ${PHPUNIT_COLOR_OPTION} ${PHPUNIT_OUTPUT_STYLE_OPTION} ${PHPUNIT_COVERAGE_OPTION} --testsuite technical
 
+ifdef BEHAT_COVERAGE_OPTION
+test-functional: create-build-directories
+else ifdef PHPUNIT_FUNCTIONAL_COVERAGE_OPTION
+test-functional: create-build-directories
+endif
 test-functional:
-	./vendor/bin/phpunit ${PHPUNIT_COLOR_OPTION} ${PHPUNIT_OUTPUT_STYLE_OPTION} --testsuite functional
-	./vendor/bin/behat ${BEHAT_COLOR_OPTION} ${BEHAT_OUTPUT_STYLE_OPTION} --no-snippets
+	./vendor/bin/phpunit ${PHPUNIT_COLOR_OPTION} ${PHPUNIT_OUTPUT_STYLE_OPTION} ${PHPUNIT_FUNCTIONAL_COVERAGE_OPTION} --testsuite functional
+	./vendor/bin/behat ${BEHAT_COLOR_OPTION} ${BEHAT_OUTPUT_STYLE_OPTION} ${BEHAT_COVERAGE_OPTION} --no-snippets
 
-codestyle: create-reports-directory
+codestyle: create-build-directories
 	./vendor/bin/phpcs ${PHPCS_DISABLE_WARNING_OPTION} --standard=phpcs.xml.dist ${PHPCS_COLOR_OPTION} ${PHPCS_REPORT_FILE_OPTION} --report=${PHPCS_REPORT_STYLE}
 
-coverage: create-coverage-directory
-	./vendor/bin/phpunit ${PHPUNIT_COLOR_OPTION} ${PHPUNIT_OUTPUT_STYLE_OPTION} ${PHPUNIT_COVERAGE_OPTION}
+scrutinizer-phpunit:
+	XDEBUG_MODE=coverage ./vendor/bin/phpunit ${PHPUNIT_COLOR_OPTION} ${PHPUNIT_OUTPUT_STYLE_OPTION} --coverage-clover build/coverage-phpunit/scrutinizer.xml
 
-behat-coverage: create-behat-coverage-directory
-	composer required leanphp/behat-code-coverage
-	./vendor/bin/behat ${BEHAT_COLOR_OPTION} ${BEHAT_OUTPUT_STYLE_OPTION} --no-snippets --profile coverage
+scrutinizer-behat:
+	XDEBUG_MODE=coverage ./vendor/bin/behat ${BEHAT_COLOR_OPTION} ${BEHAT_OUTPUT_STYLE_OPTION} --profile coverage-clover --no-snippets
 
 
 # Internal commands
-create-coverage-directory:
-	mkdir -p ${COVERAGE_DIRECTORY}
+create-build-directories:
+	mkdir -p ${PHPUNIT_COVERAGE_DIRECTORY} ${BEHAT_COVERAGE_DIRECTORY} ${REPORTS_DIRECTORY}
 
-create-behat-coverage-directory:
-	mkdir -p ${BEHAT_COVERAGE_DIRECTORY}
-
-create-reports-directory:
-	mkdir -p ${REPORTS_DIRECTORY}
-
-
-.PHONY: build install configure test test-technical test-functional codestyle coverage behat-coverage create-coverage-directory create-behat-coverage-directory create-reports-directory
+.PHONY: build install configure test test-unit test-functional codestyle create-build-directories scrutinizer-behat scrutinizer-phpunit
 .DEFAULT: build
