@@ -22,7 +22,7 @@
 
 *   ✔️ Symfony 5.4
 
-*   🧪 Set Symfony 6.0 for nightly
+*   ✔️ Symfony 6.0
 
 ### Chore
 
