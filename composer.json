@@ -35,7 +35,7 @@
     "symfony/config": "^4.4 || ^5.4 || ^6.0",
     "symfony/dependency-injection": "^4.4 || ^5.4 || ^6.0",
     "symfony/event-dispatcher": "^4.4 || ^5.4 || ^6.0",
-    "symfony/event-dispatcher-contracts": "^1.0 || ^2.0",
+    "symfony/event-dispatcher-contracts": "^2.0 || ^3.0",
     "symfony/http-foundation": "^4.4 || ^5.4 || ^6.0",
     "symfony/http-kernel": "^4.4 || ^5.4 || ^6.0",
     "yoanm/jsonrpc-server-sdk": "^3.0"

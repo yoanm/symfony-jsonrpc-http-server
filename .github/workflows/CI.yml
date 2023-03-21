@@ -46,6 +46,13 @@ jobs:
           # Late php migration => Latest symfony version with lowest minor php version allowed by composer config
           - symfony-version: '5.4'
             php-version: '8.0'
+          # Symfony 6.0 latest
+          - symfony-version: '6.0'
+            php-version: '8.2'
+          # Symfony 6.0 lowest
+          - symfony-version: '6.0'
+            php-version: '8.0'
+            composer-flag: --prefer-lowest
     steps:
       - name: Check out code
         uses: actions/checkout@v3
@@ -209,8 +216,9 @@ jobs:
         symfony-version:
           - '4.4' # Lowest LTS
           - '5.4' # Latest LTS
+          - '6.0' # Latest LTS
         include:
-          - symfony-version: '6.0' # Next symfony minor version to manage with latest supported PHP version
+          - symfony-version: '6.3' # Next symfony minor version to manage with latest supported PHP version
             php-version: '8.2'
 
     steps:
