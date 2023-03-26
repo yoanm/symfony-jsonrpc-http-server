@@ -105,19 +105,10 @@ jobs:
       - name: Tests
         run: make test-unit && make test-functional
 
-      - name: DEBUG
-        if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
-        run: ls -ail build/coverage-*/
-
       # Upload to codacy first as codecov action always remove coverage files
-      # despite the disabled move_coverage_to_trash option
       - name: Upload coverages to Codacy
         if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
         run: ${{ env.CODACY_BIN }} report -r build/coverage-phpunit/unit.clover -r build/coverage-behat/clover.xml -r build/coverage-phpunit/functional.clover -t ${{ secrets.CODACY_PROJECT_TOKEN }} --partial
-
-      - name: DEBUG
-        if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
-        run: ls -ail build/coverage-*/
 
       # See the reports at https://codecov.io/gh/yoanm/symfony-jsonrpc-http-server
       - name: Upload unit tests coverage to codecov
@@ -131,10 +122,6 @@ jobs:
           move_coverage_to_trash: false
           verbose: ${{ runner.debug == '1' }}
 
-      - name: DEBUG
-        if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
-        run: ls -ail build/coverage-*/
-
       - name: Upload functional tests coverage to codecov
         if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
         uses: codecov/codecov-action@v3
@@ -145,10 +132,6 @@ jobs:
           fail_ci_if_error: true
           move_coverage_to_trash: false
           verbose: ${{ runner.debug == '1' }}
-
-      - name: DEBUG
-        if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
-        run: ls -ail build/coverage-*/
 
   static-checks:
     name: Static checks
