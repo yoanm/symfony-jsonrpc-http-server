@@ -114,6 +114,8 @@ jobs:
           name: "unit-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}"
           flags: "unit-tests,php-${{ matrix.php-version }},sf-${{ matrix.symfony-version }}"
           fail_ci_if_error: true
+          move_coverage_to_trash: false
+          verbose: ${{ runner.debug == '1' }}
 
       - name: Upload functional tests coverage to codecov
         if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
@@ -123,6 +125,8 @@ jobs:
           name: "functional-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}"
           flags: "functional-tests,php-${{ matrix.php-version }},sf-${{ matrix.symfony-version }}"
           fail_ci_if_error: true
+          move_coverage_to_trash: false
+          verbose: ${{ runner.debug == '1' }}
 
       - name: Upload coverages to Codacy
         if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
