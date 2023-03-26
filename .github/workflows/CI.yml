@@ -105,6 +105,10 @@ jobs:
       - name: Tests
         run: make test-unit && make test-functional
 
+      - name: DEBUG
+        if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
+        run: ls -ail build/coverage-*/
+
       # See the reports at https://codecov.io/gh/yoanm/symfony-jsonrpc-http-server
       - name: Upload unit tests coverage to codecov
         if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
@@ -117,6 +121,10 @@ jobs:
           move_coverage_to_trash: false
           verbose: ${{ runner.debug == '1' }}
 
+      - name: DEBUG
+        if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
+        run: ls -ail build/coverage-*/
+
       - name: Upload functional tests coverage to codecov
         if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
         uses: codecov/codecov-action@v3
@@ -127,6 +135,10 @@ jobs:
           fail_ci_if_error: true
           move_coverage_to_trash: false
           verbose: ${{ runner.debug == '1' }}
+
+      - name: DEBUG
+        if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
+        run: ls -ail build/coverage-*/
 
       - name: Upload coverages to Codacy
         if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
