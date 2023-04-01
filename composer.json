@@ -45,6 +45,7 @@
     "dvdoug/behat-code-coverage": "^5.0",
     "matthiasnoback/symfony-config-test": "^4.0",
     "matthiasnoback/symfony-dependency-injection-test": "^4.0",
+    "phpspec/prophecy": "^1.15",
     "phpspec/prophecy-phpunit": "^2.0",
     "phpunit/php-code-coverage": "^9.2.4",
     "phpunit/phpunit": "^9.0",
