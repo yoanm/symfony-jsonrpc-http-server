@@ -48,7 +48,7 @@
     "matthiasnoback/symfony-dependency-injection-test": "^3.0 || ^4.0",
     "matthiasnoback/symfony-config-test": "^3.0 || ^4.0",
     "symfony/framework-bundle": "^4.4 || ^5.4",
-    "yoanm/php-unit-extended": "^1.1",
+    "yoanm/php-unit-extended": "^2.0",
     "phpspec/prophecy-phpunit": "^2.0",
     "dvdoug/behat-code-coverage": "^5.0"
   },
