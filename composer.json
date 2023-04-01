@@ -41,14 +41,14 @@
     "yoanm/jsonrpc-server-sdk": "^3.0"
   },
   "require-dev": {
-    "behat/behat": "~3.0",
-    "squizlabs/php_codesniffer": "3.*",
+    "behat/behat": "^3.9.0",
+    "squizlabs/php_codesniffer": "^3.5",
     "phpunit/phpunit": "^8.0 || ^9.0",
+    "phpunit/php-code-coverage": "^9.2.4",
     "matthiasnoback/symfony-dependency-injection-test": "^3.0 || ^4.0",
     "matthiasnoback/symfony-config-test": "^3.0 || ^4.0",
     "symfony/framework-bundle": "^4.4 || ^5.4",
-    "symfony/routing": "^4.4 || ^5.4",
-    "yoanm/php-unit-extended": "~1.0",
+    "yoanm/php-unit-extended": "^1.1",
     "phpspec/prophecy-phpunit": "^2.0",
     "dvdoug/behat-code-coverage": "^5.0"
   },
