@@ -46,7 +46,7 @@ jobs:
           - symfony-version: '5.4'
             php-version: '8.2'
           # Late symfony migration => Lowest symfony version with latest minor php version allowed by composer config
-          - symfony-version: '4.4'
+          - symfony-version: '4.4.30' # Issue with ParamterBag below 4.4.30 => https://github.com/symfony/symfony/commit/3eca446b21607ea1c7a865ece2dd8254c33679cc
             php-version: '8.2'
             composer-flag: --prefer-lowest
           # Late php migration => Latest symfony version with lowest minor php version allowed by composer config
