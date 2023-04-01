@@ -74,7 +74,6 @@ jobs:
             ~/.composer
             ./vendor
             ${{ env.CODACY_CACHE_PATH }}
-            build/behat-code-coverage-cache
           # Clear the cache if composer json (as composer.lock is in the repo) has been updated
           key: tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}-${{ matrix.composer-flag }}-${{ hashFiles('composer.json') }}
 
