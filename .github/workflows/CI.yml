@@ -218,7 +218,7 @@ jobs:
           - '5.4' # Latest LTS
           - '6.0' # Current major version
         include:
-          - symfony-version: '6.3@dev' # Next symfony minor version to manage with latest supported PHP version
+          - symfony-version: '6.3' # Next symfony minor version to manage with latest supported PHP version
             php-version: '8.2'
 
     steps:
@@ -247,7 +247,8 @@ jobs:
 
       - name: Build
         run: |
-          composer require -W ${{ env.COMPOSER_OPTIONS }} \
+          composer config minimum-stability dev \
+          && composer require -W ${{ env.COMPOSER_OPTIONS }} \
             symfony/http-foundation:^${{ matrix.symfony-version }} \
             symfony/http-kernel:^${{ matrix.symfony-version }} \
             symfony/config:^${{ matrix.symfony-version }} \
