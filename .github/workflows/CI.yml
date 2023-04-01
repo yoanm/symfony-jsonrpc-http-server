@@ -38,25 +38,24 @@ jobs:
       max-parallel: 4
       matrix:
         php-version:
-          - '8.1' # Latest supported
-          - '8.0' # First php 8 version
-          - '7.4' # Latest php 7 version
-          - '7.3' # Lowest supported
+          - '8.2' # Latest supported
+          - '8.1'
+          - '8.0' # Lowest supported
         symfony-version:
           - '4.4' # Lowest LTS
           - '5.4' # Latest LTS
         exclude:
           # Run all symfony version only on Lowest and Latest php versions, run it only one time for others
-          - php-version: '8.0'
+          - php-version: '8.1'
             symfony-version: '4.4'
-          - php-version: '7.4'
+          - php-version: '8.1'
             symfony-version: '5.4'
     steps:
       - name: Check out code
         uses: actions/checkout@v3
 
       - name: Enable coverage
-        if: ${{ matrix.php-version == '8.1' }}
+        if: ${{ matrix.php-version == '8.2' }}
         run: |
           echo "COVERAGE_OUTPUT_STYLE=clover" >> $GITHUB_ENV
           echo "COVERAGE_TYPE=xdebug" >> $GITHUB_ENV
@@ -141,10 +140,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup PHP 8.1
+      - name: Setup PHP 8.2
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.1 # Latest supported
+          php-version: 8.2 # Latest supported
           tools: composer
           coverage: none
         env:
@@ -210,13 +209,13 @@ jobs:
       #  - next Symfony minor version to manage with latest supported php version
       matrix:
         php-version:
-          - '8.2' # Current php dev version
+          - '8.3' # Current php dev version
         symfony-version:
           - '4.4' # Lowest LTS
           - '5.4' # Latest LTS
         include:
           - symfony-version: '6.0' # Next symfony minor version to manage with latest supported PHP version
-            php-version: '8.1'
+            php-version: '8.2'
 
     steps:
       - name: Check out code
