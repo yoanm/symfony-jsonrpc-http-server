@@ -16,16 +16,10 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # Cache params
-  CACHE_VERSION: 2022061905 # To be able to create a new cache (YYYYMMDDXX)
   TEST_OUTPUT_STYLE: pretty
   COMPOSER_OPTIONS: --optimize-autoloader
   CODACY_CACHE_PATH: ~/.cache/codacy
   CODACY_BIN: ~/.cache/codacy/codacy.sh
-
-
-#permissions:
-#  actions: write # Required to be able to trigger sub CI workflows
 
 jobs:
   tests:
@@ -37,26 +31,27 @@ jobs:
       fail-fast: true
       max-parallel: 4
       matrix:
-        php-version:
-          - '8.1' # Latest supported
-          - '8.0' # First php 8 version
-          - '7.4' # Latest php 7 version
-          - '7.3' # Lowest supported
-        symfony-version:
-          - '4.4' # Lowest LTS
-          - '5.4' # Latest LTS
-        exclude:
-          # Run all symfony version only on Lowest and Latest php versions, run it only one time for others
-          - php-version: '8.0'
-            symfony-version: '4.4'
-          - php-version: '7.4'
-            symfony-version: '5.4'
+        include:
+          # Bare minimum => Lowest versions allowed by composer config
+          - symfony-version: '4.4'
+            php-version: '8.0'
+            composer-flag: --prefer-lowest
+          # Up to date versions => Latest versions allowed by composer config
+          - symfony-version: '5.4'
+            php-version: '8.2'
+          # Late symfony migration => Lowest symfony version with latest minor php version allowed by composer config
+          - symfony-version: '4.4'
+            php-version: '8.2'
+            composer-flag: --prefer-lowest
+          # Late php migration => Latest symfony version with lowest minor php version allowed by composer config
+          - symfony-version: '5.4'
+            php-version: '8.0'
     steps:
       - name: Check out code
         uses: actions/checkout@v3
 
       - name: Enable coverage
-        if: ${{ matrix.php-version == '8.1' }}
+        if: ${{ matrix.php-version == '8.2' }}
         run: |
           echo "COVERAGE_OUTPUT_STYLE=clover" >> $GITHUB_ENV
           echo "COVERAGE_TYPE=xdebug" >> $GITHUB_ENV
@@ -79,9 +74,8 @@ jobs:
             ~/.composer
             ./vendor
             ${{ env.CODACY_CACHE_PATH }}
-            build/behat-code-coverage-cache
           # Clear the cache if composer json (as composer.lock is in the repo) has been updated
-          key: ${{ env.CACHE_VERSION }}-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}-${{ hashFiles('composer.json') }}
+          key: tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}-${{ matrix.composer-flag }}-${{ hashFiles('composer.json') }}
 
       - name: Download codacy binary
         if: steps.cache.outputs.cache-hit != 'true'
@@ -93,13 +87,17 @@ jobs:
 
       - name: Build
         run: |
-          composer require -W \
-            symfony/http-foundation:^${{ matrix.symfony-version }} \
-            symfony/http-kernel:^${{ matrix.symfony-version }} \
-            symfony/config:^${{ matrix.symfony-version }} \
-            symfony/dependency-injection:^${{ matrix.symfony-version }} \
-            symfony/event-dispatcher:^${{ matrix.symfony-version }} \
-            symfony/routing:^${{ matrix.symfony-version }} \
+          SF_VERSION=${{ matrix.symfony-version }}
+          # Issue with ParamterBag below 4.4.30 => https://github.com/symfony/symfony/commit/3eca446b21607ea1c7a865ece2dd8254c33679cc
+          test '${{ matrix.symfony-version }}' = '4.4' && test '${{ matrix.php-version }}' = '8.2' && SF_VERSION=4.4.30
+          composer require -W ${{ env.COMPOSER_OPTIONS }} ${{ matrix.composer-flag }} \
+            symfony/http-foundation:^$SF_VERSION \
+            symfony/http-kernel:^$SF_VERSION \
+            symfony/config:^$SF_VERSION \
+            symfony/dependency-injection:^$SF_VERSION \
+            symfony/event-dispatcher:^$SF_VERSION \
+            symfony/routing:^$SF_VERSION \
+          && composer update ${{ env.COMPOSER_OPTIONS }} ${{ matrix.composer-flag }} \
           && make build
 
       - name: Tests
@@ -108,7 +106,7 @@ jobs:
       # Upload to codacy first as codecov action always remove coverage files despite move_coverage_to_trash at false
       # And only if it's not a PR from a fork => Can't work as codacy secret is not accessible in that context
       - name: Upload coverages to Codacy
-        if: ${{ github.event.pull_request.head.repo.full_name == 'yoanm/symfony-jsonrpc-http-server' && env.COVERAGE_TYPE == 'xdebug' }}
+        if: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'yoanm/symfony-jsonrpc-http-server') && env.COVERAGE_TYPE == 'xdebug' }}
         run: ${{ env.CODACY_BIN }} report -r build/coverage-phpunit/unit.clover -r build/coverage-behat/clover.xml -r build/coverage-phpunit/functional.clover -t ${{ secrets.CODACY_PROJECT_TOKEN }} --partial
 
       # See the reports at https://codecov.io/gh/yoanm/symfony-jsonrpc-http-server
@@ -141,10 +139,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup PHP 8.1
+      - name: Setup PHP 8.2
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.1 # Latest supported
+          php-version: 8.2 # Latest supported
           tools: composer
           coverage: none
         env:
@@ -158,7 +156,7 @@ jobs:
           path: |
             ~/.composer
           # Clear the cache if composer json (as composer.lock is in the repo) has been updated
-          key: ${{ env.CACHE_VERSION }}-tests-${{ env.PHP_VERSION }}-${{ hashFiles('composer.json') }}
+          key: tests-${{ env.PHP_VERSION }}-${{ hashFiles('composer.json') }}
 
       - name: Build
         run: make build
@@ -173,7 +171,7 @@ jobs:
   finalize-codacy-coverage-report:
     runs-on: ubuntu-latest
     name: Finalize Codacy coverage report
-    if: ${{ github.event.pull_request.head.repo.full_name == 'yoanm/symfony-jsonrpc-http-server' }}
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'yoanm/symfony-jsonrpc-http-server' }}
     needs: [ tests ]
     steps:
       - name: Setup cache
@@ -182,7 +180,7 @@ jobs:
         with:
           path: |
             ${{ env.CODACY_CACHE_PATH }}
-          key: ${{ env.CACHE_VERSION }}-codacy-final
+          key: codacy-final
 
       - name: Download codacy binary
         if: steps.cache.outputs.cache-hit != 'true'
@@ -205,18 +203,15 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: 4
-      # Perform tests against:
-      #  - current php dev version with all supported symfony version
-      #  - next Symfony minor version to manage with latest supported php version
       matrix:
         php-version:
-          - '8.2' # Current php dev version
+          - '8.3' # Current php dev version
         symfony-version:
           - '4.4' # Lowest LTS
           - '5.4' # Latest LTS
         include:
           - symfony-version: '6.0' # Next symfony minor version to manage with latest supported PHP version
-            php-version: '8.1'
+            php-version: '8.2'
 
     steps:
       - name: Check out code
@@ -240,7 +235,7 @@ jobs:
             ~/.composer
             ./vendor
           # Clear the cache if composer json (as composer.lock is in the repo) has been updated
-          key: ${{ env.CACHE_VERSION }}-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}-${{ hashFiles('composer.json') }}
+          key: tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}-${{ hashFiles('composer.json') }}
 
       - name: Build
         run: |
@@ -251,6 +246,7 @@ jobs:
             symfony/dependency-injection:^${{ matrix.symfony-version }} \
             symfony/event-dispatcher:^${{ matrix.symfony-version }} \
             symfony/routing:^${{ matrix.symfony-version }} \
+          && composer update ${{ env.COMPOSER_OPTIONS }} \
           && make build
 
       - name: Test

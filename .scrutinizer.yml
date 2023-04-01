@@ -45,7 +45,7 @@ build:
       COVERAGE_OUTPUT_STYLE: 'clover'
       COVERAGE_CLOVER_FILE_PATH: 'build/coverage/clover.xml'
     php:
-      version: "8.1"
+      version: "8.2"
       ini:
         memory_limit: "-1"
     timezone: UTC
