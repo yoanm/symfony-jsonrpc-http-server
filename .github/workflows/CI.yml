@@ -40,7 +40,7 @@ jobs:
           - symfony-version: '5.4'
             php-version: '8.2'
           # Late symfony migration => Lowest symfony version with latest minor php version allowed by composer config
-          - symfony-version: '4.4.30' # Issue with ParamterBag below 4.4.30 => https://github.com/symfony/symfony/commit/3eca446b21607ea1c7a865ece2dd8254c33679cc
+          - symfony-version: '4.4'
             php-version: '8.2'
             composer-flag: --prefer-lowest
           # Late php migration => Latest symfony version with lowest minor php version allowed by composer config
@@ -88,13 +88,16 @@ jobs:
 
       - name: Build
         run: |
+          SF_VERSION=${{ matrix.symfony-version }}
+          # Issue with ParamterBag below 4.4.30 => https://github.com/symfony/symfony/commit/3eca446b21607ea1c7a865ece2dd8254c33679cc
+          test '${{ matrix.symfony-version }}' = '4.4' && test '${{ matrix.php-version }}' = '8.2' && SF_VERSION=4.4.30
           composer require -W ${{ env.COMPOSER_OPTIONS }} ${{ matrix.composer-flag }} \
-            symfony/http-foundation:^${{ matrix.symfony-version }} \
-            symfony/http-kernel:^${{ matrix.symfony-version }} \
-            symfony/config:^${{ matrix.symfony-version }} \
-            symfony/dependency-injection:^${{ matrix.symfony-version }} \
-            symfony/event-dispatcher:^${{ matrix.symfony-version }} \
-            symfony/routing:^${{ matrix.symfony-version }} \
+            symfony/http-foundation:^$SF_VERSION \
+            symfony/http-kernel:^$SF_VERSION \
+            symfony/config:^$SF_VERSION \
+            symfony/dependency-injection:^$SF_VERSION \
+            symfony/event-dispatcher:^$SF_VERSION \
+            symfony/routing:^$SF_VERSION \
           && composer update ${{ env.COMPOSER_OPTIONS }} ${{ matrix.composer-flag }} \
           && make build
 
