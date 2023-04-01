@@ -216,9 +216,9 @@ jobs:
         symfony-version:
           - '4.4' # Lowest LTS
           - '5.4' # Latest LTS
-          - '6.0' # Latest LTS
+          - '6.0' # Current major version
         include:
-          - symfony-version: '6.3' # Next symfony minor version to manage with latest supported PHP version
+          - symfony-version: '6.3@dev' # Next symfony minor version to manage with latest supported PHP version
             php-version: '8.2'
 
     steps:
