@@ -25,17 +25,17 @@ See [yoanm/symfony-jsonrpc-http-server-doc](https://github.com/yoanm/symfony-jso
 
 ## Versions
 
-* Symfony v3/4 - PHP >=7.1 : `^2.0`
+*   Symfony v3/4 - PHP >=7.1 : `^2.0`
 
     ⚠️⚠️ `v2.1.0` and `v2.1.1` were badly taggued, used `v3.0.0` instead ! ⚠️⚠️
 
-* Symfony v4/5 - PHP >=7.2 : `~3.0.0`
+*   Symfony v4/5 - PHP >=7.2 : `~3.0.0`
 
-* Symfony v4/5 - PHP >=7.3 : `^3.1`
+*   Symfony v4/5 - PHP >=7.3 : `^3.1`
 
-* Symfony v4.4/5.4 - PHP ^8.0 : `^3.2`
+*   Symfony v4.4/5.4 - PHP ^8.0 : `^3.2`
 
-* Symfony v4.4/5.4/6.x - PHP ^8.0 : `^3.3`
+*   Symfony v4.4/5.4/6.x - PHP ^8.0 : `^3.3`
 
 ## How to use
 
