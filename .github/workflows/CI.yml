@@ -105,10 +105,6 @@ jobs:
       - name: Tests
         run: make test-unit && make test-functional
 
-      - name: DEBUG
-        if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
-        run: ls -ail build/coverage-*/
-
       # Upload to codacy first as codecov action always remove coverage files despite move_coverage_to_trash at false
       - name: Upload coverages to Codacy
         if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
@@ -126,10 +122,6 @@ jobs:
           move_coverage_to_trash: false
           verbose: ${{ runner.debug == '1' }}
 
-      - name: DEBUG
-        if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
-        run: ls -ail build/coverage-*/
-
       - name: Upload functional tests coverage to codecov
         if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
         uses: codecov/codecov-action@v3
@@ -140,10 +132,6 @@ jobs:
           fail_ci_if_error: true
           move_coverage_to_trash: false
           verbose: ${{ runner.debug == '1' }}
-
-      - name: DEBUG
-        if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
-        run: ls -ail build/coverage-*/
 
   static-checks:
     name: Static checks
