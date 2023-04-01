@@ -37,19 +37,21 @@ jobs:
       fail-fast: true
       max-parallel: 4
       matrix:
-        php-version:
-          - '8.2' # Latest supported
-          - '8.1'
-          - '8.0' # Lowest supported
-        symfony-version:
-          - '4.4' # Lowest LTS
-          - '5.4' # Latest LTS
-        exclude:
-          # Run all symfony version only on Lowest and Latest php versions, run it only one time for others
-          - php-version: '8.1'
-            symfony-version: '4.4'
-          - php-version: '8.1'
-            symfony-version: '5.4'
+        include:
+          # Bare minimum => Lowest versions allowed by composer config
+          - symfony-version: '4.4'
+            php-version: '8.0'
+            composer-flag: --prefer-lowest
+          # Up to date versions => Latest versions allowed by composer config
+          - symfony-version: '5.4'
+            php-version: '8.2'
+          # Late symfony migration => Lowest symfony version with latest minor php version allowed by composer config
+          - symfony-version: '4.4'
+            php-version: '8.2'
+            composer-flag: --prefer-lowest
+          # Late php migration => Latest symfony version with lowest minor php version allowed by composer config
+          - symfony-version: '5.4'
+            php-version: '8.0'
     steps:
       - name: Check out code
         uses: actions/checkout@v3
@@ -92,13 +94,14 @@ jobs:
 
       - name: Build
         run: |
-          composer require -W \
+          composer require -W ${{ env.COMPOSER_OPTIONS }} \
             symfony/http-foundation:^${{ matrix.symfony-version }} \
             symfony/http-kernel:^${{ matrix.symfony-version }} \
             symfony/config:^${{ matrix.symfony-version }} \
             symfony/dependency-injection:^${{ matrix.symfony-version }} \
             symfony/event-dispatcher:^${{ matrix.symfony-version }} \
             symfony/routing:^${{ matrix.symfony-version }} \
+          && composer update ${{ matrix.composer-flag }} \
           && make build
 
       - name: Tests
