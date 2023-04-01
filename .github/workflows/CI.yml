@@ -46,6 +46,13 @@ jobs:
           # Late php migration => Latest symfony version with lowest minor php version allowed by composer config
           - symfony-version: '5.4'
             php-version: '8.0'
+          # Symfony 6.0 latest
+          - symfony-version: '6.0'
+            php-version: '8.2'
+          # Symfony 6.0 lowest
+          - symfony-version: '6.0'
+            php-version: '8.0'
+            composer-flag: --prefer-lowest
     steps:
       - name: Check out code
         uses: actions/checkout@v3
@@ -162,7 +169,7 @@ jobs:
         run: make build
 
       - name: ComposerRequireChecker
-        uses: docker://webfactory/composer-require-checker:3.2.0
+        uses: docker://webfactory/composer-require-checker:4.5.0
 
       - name: Dependencies check
         if: ${{ github.event_name == 'pull_request' }}
@@ -209,8 +216,9 @@ jobs:
         symfony-version:
           - '4.4' # Lowest LTS
           - '5.4' # Latest LTS
+          - '6.0' # Current major version
         include:
-          - symfony-version: '6.0' # Next symfony minor version to manage with latest supported PHP version
+          - symfony-version: '6.3' # Next symfony minor version to manage with latest supported PHP version
             php-version: '8.2'
 
     steps:
@@ -239,7 +247,8 @@ jobs:
 
       - name: Build
         run: |
-          composer require -W ${{ env.COMPOSER_OPTIONS }} \
+          composer config minimum-stability dev \
+          && composer require -W ${{ env.COMPOSER_OPTIONS }} \
             symfony/http-foundation:^${{ matrix.symfony-version }} \
             symfony/http-kernel:^${{ matrix.symfony-version }} \
             symfony/config:^${{ matrix.symfony-version }} \

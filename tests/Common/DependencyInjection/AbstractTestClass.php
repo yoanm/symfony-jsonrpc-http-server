@@ -84,7 +84,7 @@ abstract class AbstractTestClass extends AbstractExtensionTestCase
     protected function createJsonRpcMethodDefinition($class = ConcreteJsonRpcMethod::class)
     {
         return (new Definition($class))
-            ->setPrivate(false);
+            ->setPublic(true);
     }
 
     protected function mockResolver()

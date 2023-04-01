@@ -217,7 +217,7 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
 
         if (null !== $class && !$class->implementsInterface(JsonRpcMethodAwareInterface::class)) {
             throw new LogicException(sprintf(
-                'Service "%s" is taggued as JSON-RPC method aware but does not implement %s',
+                'Service "%s" is tagged as JSON-RPC method aware but does not implement %s',
                 $serviceId,
                 JsonRpcMethodAwareInterface::class
             ));
