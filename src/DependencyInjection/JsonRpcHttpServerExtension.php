@@ -14,7 +14,7 @@ use Yoanm\JsonRpcServer\App\Dispatcher\JsonRpcServerDispatcherAwareTrait;
 use Yoanm\JsonRpcServer\Domain\JsonRpcMethodAwareInterface;
 
 /**
- * Class JsonRpcHttpServerExtension
+ * @see \Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\Configuration
  */
 class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInterface
 {
@@ -115,7 +115,7 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
      */
     private function bindJsonRpcServerDispatcher(ContainerBuilder $container) : void
     {
-        $dispatcherRef = new Reference('json_rpc_http_server.dispatcher.server');
+        $dispatcherRef = new Reference(self::EXTENSION_IDENTIFIER.'.dispatcher.server');
         $dispatcherAwareServiceList = $container->findTaggedServiceIds(self::JSONRPC_SERVER_DISPATCHER_AWARE_TAG);
         foreach ($dispatcherAwareServiceList as $serviceId => $tagAttributeList) {
             $definition = $container->getDefinition($serviceId);
@@ -169,7 +169,7 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
 
         // Service locator for method resolver
         // => first argument is an array of wanted service with keys as alias for internal use
-        $container->getDefinition('json_rpc_http_server.service_locator.method_resolver')
+        $container->getDefinition(self::EXTENSION_IDENTIFIER.'.service_locator.method_resolver')
             ->setArgument(0, $methodMappingList);
     }
 
@@ -229,9 +229,9 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
 
     private function bindDebug(ContainerBuilder $container) : void
     {
-        if ($container->getParameter('json_rpc_http_server.debug.enabled')) {
-            $container->getDefinition('json_rpc_server_sdk.app.serialization.jsonrpc_response_normalizer')
-                ->addArgument(new Reference('json_rpc_server_sdk.app.serialization.jsonrpc_response_error_normalizer'));
+        if ($container->getParameter(self::EXTENSION_IDENTIFIER.'.debug.enabled')) {
+            $container->getDefinition(self::EXTENSION_IDENTIFIER.'.app.serialization.jsonrpc_response_normalizer')
+                ->addArgument(new Reference(self::EXTENSION_IDENTIFIER.'.app.serialization.jsonrpc_response_error_normalizer'));
         }
     }
 }
