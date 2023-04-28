@@ -130,6 +130,36 @@ mapping_aware_service:
   tags: ['json_rpc_http_server.method_aware']
 ```
 
+## Debug mode
+
+You can setup 'debug' mode for the JSON-RPC server, which allows display of verbose error information within the response JSON body.
+This information contains actual exception class name, code, message and stack trace.
+
+> Note: you should never enable 'debug' mode in 'production' environment, since it will expose vital internal information to the API consumer.
+
+Configuration example:
+
+```yaml
+# file 'config/packages/json_rpc.yaml'
+json_rpc_http_server:
+  endpoint: '/json-rpc'
+  debug:
+    enabled: false
+    max_trace_size: 10
+    show_trace_arguments: true
+    simplify_trace_arguments: true
+
+when@dev:
+  json_rpc_http_server:
+    debug:
+      enabled: true
+
+when@test:
+  json_rpc_http_server:
+    debug:
+      enabled: true
+```
+
 ## Contributing
 
 See [contributing note](./CONTRIBUTING.md)
