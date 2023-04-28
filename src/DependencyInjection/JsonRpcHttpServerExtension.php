@@ -66,7 +66,8 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
     {
         $this->bindJsonRpcServerDispatcher($container);
         $this->bindValidatorIfDefined($container);
-        $this->binJsonRpcMethods($container);
+        $this->bindJsonRpcMethods($container);
+        $this->bindDebug($container);
     }
 
     /**
@@ -102,9 +103,11 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
         $configuration = new Configuration();
         $config = (new Processor())->processConfiguration($configuration, $configs);
 
-        $httpEndpointPath = $config['endpoint'];
+        $container->setParameter(self::ENDPOINT_PATH_CONTAINER_PARAM_ID, $config['endpoint']);
 
-        $container->setParameter(self::ENDPOINT_PATH_CONTAINER_PARAM_ID, $httpEndpointPath);
+        foreach ($config['debug'] as $name => $value) {
+            $container->setParameter(self::EXTENSION_IDENTIFIER.'.debug.'.$name, $value);
+        }
     }
 
     /**
@@ -149,7 +152,7 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
     /**
      * @param ContainerBuilder $container
      */
-    private function binJsonRpcMethods(ContainerBuilder $container) : void
+    private function bindJsonRpcMethods(ContainerBuilder $container) : void
     {
         $mappingAwareServiceDefinitionList = $this->findAndValidateMappingAwareDefinitionList($container);
 
@@ -221,6 +224,14 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
                 $serviceId,
                 JsonRpcMethodAwareInterface::class
             ));
+        }
+    }
+
+    private function bindDebug(ContainerBuilder $container) : void
+    {
+        if ($container->getParameter('json_rpc_http_server.debug.enabled')) {
+            $container->getDefinition('json_rpc_server_sdk.app.serialization.jsonrpc_response_normalizer')
+                ->addArgument(new Reference('json_rpc_server_sdk.app.serialization.jsonrpc_response_error_normalizer'));
         }
     }
 }

@@ -1,5 +1,5 @@
 services:
-  #Serialization
+  # Serialization
   json_rpc_server_sdk.app.serialization.jsonrpc_request_denormalizer:
       class: Yoanm\JsonRpcServer\App\Serialization\JsonRpcRequestDenormalizer
 
@@ -22,7 +22,7 @@ services:
         - '@json_rpc_server_sdk.app.serialization.jsonrpc_call_dernormalizer'
         - '@json_rpc_server_sdk.app.serialization.jsonrpc_call_response_normalizer'
 
-  #Handlers
+  # Handlers
   json_rpc_server_sdk.app.handler.jsonrpc_request:
       class: Yoanm\JsonRpcServer\App\Handler\JsonRpcRequestHandler
       arguments:
@@ -39,3 +39,11 @@ services:
   # Creator
   json_rpc_server_sdk.app.creator.response:
       class: Yoanm\JsonRpcServer\App\Creator\ResponseCreator
+
+  # Debug
+  json_rpc_server_sdk.app.serialization.jsonrpc_response_error_normalizer:
+      class: Yoanm\JsonRpcServer\App\Serialization\JsonRpcResponseErrorNormalizer
+      arguments:
+        - '%json_rpc_http_server.debug.max_trace_size%'
+        - '%json_rpc_http_server.debug.show_trace_arguments%'
+        - '%json_rpc_http_server.debug.simplify_trace_arguments%'
