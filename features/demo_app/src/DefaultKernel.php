@@ -10,9 +10,4 @@ class DefaultKernel extends AbstractKernel
     {
         return 'default_config';
     }
-
-    public function getConfigDir(): string
-    {
-        return $this->getProjectDir().'/'.$this->getConfigDirectoryName();
-    }
 }

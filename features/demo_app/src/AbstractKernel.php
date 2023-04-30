@@ -57,6 +57,11 @@ abstract class AbstractKernel extends BaseHttpKernel
         return realpath(__DIR__.'/../');
     }
 
+    public function getConfigDir(): string
+    {
+        return $this->getProjectDir().'/'.$this->getConfigDirectoryName();
+    }
+
     /**
      * @param RouteCollectionBuilder|RoutingConfigurator $routes
      */
@@ -69,7 +74,7 @@ abstract class AbstractKernel extends BaseHttpKernel
             $routes->import($confDir . '/routes' . self::CONFIG_EXTS, '/', 'glob');
         }
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -93,5 +98,4 @@ abstract class AbstractKernel extends BaseHttpKernel
     }
 
     abstract public function getConfigDirectoryName() : string;
-    abstract public function getConfigDir(): string;
 }
