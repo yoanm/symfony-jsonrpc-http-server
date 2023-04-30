@@ -44,6 +44,7 @@ build:
       COMPOSER_OPTIONS: '--optimize-autoloader'
       COVERAGE_OUTPUT_STYLE: 'clover'
       COVERAGE_CLOVER_FILE_PATH: 'build/coverage/clover.xml'
+      PHPCS_DISABLE_WARNING: 'true'
     php:
       version: "8.2"
       ini:
