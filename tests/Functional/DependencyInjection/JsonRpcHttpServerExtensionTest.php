@@ -185,4 +185,22 @@ class JsonRpcHttpServerExtensionTest extends AbstractTestClass
 
         $this->loadContainer();
     }
+
+    public function testShouldAddDebugResponseErrorNormalizerIfDebugModeEnabled()
+    {
+        $this->loadContainer([
+            'debug' => [
+                'enabled' => true,
+            ]
+        ]);
+
+        // Assert response normalizer has responseErrorNormalizer as first argument
+        $this->assertContainerBuilderHasServiceDefinitionWithArgument(
+            'json_rpc_server_sdk.app.serialization.jsonrpc_response_normalizer',
+            0,
+            new Reference('json_rpc_server_sdk.app.serialization.jsonrpc_response_error_normalizer'),
+        );
+
+        $this->assertEndpointIsUsable();
+    }
 }

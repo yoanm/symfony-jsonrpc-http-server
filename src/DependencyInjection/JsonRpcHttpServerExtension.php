@@ -14,7 +14,7 @@ use Yoanm\JsonRpcServer\App\Dispatcher\JsonRpcServerDispatcherAwareTrait;
 use Yoanm\JsonRpcServer\Domain\JsonRpcMethodAwareInterface;
 
 /**
- * Class JsonRpcHttpServerExtension
+ * @see \Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\Configuration
  */
 class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInterface
 {
@@ -66,7 +66,8 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
     {
         $this->bindJsonRpcServerDispatcher($container);
         $this->bindValidatorIfDefined($container);
-        $this->binJsonRpcMethods($container);
+        $this->bindJsonRpcMethods($container);
+        $this->bindDebug($container);
     }
 
     /**
@@ -102,9 +103,11 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
         $configuration = new Configuration();
         $config = (new Processor())->processConfiguration($configuration, $configs);
 
-        $httpEndpointPath = $config['endpoint'];
+        $container->setParameter(self::ENDPOINT_PATH_CONTAINER_PARAM_ID, $config['endpoint']);
 
-        $container->setParameter(self::ENDPOINT_PATH_CONTAINER_PARAM_ID, $httpEndpointPath);
+        foreach ($config['debug'] as $name => $value) {
+            $container->setParameter(self::EXTENSION_IDENTIFIER.'.debug.'.$name, $value);
+        }
     }
 
     /**
@@ -112,7 +115,7 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
      */
     private function bindJsonRpcServerDispatcher(ContainerBuilder $container) : void
     {
-        $dispatcherRef = new Reference('json_rpc_http_server.dispatcher.server');
+        $dispatcherRef = new Reference(self::EXTENSION_IDENTIFIER.'.dispatcher.server');
         $dispatcherAwareServiceList = $container->findTaggedServiceIds(self::JSONRPC_SERVER_DISPATCHER_AWARE_TAG);
         foreach ($dispatcherAwareServiceList as $serviceId => $tagAttributeList) {
             $definition = $container->getDefinition($serviceId);
@@ -149,7 +152,7 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
     /**
      * @param ContainerBuilder $container
      */
-    private function binJsonRpcMethods(ContainerBuilder $container) : void
+    private function bindJsonRpcMethods(ContainerBuilder $container) : void
     {
         $mappingAwareServiceDefinitionList = $this->findAndValidateMappingAwareDefinitionList($container);
 
@@ -166,7 +169,7 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
 
         // Service locator for method resolver
         // => first argument is an array of wanted service with keys as alias for internal use
-        $container->getDefinition('json_rpc_http_server.service_locator.method_resolver')
+        $container->getDefinition(self::EXTENSION_IDENTIFIER.'.service_locator.method_resolver')
             ->setArgument(0, $methodMappingList);
     }
 
@@ -221,6 +224,14 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
                 $serviceId,
                 JsonRpcMethodAwareInterface::class
             ));
+        }
+    }
+
+    private function bindDebug(ContainerBuilder $container) : void
+    {
+        if ($container->getParameter(self::EXTENSION_IDENTIFIER.'.debug.enabled')) {
+            $container->getDefinition('json_rpc_server_sdk.app.serialization.jsonrpc_response_normalizer')
+                ->addArgument(new Reference('json_rpc_server_sdk.app.serialization.jsonrpc_response_error_normalizer'));
         }
     }
 }
