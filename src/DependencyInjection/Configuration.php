@@ -26,7 +26,9 @@ class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->booleanNode('enabled')
-                            ->info('Whether to render debug information on error or not (should NOT be enabled on prod)')
+                            ->info(
+                                'Whether to render debug information on error or not (should NOT be enabled on prod)'
+                            )
                             ->defaultFalse()
                         ->end()
                         ->integerNode('max_trace_size')

@@ -230,8 +230,8 @@ class JsonRpcHttpServerExtension implements ExtensionInterface, CompilerPassInte
     private function bindDebug(ContainerBuilder $container) : void
     {
         if ($container->getParameter(self::EXTENSION_IDENTIFIER.'.debug.enabled')) {
-            $container->getDefinition(self::EXTENSION_IDENTIFIER.'.app.serialization.jsonrpc_response_normalizer')
-                ->addArgument(new Reference(self::EXTENSION_IDENTIFIER.'.app.serialization.jsonrpc_response_error_normalizer'));
+            $container->getDefinition('json_rpc_server_sdk.app.serialization.jsonrpc_response_normalizer')
+                ->addArgument(new Reference('json_rpc_server_sdk.app.serialization.jsonrpc_response_error_normalizer'));
         }
     }
 }

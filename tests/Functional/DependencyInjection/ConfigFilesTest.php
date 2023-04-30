@@ -11,6 +11,7 @@ use Yoanm\JsonRpcServer\App\Serialization\JsonRpcCallResponseNormalizer;
 use Yoanm\JsonRpcServer\App\Serialization\JsonRpcCallSerializer;
 use Yoanm\JsonRpcServer\App\Serialization\JsonRpcRequestDenormalizer;
 use Yoanm\JsonRpcServer\App\Serialization\JsonRpcResponseNormalizer;
+use Yoanm\JsonRpcServer\App\Serialization\JsonRpcResponseErrorNormalizer;
 use Yoanm\JsonRpcServer\Infra\Endpoint\JsonRpcEndpoint;
 use Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\JsonRpcHttpServerExtension;
 use Yoanm\SymfonyJsonRpcHttpServer\Dispatcher\SymfonyJsonRpcServerDispatcher;
@@ -98,6 +99,11 @@ class ConfigFilesTest extends AbstractTestClass
             'SDK - App - Response Creator' => [
                 'serviceId' => 'json_rpc_server_sdk.app.creator.response',
                 'serviceClassName' => ResponseCreator::class,
+                'public' => false,
+            ],
+            'SDK - App - Response error normalizer' => [
+                'serviceId' => 'json_rpc_server_sdk.app.serialization.jsonrpc_response_error_normalizer',
+                'serviceClassName' => JsonRpcResponseErrorNormalizer::class,
                 'public' => false,
             ],
         ];
