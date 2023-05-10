@@ -16,6 +16,7 @@ use Yoanm\JsonRpcServer\Infra\Endpoint\JsonRpcEndpoint;
 use Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\JsonRpcHttpServerExtension;
 use Yoanm\SymfonyJsonRpcHttpServer\Dispatcher\SymfonyJsonRpcServerDispatcher;
 use Yoanm\SymfonyJsonRpcHttpServer\Endpoint\JsonRpcHttpEndpoint;
+use Yoanm\SymfonyJsonRpcHttpServer\EventListener\RequestListener;
 use Yoanm\SymfonyJsonRpcHttpServer\Resolver\MethodResolver;
 
 /**
@@ -39,6 +40,7 @@ class ConfigFilesTest extends AbstractTestClass
      * @dataProvider provideSDKAppServiceIdAndClass
      * @dataProvider provideSDKInfraServiceIdAndClass
      * @dataProvider provideBundlePublicServiceIdAndClass
+     * @dataProvider provideBundlePrivateServiceIdAndClass
      *
      * @param string $serviceId
      * @param string $expectedClassName
@@ -129,11 +131,6 @@ class ConfigFilesTest extends AbstractTestClass
     public function provideBundlePublicServiceIdAndClass()
     {
         return [
-            'Bundle - Public - HTTP endpoint' => [
-                'serviceId' => 'json_rpc_http_server.endpoint',
-                'serviceClassName' => JsonRpcHttpEndpoint::class,
-                'public' => true,
-            ],
             'Bundle - Public - Event Dispatcher' => [
                 'serviceId' => 'json_rpc_http_server.dispatcher.server',
                 'serviceClassName' => SymfonyJsonRpcServerDispatcher::class,
@@ -148,15 +145,20 @@ class ConfigFilesTest extends AbstractTestClass
     public function provideBundlePrivateServiceIdAndClass()
     {
         return [
+            'Bundle - Public - HTTP endpoint' => [
+                'serviceId' => 'json_rpc_http_server.request_listener',
+                'serviceClassName' => RequestListener::class,
+                'public' => false,
+            ],
             'Bundle - Private - JSON-RPC method resolver ServiceLocator' => [
                 'serviceId' => 'json_rpc_http_server.service_locator.method_resolver',
                 'serviceClassName' => ServiceLocator::class,
-                'public' => true,
+                'public' => false,
             ],
             'Bundle - Private - MethodResolver alias' => [
                 'serviceId' => 'json_rpc_http_server.alias.method_resolver',
                 'serviceClassName' => MethodResolver::class,
-                'public' => true,
+                'public' => false,
             ],
         ];
     }

@@ -1,34 +1,48 @@
 <?php
-namespace Yoanm\SymfonyJsonRpcHttpServer\Endpoint;
+namespace Yoanm\SymfonyJsonRpcHttpServer\EventListener;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Yoanm\JsonRpcServer\Infra\Endpoint\JsonRpcEndpoint as SDKJsonRpcEndpoint;
 
-/**
- * Class JsonRpcHttpEndpoint
- */
-class JsonRpcHttpEndpoint
+class RequestListener
 {
+    /** @var string */
+    private $uri;
     /** @var SdkJsonRpcEndpoint */
     private $sdkEndpoint;
-
     /** @var string[] */
     private $allowedMethodList = [];
 
-    /**
-     * @param SDKJsonRpcEndpoint $sdkEndpoint
-     */
-    public function __construct(SDKJsonRpcEndpoint $sdkEndpoint)
+    public function __construct(SDKJsonRpcEndpoint $sdkEndpoint, $uri)
     {
+        $this->uri = $uri;
         $this->sdkEndpoint = $sdkEndpoint;
         $this->allowedMethodList = [Request::METHOD_POST, Request::METHOD_OPTIONS];
     }
 
-    /**
-     * @return Response
-     */
-    public function httpOptions() : Response
+    public function onKernelRequest(RequestEvent $event)
+    {
+        if (!$event->isMasterRequest()) {
+            // Don't do anything if it's not the master request !
+            return;
+        }
+
+        $request = $event->getRequest();
+        if ($this->uri === $request->getRequestUri()) {
+            switch ($request->getMethod()) {
+                case Request::METHOD_POST:
+                    $event->setResponse($this->httpPost($request));
+                    break;
+                case Request::METHOD_OPTIONS:
+                    $event->setResponse($this->httpOptions());
+                    break;
+            }
+        }
+    }
+
+    protected function httpOptions() : Response
     {
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
@@ -45,12 +59,7 @@ class JsonRpcHttpEndpoint
         return $response;
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return Response
-     */
-    public function httpPost(Request $request) : Response
+    protected function httpPost(Request $request) : Response
     {
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
