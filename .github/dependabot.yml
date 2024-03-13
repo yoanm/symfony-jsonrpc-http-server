@@ -1,7 +1,81 @@
 version: 2
 updates:
-  - package-ecosystem: composer
-    directory: "/"
+#
+#
+# [GHAction]
+# Based on https://github.com/yoanm/shared-config/blob/master/GitHub/dependabot/github-action.yml file
+#
+  - package-ecosystem: github-actions
+    directory: /
     schedule:
-      interval: monthly
-    open-pull-requests-limit: 10
+      interval: weekly
+      day: sunday # Create PRs during week-ends, they will be ready on monday morning
+    commit-message:
+      prefix: '[dependabot][ghaction] - ' # No need to specify prod/dev for GHAction as there is only "production" updates !
+      include: scope
+    groups:
+# Group all basic updates inside the a single PR
+# No need to split prod/dev as there is only prod updates
+      all-actions:
+        applies-to: version-updates
+        patterns: ['*']
+# Group all security updates inside the a single PR
+# No need to split prod/dev as there is only prod updates
+# +Most likely no need to split major and other updates either
+      SECURITY-all:
+        applies-to: security-updates
+        patterns: ['*']
+#
+#
+# [Composer]
+# Based on https://github.com/yoanm/shared-config/blob/master/GitHub/dependabot/composer.yml file
+#
+  - package-ecosystem: composer
+    directory: /
+    schedule: # Create PRs during week-ends, they will be ready on monday morning
+      interval: weekly
+      day: sunday
+    versioning-strategy: widen
+    commit-message:
+      prefix: '[dependabot][prod][composer] - '
+      prefix-development: '[dependabot][dev][composer] - '
+      include: scope
+    groups:
+# Split basic updates by:
+#  - prod vs dev
+#  - major vs others (assuming packages properly follow semver !)
+      prod-majors:
+        applies-to: version-updates
+        dependency-type: production
+        update-types: ['major']
+        patterns: ['*']
+      prod-others:
+        applies-to: version-updates
+        dependency-type: production
+        patterns: ['*']
+      dev-majors:
+        applies-to: version-updates
+        dependency-type: development
+        update-types: ['major']
+        patterns: ['*']
+      dev-others:
+        applies-to: version-updates
+        dependency-type: development
+        patterns: ['*']
+# Split security updates by:
+#  - prod vs dev
+# @TODO - Uncomment the following group (and keep comment header below for explanation !) in case repository is for a library, else remove it !
+#  - Major prod updates vs other prod updates
+#      SECURITY-prod-major:
+#        applies-to: security-updates
+#        dependency-type: production
+#        update-types: ['major']
+#        patterns: ['*']
+      SECURITY-prod:
+        applies-to: security-updates
+        dependency-type: production
+        patterns: ['*']
+      SECURITY-dev:
+        applies-to: security-updates
+        dependency-type: development
+        patterns: ['*']
