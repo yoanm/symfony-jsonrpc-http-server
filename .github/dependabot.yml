@@ -64,13 +64,12 @@ updates:
         patterns: ['*']
 # Split security updates by:
 #  - prod vs dev
-# @TODO - Uncomment the following group (and keep comment header below for explanation !) in case repository is for a library, else remove it !
 #  - Major prod updates vs other prod updates
-#      SECURITY-prod-major:
-#        applies-to: security-updates
-#        dependency-type: production
-#        update-types: ['major']
-#        patterns: ['*']
+      SECURITY-prod-major:
+        applies-to: security-updates
+        dependency-type: production
+        update-types: ['major']
+        patterns: ['*']
       SECURITY-prod:
         applies-to: security-updates
         dependency-type: production
