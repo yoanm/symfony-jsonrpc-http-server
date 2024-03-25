@@ -1,4 +1,5 @@
 name: 'CI'
+
 on: # Build any PRs and main branch changes
   workflow_dispatch: # Allows to run the workflow manually from the Actions tab
   pull_request:
