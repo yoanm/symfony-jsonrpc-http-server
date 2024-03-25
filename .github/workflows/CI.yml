@@ -1,10 +1,10 @@
 name: 'CI'
+
 on: # Build any PRs and main branch changes
   workflow_dispatch: # Allows to run the workflow manually from the Actions tab
   pull_request:
     types:
       - opened
-      - edited
       - synchronize
   push:
     branches: [ master ]
@@ -18,8 +18,6 @@ concurrency:
 env:
   TEST_OUTPUT_STYLE: pretty
   COMPOSER_OPTIONS: --optimize-autoloader
-  CODACY_CACHE_PATH: ~/.cache/codacy
-  CODACY_BIN: ~/.cache/codacy/codacy.sh
 
 jobs:
   tests:
@@ -65,13 +63,13 @@ jobs:
 
       - name: Setup PHP ${{ matrix.php-version }}
         uses: shivammathur/setup-php@v2
+        env:
+          update: true # Always use latest available patch for the version
+          fail-fast: true # step will fail if an extension or tool fails to set up
         with:
           php-version: '${{ matrix.php-version }}'
           tools: composer
           coverage: ${{ env.COVERAGE_TYPE }}
-        env:
-          # Always use latest available patch for the version
-          update: true
 
       - name: Setup cache
         id: cache
@@ -80,17 +78,8 @@ jobs:
           path: |
             ~/.composer
             ./vendor
-            ${{ env.CODACY_CACHE_PATH }}
           # Clear the cache if composer json (as composer.lock is in the repo) has been updated
           key: tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}-${{ matrix.composer-flag }}-${{ hashFiles('composer.json') }}
-
-      - name: Download codacy binary
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          mkdir -p ${{ env.CODACY_CACHE_PATH }} \
-          && curl -LN https://coverage.codacy.com/get.sh -o ${{ env.CODACY_BIN }} \
-          && chmod +x ${{ env.CODACY_BIN }} \
-          && ${{ env.CODACY_BIN }} download
 
       - name: Build
         run: |
@@ -110,39 +99,45 @@ jobs:
       - name: Tests
         run: make test-unit && make test-functional
 
-      # Upload to codacy first as codecov action always remove coverage files despite move_coverage_to_trash at false
-      # And only if it's not a PR from a fork => Can't work as codacy secret is not accessible in that context
-      - name: Upload coverages to Codacy
-        if: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'yoanm/symfony-jsonrpc-http-server') && env.COVERAGE_TYPE == 'xdebug' }}
-        run: ${{ env.CODACY_BIN }} report -r build/coverage-phpunit/unit.clover -r build/coverage-behat/clover.xml -r build/coverage-phpunit/functional.clover -t ${{ secrets.CODACY_PROJECT_TOKEN }} --partial
-
-      # See the reports at https://codecov.io/gh/yoanm/symfony-jsonrpc-http-server
-      - name: Upload unit tests coverage to codecov
+      - name: Create "unit tests" reports group
         if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
-        uses: codecov/codecov-action@v3
+        id: unit-tests-coverage-group
+        uses: yoanm/tmp-reports-group-workspace/.github/actions/create-action@develop
         with:
-          file: "build/coverage-phpunit/unit.clover"
-          name: "unit-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}"
-          flags: "unit-tests,php-${{ matrix.php-version }},sf-${{ matrix.symfony-version }}"
-          fail_ci_if_error: true
-          move_coverage_to_trash: false
-          verbose: ${{ runner.debug == '1' }}
+          name: unit-tests
+          format: clover
+          files: build/coverage-phpunit/unit.clover
+          flags: |
+            unit-tests
+            php-${{ matrix.php-version }}
+          path: build/coverage-groups
 
-      - name: Upload functional tests coverage to codecov
+      - name: Create "functional tests" coverage group
         if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
-        uses: codecov/codecov-action@v3
+        id: functional-tests-coverage-group
+        uses: yoanm/tmp-reports-group-workspace/.github/actions/create-action@develop
         with:
-          files: "build/coverage-behat/clover.xml,build/coverage-phpunit/functional.clover"
-          name: "functional-tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}"
-          flags: "functional-tests,php-${{ matrix.php-version }},sf-${{ matrix.symfony-version }}"
-          fail_ci_if_error: true
-          move_coverage_to_trash: false
-          verbose: ${{ runner.debug == '1' }}
+          name: functional-tests
+          format: clover
+          files: |
+            build/coverage-phpunit/functional.clover
+            build/coverage-behat/clover.xml
+          flags: |
+            functional-tests
+            php-${{ matrix.php-version }}
+          path: build/coverage-groups
+
+      - name: Upload coverage reports
+        if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-groups-php${{ matrix.php-version }}-sf${{ matrix.symfony-version }}
+          path: build/coverage-groups
+          if-no-files-found: error
 
   static-checks:
     name: Static checks
     runs-on: ubuntu-latest
-    needs: [ tests ]
     steps:
       - uses: actions/checkout@v3
 
@@ -174,31 +169,6 @@ jobs:
       - name: Dependencies check
         if: ${{ github.event_name == 'pull_request' }}
         uses: actions/dependency-review-action@v1
-
-  finalize-codacy-coverage-report:
-    runs-on: ubuntu-latest
-    name: Finalize Codacy coverage report
-    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'yoanm/symfony-jsonrpc-http-server' }}
-    needs: [ tests ]
-    steps:
-      - name: Setup cache
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ env.CODACY_CACHE_PATH }}
-          key: codacy-final
-
-      - name: Download codacy binary
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          mkdir -p ${{ env.CODACY_CACHE_PATH }} \
-          && curl -LN https://coverage.codacy.com/get.sh -o ${{ env.CODACY_BIN }} \
-          && chmod +x ${{ env.CODACY_BIN }} \
-          && ${{ env.CODACY_BIN }} download
-
-      - name: Finalize reporting
-        run: ${{ env.CODACY_BIN }} final -t ${{ secrets.CODACY_PROJECT_TOKEN }}
 
   nightly-tests:
     name: Nightly - Symfony ${{ matrix.symfony-version }}
