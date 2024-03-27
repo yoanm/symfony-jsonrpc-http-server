@@ -102,7 +102,7 @@ jobs:
       - name: Create "unit tests" reports group
         if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
         id: unit-tests-coverage-group
-        uses: yoanm/tmp-reports-group-workspace/.github/actions/create-action@develop
+        uses: yoanm/temp-reports-group-workspace/.github/actions/create-action@develop
         with:
           name: unit-tests
           format: clover
@@ -115,7 +115,7 @@ jobs:
       - name: Create "functional tests" coverage group
         if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
         id: functional-tests-coverage-group
-        uses: yoanm/tmp-reports-group-workspace/.github/actions/create-action@develop
+        uses: yoanm/temp-reports-group-workspace/.github/actions/create-action@develop
         with:
           name: functional-tests
           format: clover
