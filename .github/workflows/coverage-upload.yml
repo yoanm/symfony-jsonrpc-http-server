@@ -13,12 +13,12 @@ jobs:
       checks: write # For the check run creation !
     steps:
       - name: 'Check run ○'
-        uses: yoanm/tmp-reports-group-workspace/.github/actions/attach-check-run-to-triggering-workflow-action@develop
+        uses: yoanm/temp-reports-group-workspace/.github/actions/attach-check-run-to-triggering-workflow-action@develop
         with:
           name: 'Fetch coverage info'
           fails-on-triggering-workflow-failure: true
 
-      - uses: yoanm/tmp-reports-group-workspace/.github/actions/fetch-workflow-metadata-action@develop
+      - uses: yoanm/temp-reports-group-workspace/.github/actions/fetch-workflow-metadata-action@develop
         id: fetch-workflow-metadata
 
     outputs:
@@ -28,7 +28,7 @@ jobs:
   codacy-uploader:
     name: Codacy
     needs: [fetch-info]
-    uses: yoanm/tmp-reports-group-workspace/.github/workflows/codacy-upload-from-artifacts.yml@develop
+    uses: yoanm/temp-reports-group-workspace/.github/workflows/codacy-upload-from-artifacts.yml@develop
     permissions:
       contents: read
       checks: write # For the check run creation !
@@ -37,12 +37,11 @@ jobs:
     with:
       artifacts-pattern: coverage-groups-*
       run-id: ${{ needs.fetch-info.outputs.run-id }}
-      override-commit: ${{ needs.fetch-info.outputs.commit-sha }}
 
   codecov-uploader:
     name: Codecov
     needs: [fetch-info]
-    uses: yoanm/tmp-reports-group-workspace/.github/workflows/codecov-upload-from-artifacts.yml@develop
+    uses: yoanm/temp-reports-group-workspace/.github/workflows/codecov-upload-from-artifacts.yml@develop
     permissions:
       contents: read
       checks: write # For the check run creation !
