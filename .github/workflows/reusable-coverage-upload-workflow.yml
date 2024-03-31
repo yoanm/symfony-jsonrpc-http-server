@@ -41,7 +41,6 @@ jobs:
     with:
       artifacts-pattern: coverage-groups-*
       run-id: ${{ needs.fetch-info.outputs.run-id }}
-      override-job-name: "Codacy title"
       force-git-commit: ${{ needs.fetch-info.outputs.commit-sha }}
       # force-uploader-language: ...
       # force-uploader-coverage-parser: ...
@@ -59,7 +58,6 @@ jobs:
     with:
       artifacts-pattern: coverage-groups-*
       run-id: ${{ needs.fetch-info.outputs.run-id }}
-      override-job-name: "Codecov title"
       force-git-commit: ${{ needs.fetch-info.outputs.commit-sha }}
       force-git-branch: ${{ needs.fetch-info.outputs.branch }}
       force-gh-pr: ${{ needs.fetch-info.outputs.pr-number }}
