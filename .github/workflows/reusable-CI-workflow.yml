@@ -9,7 +9,7 @@ env:
 
 jobs:
   tests:
-    name: PHP ${{ matrix.php-version }} / Symfony ${{ matrix.symfony-version }}
+    name: PHP ${{ matrix.php-version }} & Symfony ${{ matrix.symfony-version }}
     runs-on: ubuntu-latest
     env:
       COVERAGE_TYPE: none
@@ -161,7 +161,7 @@ jobs:
         uses: actions/dependency-review-action@v4
 
   nightly-tests:
-    name: Nightly - PHP ${{ matrix.php-version }} / Symfony ${{ matrix.symfony-version }}
+    name: Nightly - PHP ${{ matrix.php-version }} & Symfony ${{ matrix.symfony-version }}
     runs-on: ubuntu-latest
     env:
       COMPOSER_OPTIONS: '--optimize-autoloader --ignore-platform-req=php+'
