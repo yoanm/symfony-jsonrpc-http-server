@@ -1,0 +1,40 @@
+name: 'Test CI updates'
+# [DESCRIPTION]
+# As CI workflow relies on `workflow_run` trigger for upload, this workflow is used in order to ease updates made on
+# CI workflow (or linked workflows/actions). It's kind of pre-check to ensure once updates are merged on main branch,
+# the `workflow_run` workflow execution will behave as expected.
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+    branches: [master] # Only for PR targeting master branch
+    paths: # /!\ Duplicate the same list as `on.pull_request.paths-ignore` property value for CI workflow !
+      - '.github/workflows/pre-check-CI-updates.yml' # This workflow
+      - '.github/workflows/CI.yml'
+      - '.github/workflows/coverage-upload.yml'
+      - '.github/workflows/reusable-CI-workflow.yml'
+      - '.github/workflows/reusable-coverage-upload-workflow.yml'
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: Tests
+    permissions:
+      contents: read
+    uses: ./.github/workflows/reusable-CI-workflow.yml
+
+  upload:
+    name: Upload
+    needs: [tests]
+    permissions:
+      contents: read
+      checks: write # For the check run creation !
+    secrets:
+      CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    uses: ./.github/workflows/reusable-coverage-upload-workflow.yml

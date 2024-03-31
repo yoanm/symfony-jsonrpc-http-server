@@ -1,57 +1,16 @@
-name: 'Coverage upload'
+name: 'Coverage'
 on:
   workflow_run:
     workflows: ["CI"]
     types: [completed]
 
 jobs:
-  fetch-info:
-    name: Fetch triggering workflow metadata
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      checks: write # For the check run creation !
-    steps:
-      - name: 'Check run ○'
-        uses: yoanm/temp-reports-group-workspace/.github/actions/attach-check-run-to-triggering-workflow-action@develop
-        with:
-          name: 'Fetch coverage info'
-          fails-on-triggering-workflow-failure: true
-
-      - uses: yoanm/temp-reports-group-workspace/.github/actions/fetch-workflow-metadata-action@develop
-        id: fetch-workflow-metadata
-
-    outputs:
-      commit-sha: ${{ steps.fetch-workflow-metadata.outputs.commit-sha }}
-      run-id: ${{ steps.fetch-workflow-metadata.outputs.run-id }}
-
-  codacy-uploader:
-    name: Codacy
-    needs: [fetch-info]
-    uses: yoanm/temp-reports-group-workspace/.github/workflows/codacy-upload-from-artifacts.yml@develop
+  upload:
+    name: Upload
     permissions:
       contents: read
       checks: write # For the check run creation !
     secrets:
-      PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
-    with:
-      artifacts-pattern: coverage-groups-*
-      run-id: ${{ needs.fetch-info.outputs.run-id }}
-
-  codecov-uploader:
-    name: Codecov
-    needs: [fetch-info]
-    uses: yoanm/temp-reports-group-workspace/.github/workflows/codecov-upload-from-artifacts.yml@develop
-    permissions:
-      contents: read
-      checks: write # For the check run creation !
-    secrets:
-      TOKEN: ${{ secrets.CODECOV_TOKEN }}
-    with:
-      artifacts-pattern: coverage-groups-*
-      run-id: ${{ needs.fetch-info.outputs.run-id }}
-      override-commit: ${{ needs.fetch-info.outputs.commit-sha }}
-      override-branch: ${{ needs.fetch-info.outputs.branch }}
-      override-pr: ${{ needs.fetch-info.outputs.pr-number }}
-      override-build: ${{ needs.fetch-info.outputs.run-id }}
-      override-build-url: ${{ needs.fetch-info.outputs.run-url }}
+      CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    uses: ./.github/workflows/reusable-coverage-upload-workflow.yml

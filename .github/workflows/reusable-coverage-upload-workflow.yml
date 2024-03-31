@@ -1,0 +1,65 @@
+name: 'Coverage upload reusable workflow'
+
+on:
+  workflow_call:
+    secrets:
+      CODACY_PROJECT_TOKEN:
+        required: true
+      CODECOV_TOKEN:
+        required: true
+
+jobs:
+  fetch-info:
+    name: Fetch triggering workflow metadata
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write # For the check run creation !
+    steps:
+      - name: 'Check run ○'
+        uses: yoanm/temp-reports-group-workspace/gha-attach-check-run-to-triggering-workflow@v0
+        with:
+          name: 'Fetch coverage info'
+          fails-on-triggering-workflow-failure: true
+
+      - uses: yoanm/temp-reports-group-workspace/gha-fetch-workflow-metadata@v0
+        id: fetch-workflow-metadata
+
+    outputs:
+      commit-sha: ${{ steps.fetch-workflow-metadata.outputs.commit-sha }}
+      run-id: ${{ steps.fetch-workflow-metadata.outputs.run-id }}
+
+  codacy-uploader:
+    name: Codacy
+    needs: [fetch-info]
+    uses: yoanm/temp-reports-group-workspace/.github/workflows/codacy-upload-from-artifacts.yml@v0
+    permissions:
+      contents: read
+      checks: write # For the check run creation !
+    secrets:
+      PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+    with:
+      artifacts-pattern: coverage-groups-*
+      run-id: ${{ needs.fetch-info.outputs.run-id }}
+      force-git-commit: ${{ needs.fetch-info.outputs.commit-sha }}
+      # force-uploader-language: ...
+      # force-uploader-coverage-parser: ...
+      # force-uploader-cli-version: ...
+
+  codecov-uploader:
+    name: Codecov
+    needs: [fetch-info]
+    uses: yoanm/temp-reports-group-workspace/.github/workflows/codecov-upload-from-artifacts.yml@v0
+    permissions:
+      contents: read
+      checks: write # For the check run creation !
+    secrets:
+      TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    with:
+      artifacts-pattern: coverage-groups-*
+      run-id: ${{ needs.fetch-info.outputs.run-id }}
+      force-git-commit: ${{ needs.fetch-info.outputs.commit-sha }}
+      force-git-branch: ${{ needs.fetch-info.outputs.branch }}
+      force-gh-pr: ${{ needs.fetch-info.outputs.pr-number }}
+      force-uploader-build: ${{ needs.fetch-info.outputs.run-id }}
+      force-uploader-build-url: ${{ needs.fetch-info.outputs.run-url }}

@@ -1,0 +1,222 @@
+name: 'CI reusable workflow'
+
+on:
+  workflow_call:
+
+env:
+  TEST_OUTPUT_STYLE: pretty
+  COMPOSER_OPTIONS: --optimize-autoloader
+
+jobs:
+  tests:
+    name: PHP ${{ matrix.php-version }} & Symfony ${{ matrix.symfony-version }}
+    runs-on: ubuntu-latest
+    env:
+      COVERAGE_TYPE: none
+    strategy:
+      fail-fast: true
+      max-parallel: 4
+      matrix:
+        include:
+          # Bare minimum => Lowest versions allowed by composer config
+          - symfony-version: '4.4'
+            php-version: '8.0'
+            composer-flag: --prefer-lowest
+          # Up to date versions => Latest versions allowed by composer config
+          - symfony-version: '5.4'
+            php-version: '8.2'
+          # Late symfony migration => Lowest symfony version with latest minor php version allowed by composer config
+          - symfony-version: '4.4'
+            php-version: '8.2'
+            composer-flag: --prefer-lowest
+          # Late php migration => Latest symfony version with lowest minor php version allowed by composer config
+          - symfony-version: '5.4'
+            php-version: '8.0'
+          # Symfony 6.0 latest
+          - symfony-version: '6.0'
+            php-version: '8.2'
+          # Symfony 6.0 lowest
+          - symfony-version: '6.0'
+            php-version: '8.0'
+            composer-flag: --prefer-lowest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Enable coverage
+        if: ${{ matrix.php-version == '8.2' }}
+        run: |
+          echo "COVERAGE_OUTPUT_STYLE=clover" >> $GITHUB_ENV
+          echo "COVERAGE_TYPE=xdebug" >> $GITHUB_ENV
+
+      - name: Setup PHP ${{ matrix.php-version }}
+        uses: shivammathur/setup-php@v2
+        env:
+          update: true # Always use latest available patch for the version
+          fail-fast: true # step will fail if an extension or tool fails to set up
+        with:
+          php-version: '${{ matrix.php-version }}'
+          tools: composer
+          coverage: ${{ env.COVERAGE_TYPE }}
+
+      - name: Setup cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.composer
+            ./vendor
+          # Clear the cache if composer json (as composer.lock is in the repo) has been updated
+          key: tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}-${{ matrix.composer-flag }}-${{ hashFiles('composer.json') }}
+
+      - name: Build
+        run: |
+          SF_VERSION=${{ matrix.symfony-version }}
+          # Issue with ParamterBag below 4.4.30 => https://github.com/symfony/symfony/commit/3eca446b21607ea1c7a865ece2dd8254c33679cc
+          test '${{ matrix.symfony-version }}' = '4.4' && test '${{ matrix.php-version }}' = '8.2' && SF_VERSION=4.4.30
+          composer require -W ${{ env.COMPOSER_OPTIONS }} ${{ matrix.composer-flag }} \
+            symfony/http-foundation:^$SF_VERSION \
+            symfony/http-kernel:^$SF_VERSION \
+            symfony/config:^$SF_VERSION \
+            symfony/dependency-injection:^$SF_VERSION \
+            symfony/event-dispatcher:^$SF_VERSION \
+            symfony/routing:^$SF_VERSION \
+          && composer update ${{ env.COMPOSER_OPTIONS }} ${{ matrix.composer-flag }} \
+          && make build
+
+      - name: Tests
+        run: make test-unit && make test-functional
+
+      - name: Create "unit tests" reports group
+        if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
+        id: unit-tests-coverage-group
+        uses: yoanm/temp-reports-group-workspace/gha-create@v0
+        with:
+          name: unit-tests
+          format: clover
+          files: build/coverage-phpunit/unit.clover
+          flags: |
+            unit-tests
+            php-${{ matrix.php-version }}
+            sf-${{ matrix.symfony-version }}
+          path: build/coverage-groups
+
+      - name: Create "functional tests" reports group
+        if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
+        id: functional-tests-coverage-group
+        uses: yoanm/temp-reports-group-workspace/gha-create@v0
+        with:
+          name: functional-tests
+          format: clover
+          files: |
+            build/coverage-phpunit/functional.clover
+            build/coverage-behat/clover.xml
+          flags: |
+            functional-tests
+            php-${{ matrix.php-version }}
+            sf-${{ matrix.symfony-version }}
+          path: build/coverage-groups
+
+      - name: Upload coverage reports
+        if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-groups-php${{ matrix.php-version }}-sf${{ matrix.symfony-version }}
+          path: build/coverage-groups
+          if-no-files-found: error
+
+  static-checks:
+    name: Static analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2 # Latest supported
+          tools: composer
+          coverage: none
+        env:
+          # Always use latest available patch for the version
+          update: true
+
+      - name: Setup cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.composer
+          # Clear the cache if composer json (as composer.lock is in the repo) has been updated
+          key: tests-${{ env.PHP_VERSION }}-${{ hashFiles('composer.json') }}
+
+      - name: Build
+        run: make build
+
+      - name: ComposerRequireChecker
+        uses: docker://webfactory/composer-require-checker:4.5.0
+
+      - name: Dependencies check
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/dependency-review-action@v4
+
+  nightly-tests:
+    name: Nightly - PHP ${{ matrix.php-version }} & Symfony ${{ matrix.symfony-version }}
+    runs-on: ubuntu-latest
+    env:
+      COMPOSER_OPTIONS: '--optimize-autoloader --ignore-platform-req=php+'
+    continue-on-error: true
+    needs: [ static-checks, tests ]
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        php-version:
+          - '8.3' # Current php dev version
+        symfony-version:
+          - '4.4' # Lowest LTS
+          - '5.4' # Latest LTS
+          - '6.0' # Current major version
+        include:
+          - symfony-version: '6.3' # Next symfony minor version to manage with latest supported PHP version
+            php-version: '8.2'
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP ${{ matrix.php-version }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '${{ matrix.php-version }}'
+          tools: composer
+          coverage: none
+        env:
+          # Always use latest available patch for the version
+          update: true
+
+      - name: Setup cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.composer
+            ./vendor
+          # Clear the cache if composer json (as composer.lock is in the repo) has been updated
+          key: tests-${{ matrix.php-version }}-${{ matrix.symfony-version }}-${{ hashFiles('composer.json') }}
+
+      - name: Build
+        run: |
+          composer config minimum-stability dev \
+          && composer require -W ${{ env.COMPOSER_OPTIONS }} \
+            symfony/http-foundation:^${{ matrix.symfony-version }} \
+            symfony/http-kernel:^${{ matrix.symfony-version }} \
+            symfony/config:^${{ matrix.symfony-version }} \
+            symfony/dependency-injection:^${{ matrix.symfony-version }} \
+            symfony/event-dispatcher:^${{ matrix.symfony-version }} \
+            symfony/routing:^${{ matrix.symfony-version }} \
+          && composer update ${{ env.COMPOSER_OPTIONS }} \
+          && make build
+
+      - name: Test
+        run: make test-unit && make test-functional
