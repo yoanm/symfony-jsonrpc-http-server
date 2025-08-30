@@ -70,7 +70,7 @@ jobs:
             php-version: '${{ inputs.php-min-version }}'
             symfony-version: '5.4'
           - job-name: Late migration - PHP # => Highest symfony version with lowest php version allowed by composer config
-            php-version: '${{ inputs.php-min-version }}'
+            php-version: ${{ ( inputs.symfony-max-version == '6.4' && inputs.php-min-version < 8.1 ) && '8.1' || inputs.php-min-version }} # Fix - Sf 6.4 require php 8.1 minimum !
             symfony-version: '${{ inputs.symfony-max-version }}'
           - job-name: Late migration - Symfony # => Lowest symfony version with highest php version allowed by composer config
             php-version: '${{ inputs.php-max-version }}'
@@ -241,7 +241,7 @@ jobs:
             # Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
             pkg-extra-constraints: behat/gherkin:~4.12.0
           - job-name: Symfony - With lowest supported PHP version
-            php-version: ${{ inputs.php-min-version > 8.1 && inputs.php-min-version || '8.1' }} # Fix - Sf 6.3 (current next) require php 8.1 minimum !
+            php-version: ${{ ( inputs.symfony-next-version == '7.0' && inputs.php-min-version < 8.1 ) && '8.1' || inputs.php-min-version }} # Fix - Sf 7.0 require php 8.1 minimum !
             symfony-version: ${{ inputs.symfony-next-version }}
             # Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
             pkg-extra-constraints: behat/gherkin:~4.12.0
