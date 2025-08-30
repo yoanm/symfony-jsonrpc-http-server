@@ -14,6 +14,7 @@ on: # Build any PRs and main branch changes
       - '.github/workflows/coverage-upload.yml'
       - '.github/workflows/reusable-CI-workflow.yml'
       - '.github/workflows/reusable-coverage-upload-workflow.yml'
+      - '.github/workflows/auto-merge-dependabot.yml'
   push:
     branches: [ master ]
   schedule:
