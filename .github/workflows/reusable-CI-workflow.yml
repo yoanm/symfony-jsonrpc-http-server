@@ -62,7 +62,8 @@ jobs:
             php-version: '${{ inputs.php-max-version }}'
             symfony-version: '5.4'
             ## Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
-            pkg-extra-constraints: behat/gherkin:~4.12.0
+            # Fix - symfony/yaml - Avoid issue with Sf YAML 6.4+ and Framework bundle
+            pkg-extra-constraints: behat/gherkin:~4.12.0 symfony/yaml:~6.4.0
           - job-name: Bare minimum # => Lowest versions allowed by composer config
             php-version: '${{ inputs.php-min-version }}'
             symfony-version: '${{ inputs.symfony-min-version }}'
@@ -70,7 +71,7 @@ jobs:
             php-version: '${{ inputs.php-min-version }}'
             symfony-version: '5.4'
           - job-name: Late migration - PHP # => Highest symfony version with lowest php version allowed by composer config
-            php-version: ${{ ( inputs.symfony-max-version == '6.4' && inputs.php-min-version < 8.1 ) && '8.1' || inputs.php-min-version }} # Fix - Sf 6.4 require php 8.1 minimum !
+            php-version: ${{ ( inputs.symfony-max-version == '6.4' && inputs.php-min-version == '8.0' ) && '8.1' || inputs.php-min-version }} # Fix - Sf 6.4 require php 8.1 minimum !
             symfony-version: '${{ inputs.symfony-max-version }}'
           - job-name: Late migration - Symfony # => Lowest symfony version with highest php version allowed by composer config
             php-version: '${{ inputs.php-max-version }}'
@@ -115,12 +116,11 @@ jobs:
         run: |
           SF_CONSTRAINT="~${{ matrix.symfony-version }}.0"
           composer require -W \
-            symfony/http-foundation:${SF_CONSTRAINT} \
-            symfony/http-kernel:${SF_CONSTRAINT} \
             symfony/config:${SF_CONSTRAINT} \
             symfony/dependency-injection:${SF_CONSTRAINT} \
             symfony/event-dispatcher:${SF_CONSTRAINT} \
-            symfony/routing:${SF_CONSTRAINT} \
+            symfony/http-foundation:${SF_CONSTRAINT} \
+            symfony/http-kernel:${SF_CONSTRAINT} \
             ${{ matrix.pkg-extra-constraints }} \
           && make build
 
@@ -199,12 +199,11 @@ jobs:
         run: |
           SF_CONSTRAINT="~${{ env.SYMFONY_VERSION }}.0"
           composer require -W \
-            symfony/http-foundation:${SF_CONSTRAINT} \
-            symfony/http-kernel:${SF_CONSTRAINT} \
             symfony/config:${SF_CONSTRAINT} \
             symfony/dependency-injection:${SF_CONSTRAINT} \
             symfony/event-dispatcher:${SF_CONSTRAINT} \
-            symfony/routing:${SF_CONSTRAINT} \
+            symfony/http-foundation:${SF_CONSTRAINT} \
+            symfony/http-kernel:${SF_CONSTRAINT} \
           && make build
 
       - name: ComposerRequireChecker
@@ -239,12 +238,15 @@ jobs:
             php-version: ${{ inputs.php-max-version }}
             symfony-version: ${{ inputs.symfony-next-version }}
             # Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
-            pkg-extra-constraints: behat/gherkin:~4.12.0
+            # Fix - symfony/framework-bundle - Framework bundle <7.0 require php 8.1 minimum !
+            pkg-extra-constraints: behat/gherkin:~4.12.0  ${{ ( inputs.symfony-next-version == '7.0' && inputs.php-max-version == '8.4' ) && 'symfony/framework-bundle:~7.0.0@dev' || '' }}
           - job-name: Symfony - With lowest supported PHP version
-            php-version: ${{ ( inputs.symfony-next-version == '7.0' && inputs.php-min-version < 8.1 ) && '8.1' || inputs.php-min-version }} # Fix - Sf 7.0 require php 8.1 minimum !
+            # Fix - Sf 7.0 require php 8.1 minimum, most of deps require 8.2 !
+            php-version: ${{ ( inputs.symfony-next-version == '7.0' && inputs.php-min-version == '8.0' ) && '8.2' || inputs.php-min-version }}
             symfony-version: ${{ inputs.symfony-next-version }}
             # Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
-            pkg-extra-constraints: behat/gherkin:~4.12.0
+            # Fix - symfony/framework-bundle - Framework bundle <7.0 require php 8.1 minimum !
+            pkg-extra-constraints: behat/gherkin:~4.12.0 ${{ ( inputs.symfony-next-version == '7.0' && inputs.php-min-version == '8.0' ) && 'symfony/framework-bundle:~7.0.0@dev' || '' }}
 
     steps:
       - name: Check out code
@@ -278,12 +280,11 @@ jobs:
           SF_CONSTRAINT="~${{ matrix.symfony-version }}.0@dev"
           composer config minimum-stability dev \
           && composer require -W \
-            symfony/http-foundation:${SF_CONSTRAINT} \
-            symfony/http-kernel:${SF_CONSTRAINT} \
             symfony/config:${SF_CONSTRAINT} \
             symfony/dependency-injection:${SF_CONSTRAINT} \
             symfony/event-dispatcher:${SF_CONSTRAINT} \
-            symfony/routing:${SF_CONSTRAINT} \
+            symfony/http-foundation:${SF_CONSTRAINT} \
+            symfony/http-kernel:${SF_CONSTRAINT} \
             ${{ matrix.pkg-extra-constraints }} \
           && make build
 
