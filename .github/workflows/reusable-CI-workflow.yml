@@ -64,11 +64,15 @@ jobs:
             php-prefer-latest: true
             symfony-version: '${{ inputs.symfony-max-version }}'
             composer-prefer-lowest: false
+            # Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
+            pkg-extra-constraints: behat/gherkin:~4.12.0
           # Late symfony migration => Lowest symfony version with latest php version allowed by composer config
           - php-version: '${{ inputs.php-max-version }}'
             php-prefer-latest: true
             symfony-version: '${{ inputs.symfony-min-version }}'
             composer-prefer-lowest: true
+            # Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
+            pkg-extra-constraints: behat/gherkin:~4.12.0
           # Late php migration => Latest symfony version with lowest php version allowed by composer config
           - php-version: '${{ inputs.php-min-version }}'
             php-prefer-latest: false
@@ -120,14 +124,15 @@ jobs:
         run: |
           SF_VERSION=${{ matrix.symfony-version }}
           # Issue with ParamterBag below 4.4.30 => https://github.com/symfony/symfony/commit/3eca446b21607ea1c7a865ece2dd8254c33679cc
-          test '${{ matrix.symfony-version }}' = '4.4' && test '${{ matrix.php-version }}' = '8.2' && SF_VERSION=4.4.30 || SF_VERSION=$SF_VERSION".0"
+          test '${{ matrix.symfony-version }}' = '4.4' && test '${{ matrix.php-version }}' = '8.2' && SF_VERSION=4.4.30 || SF_VERSION="${SF_VERSION}.0"
           composer require -W ${{ env.COMPOSER_OPTIONS }} ${{ matrix.composer-prefer-lowest && '--prefer-lowest' || '' }} \
-            "symfony/http-foundation:~"$SF_VERSION \
-            "symfony/http-kernel:~"$SF_VERSION \
-            "symfony/config:~"$SF_VERSION \
-            "symfony/dependency-injection:~"$SF_VERSION \
-            "symfony/event-dispatcher:~"$SF_VERSION \
-            "symfony/routing:~"$SF_VERSION \
+            symfony/http-foundation:~${SF_VERSION} \
+            symfony/http-kernel:~${SF_VERSION} \
+            symfony/config:~${SF_VERSION} \
+            symfony/dependency-injection:~${SF_VERSION} \
+            symfony/event-dispatcher:~${SF_VERSION} \
+            symfony/routing:~${SF_VERSION} \
+            ${{ matrix.pkg-extra-constraints }} \
           && composer update ${{ env.COMPOSER_OPTIONS }} ${{ matrix.composer-prefer-lowest && '--prefer-lowest' || '' }} \
           && make build
 
