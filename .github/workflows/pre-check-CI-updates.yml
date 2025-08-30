@@ -16,6 +16,7 @@ on:
       - '.github/workflows/coverage-upload.yml'
       - '.github/workflows/reusable-CI-workflow.yml'
       - '.github/workflows/reusable-coverage-upload-workflow.yml'
+      - '.github/workflows/auto-merge-dependabot.yml'
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
