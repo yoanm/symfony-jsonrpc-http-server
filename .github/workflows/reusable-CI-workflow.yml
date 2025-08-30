@@ -232,18 +232,22 @@ jobs:
           # PHP upgrade - With highest dependencies versions => Highest supported symfony version against next php version
           - php-version: ${{ inputs.php-next-version }}
             symfony-version: ${{ inputs.symfony-max-version }}
+            # Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
+            pkg-extra-constraints: behat/gherkin:~4.12.0
           # PHP upgrade - With lowest dependencies versions => Lowest supported symfony version against next php version
           - php-version: ${{ inputs.php-next-version }}
             symfony-version: ${{ inputs.symfony-min-version }}
             # Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
             # Fix - matthiasnoback/symfony-config-test => Avoid issue with phpunit <-> symfony-config-test packages
             pkg-extra-constraints: behat/gherkin:~4.12.0 matthiasnoback/symfony-config-test:^4.3
-          # Symfony upgrade - With lowest php version => Next symfony version against lowest supported PHP version
-          - php-version: ${{ inputs.php-min-version > 8.1 && inputs.php-min-version || '8.1' }} # Fix - Sf 6.3 (current next) require php 8.1 minimum !
-            symfony-version: ${{ inputs.symfony-next-version }}
           # Symfony upgrade - With highest php version => Next symfony version against highest supported PHP version
           - php-version: ${{ inputs.php-max-version }}
             symfony-version: ${{ inputs.symfony-next-version }}
+            pkg-extra-constraints: behat/gherkin:~4.12.0
+          # Symfony upgrade - With lowest php version => Next symfony version against lowest supported PHP version
+          - php-version: ${{ inputs.php-min-version > 8.1 && inputs.php-min-version || '8.1' }} # Fix - Sf 6.3 (current next) require php 8.1 minimum !
+            symfony-version: ${{ inputs.symfony-next-version }}
+            pkg-extra-constraints: behat/gherkin:~4.12.0
 
     steps:
       - name: Check out code
