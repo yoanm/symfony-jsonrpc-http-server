@@ -27,12 +27,12 @@ on:
         required: false
         type: string
       symfony-max-version:
-        default: '6.0'
+        default: '6.4'
         description: Highest Symfony version to assess (e.g Highest supported version)
         required: false
         type: string
       symfony-next-version:
-        default: '6.3'
+        default: '7.0'
         description: Next (currently not supported) Symfony version to assess (e.g Current dev version)
         required: false
         type: string
