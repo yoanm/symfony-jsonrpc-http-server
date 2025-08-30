@@ -41,7 +41,7 @@
     "yoanm/jsonrpc-server-sdk": "^3.3"
   },
   "require-dev": {
-    "behat/behat": "^3.9.0",
+    "behat/behat": "^3.9.0,<=3.16.1",
     "dvdoug/behat-code-coverage": "^5.0",
     "matthiasnoback/symfony-config-test": "^4.0",
     "matthiasnoback/symfony-dependency-injection-test": "^4.0",

@@ -128,13 +128,15 @@ jobs:
   static-checks:
     name: Static analysis
     runs-on: ubuntu-latest
+    env:
+      SC_PHP_VERSION: 8.2 # Latest supported
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup PHP 8.2
+      - name: Setup PHP ${{ env.SC_PHP_VERSION }}
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2 # Latest supported
+          php-version: ${{ env.SC_PHP_VERSION }}
           tools: composer
           coverage: none
         env:
@@ -148,7 +150,7 @@ jobs:
           path: |
             ~/.composer
           # Clear the cache if composer json (as composer.lock is in the repo) has been updated
-          key: tests-${{ env.PHP_VERSION }}-${{ hashFiles('composer.json') }}
+          key: tests-${{ env.SC_PHP_VERSION }}-${{ hashFiles('composer.json') }}
 
       - name: Build
         run: make build
@@ -164,7 +166,7 @@ jobs:
     name: Nightly - PHP ${{ matrix.php-version }} & Symfony ${{ matrix.symfony-version }}
     runs-on: ubuntu-latest
     env:
-      COMPOSER_OPTIONS: '--optimize-autoloader --ignore-platform-req=php+'
+      COMPOSER_OPTIONS: '--optimize-autoloader --prefer-dist --ignore-platform-req=php+'
     continue-on-error: true
     needs: [ static-checks, tests ]
     strategy:
@@ -180,6 +182,9 @@ jobs:
         include:
           - symfony-version: '6.3' # Next symfony minor version to manage with latest supported PHP version
             php-version: '8.2'
+          - symfony-version: '4.4' # Fix to avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
+            php-version: '8.3'
+            pkg-extra-constraints: 'behat/gherkin:~4.12.0'
 
     steps:
       - name: Check out code
@@ -208,14 +213,15 @@ jobs:
       - name: Build
         run: |
           composer config minimum-stability dev \
-          && composer require -W ${{ env.COMPOSER_OPTIONS }} \
+          && composer require -W ${{ env.COMPOSER_OPTIONS }} --prefer-stable \
             symfony/http-foundation:^${{ matrix.symfony-version }} \
             symfony/http-kernel:^${{ matrix.symfony-version }} \
             symfony/config:^${{ matrix.symfony-version }} \
             symfony/dependency-injection:^${{ matrix.symfony-version }} \
             symfony/event-dispatcher:^${{ matrix.symfony-version }} \
             symfony/routing:^${{ matrix.symfony-version }} \
-          && composer update ${{ env.COMPOSER_OPTIONS }} \
+            ${{ matrix.pkg-extra-constraints }} \
+          && composer update  ${{ env.COMPOSER_OPTIONS }} --prefer-stable \
           && make build
 
       - name: Test
