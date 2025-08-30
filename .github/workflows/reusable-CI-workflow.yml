@@ -106,7 +106,6 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            ~/.composer
             ${{ steps.composer-cache.outputs.dir }}
           # Clear the cache if composer.json (as composer.lock is not available) has been updated
           key: tests-php${{ steps.setup-php.outputs.php-version }}-sf${{ matrix.symfony-version }}-${{ hashFiles('composer.json') }}
@@ -136,7 +135,7 @@ jobs:
           files: build/coverage-phpunit/unit.clover
           flags: |
             unit-tests
-            php-${{ steps.setup-php.outputs.php-version }}
+            php-${{ matrix.php-version }}
             sf-${{ matrix.symfony-version }}
           path: build/coverage-groups
 
@@ -151,7 +150,7 @@ jobs:
             build/coverage-behat/clover.xml
           flags: |
             functional-tests
-            php-${{ steps.setup-php.outputs.php-version }}
+            php-${{ matrix.php-version }}
             sf-${{ matrix.symfony-version }}
           path: build/coverage-groups
 
@@ -191,7 +190,6 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            ~/.composer
             ${{ steps.composer-cache.outputs.dir }}
           # Clear the cache if composer.json (as composer.lock is not available) has been updated
           key: tests-php${{ steps.setup-php.outputs.php-version }}-sf${{ env.SYMFONY_VERSION }}-${{ hashFiles('composer.json') }}
@@ -270,7 +268,6 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            ~/.composer
             ${{ steps.composer-cache.outputs.dir }}
           # Clear the cache if composer.json (as composer.lock is not available) has been updated
           key: tests-php${{ steps.setup-php.outputs.php-version }}-sf${{ matrix.symfony-version }}-${{ hashFiles('composer.json') }}
