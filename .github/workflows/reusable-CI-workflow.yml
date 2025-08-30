@@ -57,12 +57,16 @@ jobs:
           - job-name: Up to date versions # => Highest versions allowed by composer config
             php-version: '${{ inputs.php-max-version }}'
             symfony-version: '${{ inputs.symfony-max-version }}'
+            ## Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
+            pkg-extra-constraints: behat/gherkin:~4.12.0
           - job-name: Up to date versions - Special case - Symfony 5.4
             php-version: '${{ inputs.php-max-version }}'
             symfony-version: '5.4'
           - job-name: Late migration - Symfony # => Lowest symfony version with highest php version allowed by composer config
             php-version: '${{ inputs.php-max-version }}'
             symfony-version: '${{ inputs.symfony-min-version }}'
+            ## Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
+            pkg-extra-constraints: behat/gherkin:~4.12.0
           - job-name: Bare minimum # => Lowest versions allowed by composer config
             php-version: '${{ inputs.php-min-version }}'
             symfony-version: '${{ inputs.symfony-min-version }}'
