@@ -44,7 +44,7 @@ env:
 
 jobs:
   tests:
-    name: PHP ${{ matrix.php-version }} & Symfony ${{ matrix.symfony-version }}
+    name: ${{ matrix.job-name }}
     runs-on: ubuntu-latest
     env:
       COVERAGE_TYPE: none
@@ -54,28 +54,24 @@ jobs:
       max-parallel: 4
       matrix:
         include:
-          # Up to date versions => Highest versions allowed by composer config
-          - php-version: '${{ inputs.php-max-version }}'
+          - job-name: Up to date versions # => Highest versions allowed by composer config
+            php-version: '${{ inputs.php-max-version }}'
             symfony-version: '${{ inputs.symfony-max-version }}'
-            ## Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
-            pkg-extra-constraints: behat/gherkin:~4.12.0
-          # Bare minimum => Lowest versions allowed by composer config
-          - php-version: '${{ inputs.php-min-version }}'
+          - job-name: Up to date versions - Special case - Symfony 5.4
+            php-version: '${{ inputs.php-max-version }}'
+            symfony-version: '5.4'
+          - job-name: Late migration - Symfony # => Lowest symfony version with highest php version allowed by composer config
+            php-version: '${{ inputs.php-max-version }}'
             symfony-version: '${{ inputs.symfony-min-version }}'
-          # Late symfony migration => Lowest symfony version with highest php version allowed by composer config
-          - php-version: '${{ inputs.php-max-version }}'
+          - job-name: Bare minimum # => Lowest versions allowed by composer config
+            php-version: '${{ inputs.php-min-version }}'
             symfony-version: '${{ inputs.symfony-min-version }}'
-            ## Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
-            pkg-extra-constraints: behat/gherkin:~4.12.0
-          # Late php migration => Highest symfony version with lowest php version allowed by composer config
-          - php-version: '${{ inputs.php-min-version }}'
+          - job-name: Bare minimum - Special case - Symfony 5.4
+            php-version: '${{ inputs.php-min-version }}'
+            symfony-version: '5.4'
+          - job-name: Late migration - Php # => Highest symfony version with lowest php version allowed by composer config
+            php-version: '${{ inputs.php-min-version }}'
             symfony-version: '${{ inputs.symfony-max-version }}'
-          # Special case - Sf 5.4 with highest php version
-          - php-version: '${{ inputs.php-max-version }}'
-            symfony-version: '5.4'
-          # Special case - Sf 5.4 with lowest php version
-          - php-version: '${{ inputs.php-min-version }}'
-            symfony-version: '5.4'
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -214,7 +210,7 @@ jobs:
         uses: actions/dependency-review-action@v4
 
   nightly-tests:
-    name: Nightly - PHP ${{ matrix.php-version }} & Symfony ${{ matrix.symfony-version }}
+    name: ${{ matrix.job-name }}
     runs-on: ubuntu-latest
     env:
       COMPOSER_IGNORE_PLATFORM_REQ: 'php+'
@@ -225,25 +221,18 @@ jobs:
       max-parallel: 4
       matrix:
         include:
-          # PHP upgrade - With highest dependencies versions => Highest supported symfony version against next php version
-          - php-version: ${{ inputs.php-next-version }}
+          - job-name: PHP Nightly - With highest supported symfony versions
+            php-version: ${{ inputs.php-next-version }}
             symfony-version: ${{ inputs.symfony-max-version }}
-            # Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
-            pkg-extra-constraints: behat/gherkin:~4.12.0
-          # PHP upgrade - With lowest dependencies versions => Lowest supported symfony version against next php version
-          - php-version: ${{ inputs.php-next-version }}
+          - job-name: PHP Nightly - With lowest supported symfony versions
+            php-version: ${{ inputs.php-next-version }}
             symfony-version: ${{ inputs.symfony-min-version }}
-            # Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
-            # Fix - matthiasnoback/symfony-config-test => Avoid issue with phpunit <-> symfony-config-test packages
-            pkg-extra-constraints: behat/gherkin:~4.12.0 matthiasnoback/symfony-config-test:^4.3
-          # Symfony upgrade - With highest php version => Next symfony version against highest supported PHP version
-          - php-version: ${{ inputs.php-max-version }}
+          - job-name: Symfony Nightly - With highest supported php version
+            php-version: ${{ inputs.php-max-version }}
             symfony-version: ${{ inputs.symfony-next-version }}
-            pkg-extra-constraints: behat/gherkin:~4.12.0
-          # Symfony upgrade - With lowest php version => Next symfony version against lowest supported PHP version
-          - php-version: ${{ inputs.php-min-version > 8.1 && inputs.php-min-version || '8.1' }} # Fix - Sf 6.3 (current next) require php 8.1 minimum !
+          - job-name: Symfony Nightly - With lowest supported php version
+            php-version: ${{ inputs.php-min-version > 8.1 && inputs.php-min-version || '8.1' }} # Fix - Sf 6.3 (current next) require php 8.1 minimum !
             symfony-version: ${{ inputs.symfony-next-version }}
-            pkg-extra-constraints: behat/gherkin:~4.12.0
 
     steps:
       - name: Check out code
