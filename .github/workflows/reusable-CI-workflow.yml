@@ -12,12 +12,12 @@ on:
         required: false
         type: string
       php-max-version:
-        default: '8.2'
+        default: '8.4'
         description: Highest PHP version to assess (e.g Highest supported version)
         required: false
         type: string
       php-next-version:
-        default: '8.3'
+        default: '8.5'
         description: Next (currently not supported) PHP version to assess (e.g Current dev version)
         required: false
         type: string
