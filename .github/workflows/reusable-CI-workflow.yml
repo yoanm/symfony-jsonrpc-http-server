@@ -120,7 +120,7 @@ jobs:
           # Clear the cache if composer json (as composer.lock is in the repo) has been updated
           key: tests-php${{ steps.setup-php.outputs.php-version }}-sf${{ matrix.symfony-version }}-${{ hashFiles('composer.json') }}
 
-      - name: Build with PHP ${{ matrix.php-version }}${{ matrix.php-prefer-latest && ' (latest)' || '' }} & Symfony ${{ matrix.symfony-version }}${{ matrix.composer-prefer-lowest && ' (lowest)' || '' }}
+      - name: Build with PHP ${{ steps.setup-php.outputs.php-version }} & Symfony ${{ matrix.symfony-version }}${{ matrix.composer-prefer-lowest && ' (lowest)' || '' }}
         run: |
           SF_VERSION=${{ matrix.symfony-version }}
           # Issue with ParamterBag below 4.4.30 => https://github.com/symfony/symfony/commit/3eca446b21607ea1c7a865ece2dd8254c33679cc
@@ -287,7 +287,7 @@ jobs:
           # Clear the cache if composer json (as composer.lock is in the repo) has been updated
           key: tests-php${{ steps.setup-php.outputs.php-version }}-sf${{ matrix.symfony-version }}-${{ hashFiles('composer.json') }}
 
-      - name: Build with PHP ${{ matrix.php-version }} (${{ matrix.php-prefer-latest && ' latest->' || '' }}${{ steps.setup-php.outputs.php-version }}) & Symfony ${{ matrix.symfony-version }}${{ matrix.composer-prefer-lowest && ' (lowest)' || '' }}
+      - name: Build with PHP ${{ steps.setup-php.outputs.php-version }} & Symfony ${{ matrix.symfony-version }}${{ matrix.composer-prefer-lowest && ' (lowest)' || '' }}
         run: |
           composer config minimum-stability dev \
           && composer require -W ${{ env.COMPOSER_OPTIONS }} ${{ matrix.composer-prefer-lowest && '--prefer-lowest' || '' }} \
