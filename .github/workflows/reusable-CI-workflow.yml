@@ -79,7 +79,7 @@ jobs:
             pkg-extra-constraints: behat/gherkin:~4.12.0
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # Enable coverage only for specific version(s) !
       # Usually highest version(s), plus additional ones in case of code used only with specific versions
@@ -170,7 +170,7 @@ jobs:
       PHP_VERSION: ${{ inputs.php-max-version }}
       SYMFONY_VERSION: ${{ inputs.symfony-max-version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Setup PHP ${{ env.PHP_VERSION }}
         id: setup-php
@@ -248,7 +248,7 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup PHP ${{ matrix.php-version }}
         id: setup-php
