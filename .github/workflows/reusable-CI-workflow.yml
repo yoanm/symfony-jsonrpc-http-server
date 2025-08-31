@@ -217,6 +217,7 @@ jobs:
   nightly-tests:
     name: Nightly - ${{ matrix.job-name }}
     needs: [ fetch-supported-versions, tests ]
+    if: ${{ github.event_name == 'push' || ( github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'with-nightly-tests') ) }}
     runs-on: ubuntu-latest
     continue-on-error: true
     permissions:
