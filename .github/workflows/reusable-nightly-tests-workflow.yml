@@ -36,7 +36,6 @@ jobs:
       - name: 'Check run ○'
         uses: yoanm/temp-reports-group-workspace/utils/attach-check-run-to-triggering-workflow@v0
         with:
-          name: 'Fetch supported versions'
           fails-on-triggering-workflow-failure: true
 
       - name: Fetch PHP supported versions
@@ -97,7 +96,6 @@ jobs:
       - name: 'Check run ○'
         uses: yoanm/temp-reports-group-workspace/utils/attach-check-run-to-triggering-workflow@v0
         with:
-          name: ${{ matrix.job-name }}
           fails-on-triggering-workflow-failure: true
 
       - name: Check out code
