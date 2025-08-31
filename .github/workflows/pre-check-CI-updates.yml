@@ -19,11 +19,6 @@ on:
       - '.github/workflows/reusable-nightly-tests-workflow.yml'
       - '.github/workflows/auto-merge-dependabot.yml'
 
-
-permissions:
-  contents: read
-  checks: write # For the check run creation !
-
 concurrency:
   group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
   cancel-in-progress: true

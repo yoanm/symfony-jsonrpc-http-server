@@ -8,9 +8,6 @@ permissions:
 jobs:
   dependabot:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
     if: github.event.pull_request.user.login == 'dependabot[bot]' && github.repository == 'yoanm/symfony-jsonrpc-http-server'
     steps:
       - name: Dependabot metadata

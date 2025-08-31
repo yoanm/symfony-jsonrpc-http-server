@@ -4,13 +4,9 @@ on:
     workflows: ["CI"]
     types: [completed]
 
-permissions:
-  contents: read
-  checks: write # For the check run creation !
-
 jobs:
-  tests:
-    name: Tests
+  nightly:
+    name: Nightly
     permissions:
       contents: read
       checks: write # For the check run creation !
