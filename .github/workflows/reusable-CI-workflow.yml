@@ -3,13 +3,12 @@ name: 'CI reusable workflow'
 on:
   workflow_call:
 
+permissions:
+  contents: read
+
 env:
   COMPOSER_PREFER_STABLE: '1'
   TEST_OUTPUT_STYLE: pretty
-
-
-permissions:
-  contents: read
 
 jobs:
   fetch-supported-versions:
@@ -214,3 +213,84 @@ jobs:
       - name: Dependencies check
         if: ${{ github.event_name == 'pull_request' }}
         uses: actions/dependency-review-action@v4
+
+  nightly-tests:
+    name: Nightly - ${{ matrix.job-name }}
+    needs: [ fetch-supported-versions, tests ]
+    if: ${{ github.event_name == 'push' || ( github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'with-nightly-tests') ) }}
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      contents: read
+    env:
+      COMPOSER_IGNORE_PLATFORM_REQ: 'php+'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - job-name: PHP - With highest supported Symfony versions
+            php-version: ${{ needs.fetch-supported-versions.outputs.php-next }}
+            symfony-version: ${{ needs.fetch-supported-versions.outputs.symfony-max }}
+            # Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
+            pkg-extra-constraints: behat/gherkin:~4.12.0
+          - job-name: PHP - With lowest supported Symfony versions
+            php-version: ${{ needs.fetch-supported-versions.outputs.php-next }}
+            symfony-version: ${{ needs.fetch-supported-versions.outputs.symfony-min }}
+            # Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
+            pkg-extra-constraints: behat/gherkin:~4.12.0
+          - job-name: Symfony - With highest supported PHP version
+            php-version: ${{ needs.fetch-supported-versions.outputs.php-max }}
+            symfony-version: ${{ needs.fetch-supported-versions.outputs.symfony-next }}
+            # Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
+            # Fix - symfony/framework-bundle - Framework bundle <7.0 require php 8.1 minimum !
+            pkg-extra-constraints: behat/gherkin:~4.12.0  ${{ ( needs.fetch-supported-versions.outputs.symfony-next == '7.0' && needs.fetch-supported-versions.outputs.php-max == '8.4' ) && 'symfony/framework-bundle:~7.0.0@dev' || '' }}
+          - job-name: Symfony - With lowest supported PHP version
+            # Fix - Sf 7.0 require php 8.1 minimum, most of deps require 8.2 !
+            php-version: ${{ ( needs.fetch-supported-versions.outputs.symfony-next == '7.0' && needs.fetch-supported-versions.outputs.php-min == '8.0' ) && '8.2' || needs.fetch-supported-versions.outputs.php-min }}
+            symfony-version: ${{ needs.fetch-supported-versions.outputs.symfony-next }}
+            # Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
+            # Fix - symfony/framework-bundle - Framework bundle <7.0 require php 8.1 minimum !
+            pkg-extra-constraints: behat/gherkin:~4.12.0 ${{ ( needs.fetch-supported-versions.outputs.symfony-next == '7.0' && needs.fetch-supported-versions.outputs.php-min == '8.0' ) && 'symfony/framework-bundle:~7.0.0@dev' || '' }}
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v5
+
+      - name: Setup PHP ${{ matrix.php-version }}
+        id: setup-php
+        uses: shivammathur/setup-php@v2
+        env:
+          update: true # whether to use latest available patch for the version or not
+          fail-fast: true # step will fail if an extension or tool fails to set up
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: composer
+          coverage: none
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Setup cache for PHP ${{ steps.setup-php.outputs.php-version }} & Symfony ${{ matrix.symfony-version }}
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ steps.composer-cache.outputs.dir }}
+          # Clear the cache if composer.json (as composer.lock is not available) has been updated
+          key: tests-php${{ steps.setup-php.outputs.php-version }}-sf${{ matrix.symfony-version }}-${{ hashFiles('composer.json') }}
+
+      - name: Build with PHP ${{ steps.setup-php.outputs.php-version }} & Symfony ${{ matrix.symfony-version }}
+        run: |
+          SF_CONSTRAINT="~${{ matrix.symfony-version }}.0@dev"
+          composer config minimum-stability dev \
+          && composer require -W \
+            symfony/config:${SF_CONSTRAINT} \
+            symfony/dependency-injection:${SF_CONSTRAINT} \
+            symfony/event-dispatcher:${SF_CONSTRAINT} \
+            symfony/http-foundation:${SF_CONSTRAINT} \
+            symfony/http-kernel:${SF_CONSTRAINT} \
+            ${{ matrix.pkg-extra-constraints }} \
+          && make build
+
+      - name: Test
+        run: make test-unit && make test-functional
