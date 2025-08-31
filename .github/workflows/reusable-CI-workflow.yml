@@ -2,49 +2,39 @@ name: 'CI reusable workflow'
 
 on:
   workflow_call:
-    inputs:
-      # >>>> Dummy env-inputs
-      # Goal here is just to have access to variable values
-      # in order to build job matrix as `env` variable is not available there
-      php-min-version:
-        default: '8.0'
-        description: Lowest PHP version to assess (e.g Lowest supported version including security support)
-        required: false
-        type: string
-      php-max-version:
-        default: '8.4'
-        description: Highest PHP version to assess (e.g Highest supported version)
-        required: false
-        type: string
-      php-next-version:
-        default: '8.5'
-        description: Next (currently not supported) PHP version to assess (e.g Current dev version)
-        required: false
-        type: string
-      symfony-min-version:
-        default: '4.4'
-        description: Lowest Symfony version to assess (e.g Lowest supported version - usually LTS including security support)
-        required: false
-        type: string
-      symfony-max-version:
-        default: '6.4'
-        description: Highest Symfony version to assess (e.g Highest supported version)
-        required: false
-        type: string
-      symfony-next-version:
-        default: '7.0'
-        description: Next (currently not supported) Symfony version to assess (e.g Current dev version)
-        required: false
-        type: string
-      # <<<< Dummy env-inputs
 
 env:
   COMPOSER_PREFER_STABLE: '1'
   TEST_OUTPUT_STYLE: pretty
 
 jobs:
+  fetch-supported-versions:
+    name: Fetch supported versions
+    runs-on: ubuntu-latest
+    outputs:
+      php-min: ${{ steps.fetch-php-versions.outputs.min }}
+      php-max: ${{ steps.fetch-php-versions.outputs.max }}
+      php-next: ${{ steps.fetch-php-versions.outputs.next }}
+      symfony-min: ${{ steps.fetch-symfony-versions.outputs.min }}
+      symfony-max: ${{ steps.fetch-symfony-versions.outputs.max }}
+      symfony-next: ${{ steps.fetch-symfony-versions.outputs.next }}
+    steps:
+      - name: Fetch PHP supported versions
+        id: fetch-php-versions
+        uses: yoanm/gha-supported-versions-parser@feature/init
+        with:
+          dependency: php
+          path: .github/workflows/supported-versions.json
+      - name: Fetch Symfony supported versions
+        id: fetch-symfony-versions
+        uses: yoanm/gha-supported-versions-parser@feature/init
+        with:
+          dependency: symfony
+          path: .github/workflows/supported-versions.json
+
   tests:
     name: ${{ matrix.job-name }}
+    needs: [fetch-supported-versions]
     runs-on: ubuntu-latest
     env:
       COVERAGE_TYPE: none
@@ -54,28 +44,28 @@ jobs:
       matrix:
         include:
           - job-name: Up to date versions # => Highest versions allowed by composer config
-            php-version: '${{ inputs.php-max-version }}'
-            symfony-version: '${{ inputs.symfony-max-version }}'
+            php-version: '${{ needs.fetch-supported-versions.outputs.php-max }}'
+            symfony-version: '${{ needs.fetch-supported-versions.outputs.symfony-max }}'
             ## Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
             pkg-extra-constraints: behat/gherkin:~4.12.0
           - job-name: Up to date versions - Special case - Symfony 5.4
-            php-version: '${{ inputs.php-max-version }}'
+            php-version: '${{ needs.fetch-supported-versions.outputs.php-max }}'
             symfony-version: '5.4'
             ## Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
             # Fix - symfony/yaml - Avoid issue with Sf YAML 6.4+ and Framework bundle
             pkg-extra-constraints: behat/gherkin:~4.12.0 symfony/yaml:~6.4.0
           - job-name: Bare minimum # => Lowest versions allowed by composer config
-            php-version: '${{ inputs.php-min-version }}'
-            symfony-version: '${{ inputs.symfony-min-version }}'
+            php-version: '${{ needs.fetch-supported-versions.outputs.php-min }}'
+            symfony-version: '${{ needs.fetch-supported-versions.outputs.symfony-min }}'
           - job-name: Bare minimum - Special case - Symfony 5.4
-            php-version: '${{ inputs.php-min-version }}'
+            php-version: '${{ needs.fetch-supported-versions.outputs.php-min }}'
             symfony-version: '5.4'
           - job-name: Late migration - PHP # => Highest symfony version with lowest php version allowed by composer config
-            php-version: ${{ ( inputs.symfony-max-version == '6.4' && inputs.php-min-version == '8.0' ) && '8.1' || inputs.php-min-version }} # Fix - Sf 6.4 require php 8.1 minimum !
-            symfony-version: '${{ inputs.symfony-max-version }}'
+            php-version: ${{ ( needs.fetch-supported-versions.outputs.symfony-max == '6.4' && needs.fetch-supported-versions.outputs.php-min == '8.0' ) && '8.1' || needs.fetch-supported-versions.outputs.php-min }} # Fix - Sf 6.4 require php 8.1 minimum !
+            symfony-version: '${{ needs.fetch-supported-versions.outputs.symfony-max }}'
           - job-name: Late migration - Symfony # => Lowest symfony version with highest php version allowed by composer config
-            php-version: '${{ inputs.php-max-version }}'
-            symfony-version: '${{ inputs.symfony-min-version }}'
+            php-version: '${{ needs.fetch-supported-versions.outputs.php-max }}'
+            symfony-version: '${{ needs.fetch-supported-versions.outputs.symfony-min }}'
             # Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
             pkg-extra-constraints: behat/gherkin:~4.12.0
     steps:
@@ -85,7 +75,7 @@ jobs:
       # Enable coverage only for specific version(s) !
       # Usually highest version(s), plus additional ones in case of code used only with specific versions
       - name: Enable coverage
-        if: ${{ matrix.php-version == inputs.php-max-version }}
+        if: ${{ matrix.php-version == needs.fetch-supported-versions.outputs.php-max }}
         run: |
           echo "COVERAGE_TYPE=xdebug" >> $GITHUB_ENV
 
@@ -165,10 +155,11 @@ jobs:
 
   static-checks:
     name: Static analysis
+    needs: [fetch-supported-versions]
     runs-on: ubuntu-latest
     env:
-      PHP_VERSION: ${{ inputs.php-max-version }}
-      SYMFONY_VERSION: ${{ inputs.symfony-max-version }}
+      PHP_VERSION: ${{ needs.fetch-supported-versions.outputs.php-max }}
+      SYMFONY_VERSION: ${{ needs.fetch-supported-versions.outputs.symfony-max }}
     steps:
       - uses: actions/checkout@v5
 
@@ -215,38 +206,38 @@ jobs:
 
   nightly-tests:
     name: Nightly - ${{ matrix.job-name }}
+    needs: [ fetch-supported-versions, tests ]
     runs-on: ubuntu-latest
+    continue-on-error: true
     env:
       COMPOSER_IGNORE_PLATFORM_REQ: 'php+'
-    continue-on-error: true
-    needs: [ tests ]
     strategy:
       fail-fast: false
       matrix:
         include:
           - job-name: PHP - With highest supported Symfony versions
-            php-version: ${{ inputs.php-next-version }}
-            symfony-version: ${{ inputs.symfony-max-version }}
+            php-version: ${{ needs.fetch-supported-versions.outputs.php-next }}
+            symfony-version: ${{ needs.fetch-supported-versions.outputs.symfony-max }}
             # Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
             pkg-extra-constraints: behat/gherkin:~4.12.0
           - job-name: PHP - With lowest supported Symfony versions
-            php-version: ${{ inputs.php-next-version }}
-            symfony-version: ${{ inputs.symfony-min-version }}
+            php-version: ${{ needs.fetch-supported-versions.outputs.php-next }}
+            symfony-version: ${{ needs.fetch-supported-versions.outputs.symfony-min }}
             # Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
             pkg-extra-constraints: behat/gherkin:~4.12.0
           - job-name: Symfony - With highest supported PHP version
-            php-version: ${{ inputs.php-max-version }}
-            symfony-version: ${{ inputs.symfony-next-version }}
+            php-version: ${{ needs.fetch-supported-versions.outputs.php-max }}
+            symfony-version: ${{ needs.fetch-supported-versions.outputs.symfony-next }}
             # Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
             # Fix - symfony/framework-bundle - Framework bundle <7.0 require php 8.1 minimum !
-            pkg-extra-constraints: behat/gherkin:~4.12.0  ${{ ( inputs.symfony-next-version == '7.0' && inputs.php-max-version == '8.4' ) && 'symfony/framework-bundle:~7.0.0@dev' || '' }}
+            pkg-extra-constraints: behat/gherkin:~4.12.0  ${{ ( needs.fetch-supported-versions.outputs.symfony-next == '7.0' && needs.fetch-supported-versions.outputs.php-max == '8.4' ) && 'symfony/framework-bundle:~7.0.0@dev' || '' }}
           - job-name: Symfony - With lowest supported PHP version
             # Fix - Sf 7.0 require php 8.1 minimum, most of deps require 8.2 !
-            php-version: ${{ ( inputs.symfony-next-version == '7.0' && inputs.php-min-version == '8.0' ) && '8.2' || inputs.php-min-version }}
-            symfony-version: ${{ inputs.symfony-next-version }}
+            php-version: ${{ ( needs.fetch-supported-versions.outputs.symfony-next == '7.0' && needs.fetch-supported-versions.outputs.php-min == '8.0' ) && '8.2' || needs.fetch-supported-versions.outputs.php-min }}
+            symfony-version: ${{ needs.fetch-supported-versions.outputs.symfony-next }}
             # Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
             # Fix - symfony/framework-bundle - Framework bundle <7.0 require php 8.1 minimum !
-            pkg-extra-constraints: behat/gherkin:~4.12.0 ${{ ( inputs.symfony-next-version == '7.0' && inputs.php-min-version == '8.0' ) && 'symfony/framework-bundle:~7.0.0@dev' || '' }}
+            pkg-extra-constraints: behat/gherkin:~4.12.0 ${{ ( needs.fetch-supported-versions.outputs.symfony-next == '7.0' && needs.fetch-supported-versions.outputs.php-min == '8.0' ) && 'symfony/framework-bundle:~7.0.0@dev' || '' }}
 
     steps:
       - name: Check out code
