@@ -16,6 +16,7 @@ on:
       - '.github/workflows/coverage-upload.yml'
       - '.github/workflows/reusable-CI-workflow.yml'
       - '.github/workflows/reusable-coverage-upload-workflow.yml'
+      - '.github/workflows/reusable-nightly-tests-workflow.yml'
       - '.github/workflows/auto-merge-dependabot.yml'
 
 concurrency:
@@ -28,6 +29,14 @@ jobs:
     permissions:
       contents: read
     uses: ./.github/workflows/reusable-CI-workflow.yml
+
+  nightly:
+    name: Nightly
+    needs: [tests]
+    permissions:
+      contents: read
+      checks: write # For the check run creation !
+    uses: ./.github/workflows/reusable-nightly-tests-workflow.yml
 
   upload:
     name: Upload
