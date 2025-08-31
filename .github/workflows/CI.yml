@@ -20,6 +20,9 @@ on: # Build any PRs and main branch changes
   schedule:
     - cron: '0 0 1 * *' # Every month
 
+permissions:
+  contents: read
+
 concurrency:
   group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
   cancel-in-progress: true

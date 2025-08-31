@@ -8,6 +8,10 @@ on:
       CODECOV_TOKEN:
         required: true
 
+permissions:
+  contents: read
+  checks: write # For the check run creation !
+
 jobs:
   fetch-info:
     name: Fetch triggering workflow metadata
