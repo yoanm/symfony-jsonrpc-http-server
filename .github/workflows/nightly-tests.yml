@@ -1,0 +1,13 @@
+name: 'Nightly'
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+jobs:
+  nightly:
+    name: Nightly
+    permissions:
+      contents: read
+      checks: write # For the check run creation !
+    uses: ./.github/workflows/reusable-nightly-tests-workflow.yml
