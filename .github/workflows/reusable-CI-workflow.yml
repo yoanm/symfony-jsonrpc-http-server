@@ -26,20 +26,20 @@ jobs:
     steps:
       - name: Fetch supported versions file
         id: fetch-file
-        uses: yoanm/gha-supported-versions-parser/github-downloader@feature/init
+        uses: yoanm/gha-supported-versions-parser/github-downloader@v1
         with:
           file-path: .github/workflows/supported-versions.json
 
       - name: Fetch PHP supported versions
         id: fetch-php-versions
-        uses: yoanm/gha-supported-versions-parser@feature/init
+        uses: yoanm/gha-supported-versions-parser@v1
         with:
           path: ${{ steps.fetch-file.outputs.path }}
           dependency: php
 
       - name: Fetch Symfony supported versions
         id: fetch-symfony-versions
-        uses: yoanm/gha-supported-versions-parser@feature/init
+        uses: yoanm/gha-supported-versions-parser@v1
         with:
           path: ${{ steps.fetch-file.outputs.path }}
           dependency: symfony
