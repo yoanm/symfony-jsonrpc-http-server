@@ -9,8 +9,8 @@ permissions:
   checks: write # For the check run creation !
 
 jobs:
-  upload:
-    name: Upload
+  coverage:
+    name: Coverage
     permissions:
       contents: read
       checks: write # For the check run creation !

@@ -23,7 +23,7 @@ jobs:
       - name: 'Check run ○'
         uses: yoanm/temp-reports-group-workspace/utils/attach-check-run-to-triggering-workflow@v0
         with:
-          name: 'Fetch coverage info'
+          name: 'Fetch triggering workflow metadata'
           fails-on-triggering-workflow-failure: true
 
       - uses: yoanm/temp-reports-group-workspace/utils/fetch-workflow-metadata@v0
@@ -32,6 +32,8 @@ jobs:
     outputs:
       commit-sha: ${{ steps.fetch-workflow-metadata.outputs.commit-sha }}
       run-id: ${{ steps.fetch-workflow-metadata.outputs.run-id }}
+      branch: ${{ steps.fetch-workflow-metadata.outputs.branch }}
+      pull-request: ${{ steps.fetch-workflow-metadata.outputs.pull-request }}
 
   codacy-uploader:
     name: Codacy
@@ -64,6 +66,6 @@ jobs:
       run-id: ${{ needs.fetch-info.outputs.run-id }}
       force-git-commit: ${{ needs.fetch-info.outputs.commit-sha }}
       force-git-branch: ${{ needs.fetch-info.outputs.branch }}
-      force-gh-pr: ${{ needs.fetch-info.outputs.pr-number }}
+      force-gh-pr: ${{ needs.fetch-info.outputs.pull-request }}
       force-uploader-build: ${{ needs.fetch-info.outputs.run-id }}
       force-uploader-build-url: ${{ needs.fetch-info.outputs.run-url }}

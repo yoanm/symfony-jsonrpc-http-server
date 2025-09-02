@@ -109,5 +109,13 @@ scrutinizer-behat:
 create-build-directories:
 	mkdir -p ${PHPUNIT_COVERAGE_DIRECTORY} ${BEHAT_COVERAGE_DIRECTORY} ${REPORTS_DIRECTORY}
 
+.PHONY: configure-dev-env
+configure-dev-env:
+	npm install --global remark-cli remark-preset-lint-consistent remark-preset-lint-recommended remark-lint-list-item-indent
+
+.PHONY: lint-markdown
+lint-markdown:
+	npx remark . --output
+
 .PHONY: build install configure test test-unit test-functional codestyle create-build-directories scrutinizer-behat scrutinizer-phpunit
 .DEFAULT: build
