@@ -41,7 +41,6 @@ build:
     variables:
       CI: 'true'
       TEST_OUTPUT_STYLE: 'pretty'
-      COMPOSER_OPTIONS: '--optimize-autoloader'
       COVERAGE_OUTPUT_STYLE: 'clover'
       COVERAGE_CLOVER_FILE_PATH: 'build/coverage/clover.xml'
       PHPCS_DISABLE_WARNING: 'true'
