@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   upload:
-    name: Upload
+    name: Coverage
     permissions:
       contents: read
       checks: write # For the check run creation !

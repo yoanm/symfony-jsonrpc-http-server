@@ -60,14 +60,13 @@ jobs:
           - job-name: Up to date versions # => Highest versions allowed by composer config
             php-version: '${{ needs.fetch-supported-versions.outputs.php-max }}'
             symfony-version: '${{ needs.fetch-supported-versions.outputs.symfony-max }}'
-            ## Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
+            # Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
             pkg-extra-constraints: behat/gherkin:~4.12.0
           - job-name: Up to date versions - Special case - Symfony 5.4
             php-version: '${{ needs.fetch-supported-versions.outputs.php-max }}'
             symfony-version: '5.4'
-            ## Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
-            # Fix - symfony/yaml - Avoid issue with Sf YAML 6.4+ and Framework bundle
-            pkg-extra-constraints: behat/gherkin:~4.12.0 symfony/yaml:~6.4.0
+            # Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
+            pkg-extra-constraints: behat/gherkin:~4.12.0
           - job-name: Bare minimum # => Lowest versions allowed by composer config
             php-version: '${{ needs.fetch-supported-versions.outputs.php-min }}'
             symfony-version: '${{ needs.fetch-supported-versions.outputs.symfony-min }}'
@@ -75,7 +74,8 @@ jobs:
             php-version: '${{ needs.fetch-supported-versions.outputs.php-min }}'
             symfony-version: '5.4'
           - job-name: Late migration - PHP # => Highest symfony version with lowest php version allowed by composer config
-            php-version: ${{ ( needs.fetch-supported-versions.outputs.symfony-max == '6.4' && needs.fetch-supported-versions.outputs.php-min == '8.0' ) && '8.1' || needs.fetch-supported-versions.outputs.php-min }} # Fix - Sf 6.4 require php 8.1 minimum !
+            # Fix - Sf 6.4 require php 8.1 minimum !
+            php-version: ${{ ( needs.fetch-supported-versions.outputs.symfony-max == '6.4' && needs.fetch-supported-versions.outputs.php-min == '8.0' ) && '8.1' || needs.fetch-supported-versions.outputs.php-min }}
             symfony-version: '${{ needs.fetch-supported-versions.outputs.symfony-max }}'
           - job-name: Late migration - Symfony # => Lowest symfony version with highest php version allowed by composer config
             php-version: '${{ needs.fetch-supported-versions.outputs.php-max }}'

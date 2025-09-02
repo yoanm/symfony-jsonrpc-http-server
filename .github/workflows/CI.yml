@@ -10,11 +10,8 @@ on: # Build any PRs and main branch changes
       # In case of updates to those workflows, they must be pre-checked by `pre-check-CI-updates.yml` rather than this workflow !
       # Any updates on those workflows are expected to be restricted to those workflows only ! (no update on code for instance)
       - '.github/workflows/pre-check-CI-updates.yml'
-      - '.github/workflows/CI.yml'
-      - '.github/workflows/coverage-upload.yml'
       - '.github/workflows/reusable-CI-workflow.yml'
       - '.github/workflows/reusable-coverage-upload-workflow.yml'
-      - '.github/workflows/auto-merge-dependabot.yml'
   push:
     branches: [ master ]
   schedule:
@@ -29,7 +26,6 @@ concurrency:
 
 env:
   TEST_OUTPUT_STYLE: pretty
-  COMPOSER_OPTIONS: --optimize-autoloader
 
 jobs:
   tests:
