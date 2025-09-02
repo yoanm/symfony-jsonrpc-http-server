@@ -30,8 +30,8 @@ jobs:
       contents: read
     uses: ./.github/workflows/reusable-CI-workflow.yml
 
-  upload:
-    name: Upload
+  coverage:
+    name: Coverage
     needs: [tests]
     permissions:
       contents: read

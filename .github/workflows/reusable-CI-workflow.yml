@@ -225,9 +225,9 @@ jobs:
     needs: [ fetch-supported-versions, tests ]
     if: ${{ github.event_name == 'push' || ( github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'with-nightly-tests') ) }}
     runs-on: ubuntu-latest
-    continue-on-error: true
     permissions:
       contents: read
+    continue-on-error: true
     env:
       COMPOSER_IGNORE_PLATFORM_REQ: 'php+'
     strategy:
