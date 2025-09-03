@@ -8,7 +8,7 @@ class Configuration implements ConfigurationInterface
 {
     const DEFAULT_ENDPOINT = '/json-rpc';
 
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder(JsonRpcHttpServerExtension::EXTENSION_IDENTIFIER);
 
