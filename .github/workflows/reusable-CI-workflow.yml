@@ -9,6 +9,7 @@ permissions:
 env:
   COMPOSER_PREFER_STABLE: '1'
   TEST_OUTPUT_STYLE: pretty
+  SUPPORTED_VERSIONS_FILE_PATH: .github/workflows/supported-versions.json
 
 jobs:
   fetch-supported-versions:
@@ -28,7 +29,7 @@ jobs:
         id: fetch-file
         uses: yoanm/gha-supported-versions-parser/github-downloader@v1
         with:
-          file-path: .github/workflows/supported-versions.json
+          file-path: ${{ env.SUPPORTED_VERSIONS_FILE_PATH }}
 
       - name: Fetch PHP supported versions
         id: fetch-php-versions
@@ -115,7 +116,7 @@ jobs:
           path: |
             ${{ steps.composer-cache.outputs.dir }}
           # Clear the cache if composer.json (as composer.lock is not available) has been updated
-          key: tests-php${{ steps.setup-php.outputs.php-version }}-sf${{ matrix.symfony-version }}-${{ hashFiles('composer.json') }}
+          key: tests-php${{ steps.setup-php.outputs.php-version }}-sf${{ matrix.symfony-version }}-${{ hashFiles('composer.json', env.SUPPORTED_VERSIONS_FILE_PATH) }}
 
       - name: Build with PHP ${{ steps.setup-php.outputs.php-version }} & Symfony ${{ matrix.symfony-version }}
         run: |
@@ -204,7 +205,7 @@ jobs:
           path: |
             ${{ steps.composer-cache.outputs.dir }}
           # Clear the cache if composer.json (as composer.lock is not available) has been updated
-          key: tests-php${{ steps.setup-php.outputs.php-version }}-sf${{ env.SYMFONY_VERSION }}-${{ hashFiles('composer.json') }}
+          key: tests-php${{ steps.setup-php.outputs.php-version }}-sf${{ env.SYMFONY_VERSION }}-${{ hashFiles('composer.json', env.SUPPORTED_VERSIONS_FILE_PATH) }}
 
       - name: Build with PHP ${{ steps.setup-php.outputs.php-version }} & Symfony ${{ env.SYMFONY_VERSION }}
         run: |
@@ -290,7 +291,7 @@ jobs:
           path: |
             ${{ steps.composer-cache.outputs.dir }}
           # Clear the cache if composer.json (as composer.lock is not available) has been updated
-          key: tests-php${{ steps.setup-php.outputs.php-version }}-sf${{ matrix.symfony-version }}-${{ hashFiles('composer.json') }}
+          key: tests-php${{ steps.setup-php.outputs.php-version }}-sf${{ matrix.symfony-version }}-${{ hashFiles('composer.json', env.SUPPORTED_VERSIONS_FILE_PATH) }}
 
       - name: Build with PHP ${{ steps.setup-php.outputs.php-version }} & Symfony ${{ matrix.symfony-version }}
         run: |
