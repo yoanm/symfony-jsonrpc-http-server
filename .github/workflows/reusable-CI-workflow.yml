@@ -76,8 +76,8 @@ jobs:
             php-version: ${{ ( needs.fetch-supported-versions.outputs.php-min == '8.0' ) && '8.1' || needs.fetch-supported-versions.outputs.php-min }}
             symfony-version: '6.4'
           - job-name: Late PHP migration # => Highest symfony version with lowest php version allowed by composer config
-            # Fix - Sf 7.0 require php 8.1 minimum, most of deps require 8.2 !
-            php-version: ${{ ( needs.fetch-supported-versions.outputs.symfony-max == '7.0' && needs.fetch-supported-versions.outputs.php-min == '8.0' ) && '8.2' || needs.fetch-supported-versions.outputs.php-min }}
+            # Fix - Sf 7.3 require php 8.2 !
+            php-version: ${{ ( needs.fetch-supported-versions.outputs.symfony-max == '7.3' && needs.fetch-supported-versions.outputs.php-min == '8.0' ) && '8.2' || needs.fetch-supported-versions.outputs.php-min }}
             symfony-version: '${{ needs.fetch-supported-versions.outputs.symfony-max }}'
           - job-name: Late Symfony migration # => Lowest symfony version with highest php version allowed by composer config
             php-version: '${{ needs.fetch-supported-versions.outputs.php-max }}'
@@ -260,8 +260,8 @@ jobs:
             # Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
             pkg-extra-constraints: behat/gherkin:~4.12.0
           - job-name: Symfony with lowest supported PHP version
-            # Fix - Sf 7.1 require php 8.2 minimum !
-            php-version: ${{ ( needs.fetch-supported-versions.outputs.symfony-next == '7.1' && needs.fetch-supported-versions.outputs.php-min == '8.0' ) && '8.2' || needs.fetch-supported-versions.outputs.php-min }}
+            # Fix - Sf 7.4 require php 8.2 minimum !
+            php-version: ${{ ( needs.fetch-supported-versions.outputs.symfony-next == '7.4' && needs.fetch-supported-versions.outputs.php-min == '8.0' ) && '8.2' || needs.fetch-supported-versions.outputs.php-min }}
             symfony-version: ${{ needs.fetch-supported-versions.outputs.symfony-next }}
             # Fix - behat/gherkin => Avoid issue with behat <-> gherkin packages (See https://github.com/Behat/Gherkin/issues/317)
             pkg-extra-constraints: behat/gherkin:~4.12.0
