@@ -11,7 +11,7 @@
 
 [![CI](https://github.com/yoanm/symfony-jsonrpc-http-server/actions/workflows/CI.yml/badge.svg?branch=master)](https://github.com/yoanm/symfony-jsonrpc-http-server/actions/workflows/CI.yml)
 [![codecov](https://codecov.io/gh/yoanm/symfony-jsonrpc-http-server/branch/master/graph/badge.svg?token=NHdwEBUFK5)](https://codecov.io/gh/yoanm/symfony-jsonrpc-http-server)
-[![Symfony Versions](https://img.shields.io/badge/Symfony-v4.4%20%2F%20v5.4%2F%20v6.x-8892BF.svg?logo=github)](https://symfony.com/)
+[![Symfony Versions](https://img.shields.io/badge/Symfony-v5.4%20%2F%20v6.4%20%2F%20v7.x-8892BF.svg?logo=github)](https://symfony.com/)
 
 [![Latest Stable Version](https://img.shields.io/packagist/v/yoanm/symfony-jsonrpc-http-server.svg)](https://packagist.org/packages/yoanm/symfony-jsonrpc-http-server)
 [![Packagist PHP version](https://img.shields.io/packagist/php-v/yoanm/symfony-jsonrpc-http-server.svg)](https://packagist.org/packages/yoanm/symfony-jsonrpc-http-server)
@@ -37,6 +37,8 @@ See [yoanm/symfony-jsonrpc-http-server-doc](https://github.com/yoanm/symfony-jso
 * Symfony v4.4/5.4 - PHP ^8.0 : `^3.2`
 
 * Symfony v4.4/5.4/6.x - PHP ^8.0 : `^3.3`
+
+* Symfony v5.4/6.4/7.x - PHP ^8.0 : `^4.0`
 
 ## How to use
 
