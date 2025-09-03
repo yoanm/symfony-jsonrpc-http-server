@@ -7,11 +7,23 @@ on: # Build any PRs and main branch changes
       - opened
       - synchronize
     paths-ignore:
+      # >>> CI Pre-check
       # In case of updates to those workflows, they must be pre-checked by `pre-check-CI-updates.yml` rather than this workflow !
       # Any updates on those workflows are expected to be restricted to those workflows only ! (no update on code for instance)
       - '.github/workflows/pre-check-CI-updates.yml'
       - '.github/workflows/reusable-CI-workflow.yml'
       - '.github/workflows/reusable-coverage-upload-workflow.yml'
+      # <<< CI Pre-check
+      # >>> Irrelevant files (no impact whatsoever on this GHWorkflow)
+      - '.github/workflows/coverage-upload.yml' # Executed for on master (workflow_run), no impact here
+      - '.github/workflows/dependabot-PRs.yml' # Executed for dependabot PRs, no impact here
+      - '**/*.md'
+      - '**/LICENSE'
+      - '**/CODEOWNERS'
+      - '**/.remarkrc*'
+      - '**/.editorconfig'
+      - '**/.scrutinizer.yml'
+      # <<< Irrelevant files
   push:
     branches: [ master ]
   schedule:
