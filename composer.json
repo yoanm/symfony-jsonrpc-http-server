@@ -2,7 +2,7 @@
   "name": "yoanm/symfony-jsonrpc-http-server",
   "description": "Symfony Bundle to convert an HTTP json-rpc request into HTTP json-rpc response",
   "license": "MIT",
-  "type": "library",
+  "type": "symfony-bundle",
   "support": {
     "issues": "https://github.com/yoanm/symfony-jsonrpc-http-server/issues"
   },
