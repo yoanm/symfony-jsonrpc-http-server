@@ -167,7 +167,7 @@ jobs:
 
       - name: Upload coverage reports
         if: ${{ env.COVERAGE_TYPE == 'xdebug' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: coverage-groups-php${{ steps.setup-php.outputs.php-version }}-sf${{ matrix.symfony-version }}
           path: build/coverage-groups
