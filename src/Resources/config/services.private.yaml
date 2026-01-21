@@ -11,3 +11,12 @@ services:
   # Alias method resolver (used in sdk.services.app.yml)
   json_rpc_http_server.alias.method_resolver: '@json_rpc_http_server.method_resolver'
 
+  json_rpc_http_server.request_listener:
+      class: Yoanm\SymfonyJsonRpcHttpServer\EventListener\RequestListener
+      arguments:
+        - '@json_rpc_server_sdk.infra.endpoint'
+        - '%json_rpc_http_server.http_endpoint_path%'
+      tags:
+        - { name: kernel.event_listener, event: kernel.request, method: 'onKernelRequest', priority: 9999 }
+
+

@@ -11,7 +11,7 @@ use Yoanm\SymfonyJsonRpcHttpServer\DependencyInjection\JsonRpcHttpServerExtensio
 
 abstract class AbstractTestClass extends AbstractExtensionTestCase
 {
-    const EXPECTED_ENDPOINT_SERVICE_ID = 'json_rpc_http_server.endpoint';
+    const EXPECTED_DISPATCHER_SERVICE_ID = 'json_rpc_http_server.dispatcher.server';
     const EXPECTED_HTTP_ENDPOINT_PATH_CONTAINER_PARAM = 'json_rpc_http_server.http_endpoint_path';
     const EXPECTED_PARAMS_VALIDATOR_ALIAS = 'json_rpc_http_server.alias.params_validator';
     const EXPECTED_REQUEST_HANDLER_SERVICE_ID = 'json_rpc_server_sdk.app.handler.jsonrpc_request';
@@ -47,11 +47,11 @@ abstract class AbstractTestClass extends AbstractExtensionTestCase
     }
 
 
-    protected function assertEndpointIsUsable()
+    protected function assertDispatcherInstalled()
     {
         // Retrieving this service will imply to load all related dependencies
         // Any binding issues will be raised
-        $this->assertNotNull($this->container->get(self::EXPECTED_ENDPOINT_SERVICE_ID));
+        $this->assertNotNull($this->container->get(self::EXPECTED_DISPATCHER_SERVICE_ID));
     }
 
     /**
